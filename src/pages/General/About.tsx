@@ -1,5 +1,4 @@
 import React from 'react';
-import BgPicture from '../../assets/hero-about.jpg';
 import picAbout1 from '../../assets/pic-about-1.png'
 import picAbout2 from '../../assets/pic-about-2.png';
 import { Card, Carousel } from 'antd';
