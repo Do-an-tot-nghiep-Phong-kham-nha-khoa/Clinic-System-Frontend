@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import logo from '../../assets/logo.svg';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { Button, message } from 'antd';
+import LoginModal from './LoginModal';
+import { FaUserLarge } from 'react-icons/fa6';
 
 const Navbar = () => {
     const [isTop, setIsTop] = useState(true);
     const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const [loginVisible, setLoginVisible] = useState(false);
+    const [registerVisible, setRegisterVisible] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -15,6 +22,16 @@ const Navbar = () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            message.success('Đăng xuất thành công!', 2);
+            navigate('/');
+        } catch (err) {
+            console.error('Logout failed:', err);
+        }
+    };
 
     return (
         <>
@@ -40,10 +57,39 @@ const Navbar = () => {
                             <a href="/about" className='text-base font-semibold'>ABOUT</a>
                             <a href="/contact" className='text-base font-semibold'>CONTACT</a>
                         </>
+
+                        <div className='flex items-center gap-3'>
+                            {user ? (
+                                <>
+                                    <FaUserLarge /> {user.email || 'User'}
+                                    <Button
+                                        onClick={handleLogout}
+                                        variant="solid" color="blue"
+                                        className='!text-base !font-bold'
+                                    >
+                                        Logout
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button onClick={() => setLoginVisible(true)}
+                                        variant="solid" color="blue"
+                                        className='!text-base !font-bold'>
+                                        Login
+                                    </Button>
+                                    <Button
+                                        color="blue" variant="outlined" ghost
+                                        className='!text-base !font-bold'>
+                                        Register
+                                    </Button>
+                                </>
+                            )}
+                        </div>
                     </nav>
                 </div>
             </header>
 
+            <LoginModal visible={loginVisible} onClose={() => setLoginVisible(false)} />
         </>
     );
 }
