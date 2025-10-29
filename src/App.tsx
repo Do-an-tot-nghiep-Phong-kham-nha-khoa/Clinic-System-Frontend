@@ -8,6 +8,7 @@ import UserLayout from './layouts/UserLayout'
 import Home from './pages/General/Home'
 import About from './pages/General/About'
 import Contact from './pages/General/Contact'
+import Chat from './components/chat'
 import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/Admin/AdminDashboard'
 import MedicineManagement from './pages/Admin/MedicineManagement'
@@ -22,6 +23,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path='about' element={<About />} />
           <Route path='contact' element={<Contact />} />
+          <Route path='chat' element={<Chat />} />
         </ Route>
 
         <Route path='admin' element={<AdminLayout />}>
