@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import './App.css'
 // Contexts
@@ -13,6 +12,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard'
 import MedicineManagement from './pages/Admin/MedicineManagement'
 import ServiceManagement from './pages/Admin/ServiceManagement'
 import Chat from './components/chat'
+import Doctor from './pages/Doctor/Doctor';
 function App() {
 
   return (
@@ -23,6 +23,7 @@ function App() {
           <Route path='about' element={<About />} />
           <Route path='contact' element={<Contact />} />
           <Route path='chat' element={<Chat />} />
+          <Route path='doctor' element={<Doctor />} />
         </Route>
 
         <Route path='admin' element={<AdminLayout />}>
