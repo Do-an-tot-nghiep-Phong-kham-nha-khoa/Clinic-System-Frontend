@@ -13,6 +13,7 @@ import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/Admin/AdminDashboard'
 import MedicineManagement from './pages/Admin/MedicineManagement'
 import ServiceManagement from './pages/Admin/ServiceManagement'
+import RegisterPage from './pages/Auth/Register'
 import AccountManagement from './pages/Admin/AccountManagement'
 import InvoiceManagement from './pages/Admin/InvoiceManagement'
 import RoleManagement from './pages/Admin/RoleManagement'
@@ -49,6 +50,7 @@ function App() {
           <Route path='about' element={<About />} />
           <Route path='contact' element={<Contact />} />
           <Route path='chat' element={<Chat />} />
+          <Route path="/register" element={<RegisterPage />} />
         </ Route>
 
         <Route path='admin' element={<AdminLayout />}>
