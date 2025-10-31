@@ -3,11 +3,12 @@ import { Routes, Route } from 'react-router-dom'
 import './App.css'
 // Contexts
 import { AuthProvider } from './contexts/AuthContext'
-// General Layouts
+// General Layouts & Pages
 import UserLayout from './layouts/UserLayout'
 import Home from './pages/General/Home'
 import About from './pages/General/About'
 import Contact from './pages/General/Contact'
+// Admin Pages & Layouts
 import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/Admin/AdminDashboard'
 import MedicineManagement from './pages/Admin/MedicineManagement'
