@@ -3,6 +3,7 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
 } from "@ant-design/icons";
+import { BsPersonVcard } from "react-icons/bs";
 import { Button, Layout, Menu, Avatar } from "antd";
 import {
     MdDashboard,
@@ -11,7 +12,7 @@ import {
 } from "react-icons/md";
 import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
-import { FaClipboardList } from "react-icons/fa";
+import { FaClipboardList, FaFileInvoiceDollar } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import { GiMedicines } from "react-icons/gi";
 
@@ -39,7 +40,13 @@ const AdminLayout = () => {
             onClick: () => navigate("/admin/users"),
         },
         {
-            key: "categories",
+            key: "roles",
+            icon: <BsPersonVcard size={20} />,
+            label: "Quản lý phân quyền",
+            onClick: () => navigate("/admin/roles"),
+        },
+        {
+            key: "appointments",
             icon: <FaListCheck size={20} />,
             label: "Quản lý lịch hẹn",
             onClick: () => navigate("/admin/appointments"),
@@ -56,14 +63,22 @@ const AdminLayout = () => {
             label: "Quản lý dịch vụ",
             onClick: () => navigate("/admin/services"),
         },
+        {
+            key: "invoices",
+            icon: <FaFileInvoiceDollar size={20} />,
+            label: "Quản lý hoá đơn",
+            onClick: () => navigate("/admin/invoices"),
+        },
     ];
 
     const pathname = location.pathname || "";
     let selectedKey = "dashboard";
     if (pathname.startsWith("/admin/medicines")) selectedKey = "medicines";
     else if (pathname.startsWith("/admin/users")) selectedKey = "users";
-    else if (pathname.startsWith("/admin/appointments")) selectedKey = "categories";
+    else if (pathname.startsWith("/admin/appointments")) selectedKey = "appointments";
     else if (pathname.startsWith("/admin/services")) selectedKey = "services";
+    else if (pathname.startsWith("/admin/invoices")) selectedKey = "invoices";
+    else if (pathname.startsWith("/admin/roles")) selectedKey = "roles";
     else if (pathname === "/admin" || pathname === "/admin/") selectedKey = "dashboard";
 
     return (

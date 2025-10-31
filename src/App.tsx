@@ -13,6 +13,27 @@ import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/Admin/AdminDashboard'
 import MedicineManagement from './pages/Admin/MedicineManagement'
 import ServiceManagement from './pages/Admin/ServiceManagement'
+import AccountManagement from './pages/Admin/AccountManagement'
+import InvoiceManagement from './pages/Admin/InvoiceManagement'
+import RoleManagement from './pages/Admin/RoleManagement'
+import AppointmentManagement from './pages/Admin/AppointmentManagement'
+// Doctor Pages & Layouts
+import DoctorLayout from './layouts/DoctorLayout'
+import DoctorAppointment from './pages/Doctor/DoctorAppointment'
+import DoctorMedicalRecord from './pages/Doctor/DoctorMedicalRecord'
+import DoctorTreatment from './pages/Doctor/DoctorTreatment'
+// Patient Pages & Layouts
+import PatientLayout from './layouts/PatientLayout'
+import PatientProfile from './pages/Patient/PatientProfile'
+import PatientAppointment from './pages/Patient/PatientAppointment'
+import PatientMedicalRecord from './pages/Patient/PatientMedicalRecord'
+import PatientChatbot from './pages/Patient/PatientChatbot'
+import ReceptionistLayout from './layouts/ReceptionistLayout'
+import ReceptionistProfile from './pages/Receptionist/ReceptionistProfile'
+import ReceptionistAppointment from './pages/Receptionist/ReceptionistAppointment'
+import ReceptionistTreatment from './pages/Receptionist/ReceptionistTreatment'
+import ReceptionistInvoice from './pages/Receptionist/ReceptionistInvoice'
+import DoctorProfile from './pages/Doctor/DoctorProfile'
 
 function App() {
 
@@ -29,6 +50,31 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path='medicines' element={<MedicineManagement />} />
           <Route path='services' element={<ServiceManagement />} />
+          <Route path='roles' element={<RoleManagement />} />
+          <Route path='invoices' element={<InvoiceManagement />} />
+          <Route path='users' element={<AccountManagement />} />
+          <Route path='appointments' element={<AppointmentManagement />} />
+        </Route>
+
+        <Route path='doctor' element={<DoctorLayout />}>
+          <Route index element={<DoctorProfile />} />
+          <Route path='medical-records' element={<DoctorMedicalRecord />} />
+          <Route path='treatments' element={<DoctorTreatment />} />
+          <Route path='appointments' element={<DoctorAppointment />} />
+        </Route>
+
+        <Route path='patient' element={<PatientLayout />}>
+          <Route index element={<PatientProfile />} />
+          <Route path='appointments' element={<PatientAppointment />} />
+          <Route path='medical-records' element={<PatientMedicalRecord />} />
+          <Route path='chatbot' element={<PatientChatbot />} />
+        </Route>
+
+        <Route path='receptionist' element={<ReceptionistLayout />}>
+          <Route index element={<ReceptionistProfile />} />
+          <Route path='appointments' element={<ReceptionistAppointment />} />
+          <Route path='treatments' element={<ReceptionistTreatment />} />
+          <Route path='invoices' element={<ReceptionistInvoice />} />
         </Route>
       </Routes>
     </AuthProvider>
