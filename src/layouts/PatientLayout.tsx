@@ -28,7 +28,7 @@ const PatientLayout = () => {
             key: "profile",
             icon: <CgProfile size={20} />,
             label: "Thông tin cá nhân",
-            onClick: () => navigate("patient"),
+            onClick: () => navigate("/patient"),
         },
         {
             key: "appointments",
