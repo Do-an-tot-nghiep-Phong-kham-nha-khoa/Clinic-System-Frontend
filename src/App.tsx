@@ -28,6 +28,8 @@ import PatientProfile from './pages/Patient/PatientProfile'
 import PatientAppointment from './pages/Patient/PatientAppointment'
 import PatientMedicalRecord from './pages/Patient/PatientMedicalRecord'
 import PatientChatbot from './pages/Patient/PatientChatbot'
+import Chat from './components/chat'
+// Receptionist Pages & Layouts
 import ReceptionistLayout from './layouts/ReceptionistLayout'
 import ReceptionistProfile from './pages/Receptionist/ReceptionistProfile'
 import ReceptionistAppointment from './pages/Receptionist/ReceptionistAppointment'
@@ -44,6 +46,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path='about' element={<About />} />
           <Route path='contact' element={<Contact />} />
+          <Route path='chat' element={<Chat />} />
         </ Route>
 
         <Route path='admin' element={<AdminLayout />}>
