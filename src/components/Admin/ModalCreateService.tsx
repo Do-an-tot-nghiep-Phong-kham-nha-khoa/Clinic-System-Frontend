@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input, InputNumber, DatePicker, message } from 'antd';
-import type { Dayjs } from 'dayjs';
+import { Modal, Form, Input, InputNumber, message } from 'antd';
 import { createService, type CreateServiceDto, type Service } from '../../services/ServiceService';
 
 interface ModalCreateServiceProps {

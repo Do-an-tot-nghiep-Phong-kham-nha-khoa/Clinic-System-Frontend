@@ -28,7 +28,7 @@ const ReceptionistLayout = () => {
             key: "profile",
             icon: <CgProfile size={20} />,
             label: "Thông tin cá nhân",
-            onClick: () => navigate("receptionist"),
+            onClick: () => navigate("/receptionist"),
         },
         {
             key: "appointments",
@@ -55,7 +55,7 @@ const ReceptionistLayout = () => {
     if (pathname.startsWith("/receptionist/treatments")) selectedKey = "treatments";
     else if (pathname.startsWith("/receptionist/invoices")) selectedKey = "invoices";
     else if (pathname.startsWith("/receptionist/appointments")) selectedKey = "appointments";
-    else if (pathname === "/patient" || pathname === "/patient/") selectedKey = "profile";
+    else if (pathname === "/receptionist" || pathname === "/receptionist/") selectedKey = "profile";
 
     return (
         <Layout className="h-screen">
