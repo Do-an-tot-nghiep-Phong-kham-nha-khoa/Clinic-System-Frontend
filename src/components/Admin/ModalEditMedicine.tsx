@@ -77,7 +77,7 @@ const ModalEditMedicine: React.FC<ModalEditMedicineProps> = ({ open, id, onClose
             confirmLoading={saving}
             okText="Lưu"
             cancelText="Hủy"
-            destroyOnClose
+            destroyOnHidden={true}
             maskClosable={!loading}
         >
             <Form form={form} layout="vertical" preserve={false} disabled={loading}>
