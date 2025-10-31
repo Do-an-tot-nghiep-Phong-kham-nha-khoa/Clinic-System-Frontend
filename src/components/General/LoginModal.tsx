@@ -39,6 +39,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
             width={900}
             centered
             styles={{ body: { padding: 0 } }}
+            destroyOnHidden={true}
         >
             {/* Sử dụng grid với 2 cột bằng nhau: grid-cols-2 */}
             <div className="grid grid-cols-1 md:grid-cols-2 h-full min-h-[450px]">

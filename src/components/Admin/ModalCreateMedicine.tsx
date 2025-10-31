@@ -48,7 +48,7 @@ const ModalCreateMedicine: React.FC<ModalCreateMedicineProps> = ({ open, onClose
             confirmLoading={loading}
             okText="Tạo"
             cancelText="Hủy"
-            destroyOnClose
+            destroyOnHidden={true}
         >
             <Form form={form} layout="vertical" preserve={false}>
                 <Form.Item name="name" label="Tên thuốc" rules={[{ required: true, message: 'Vui lòng nhập tên thuốc' }]}>

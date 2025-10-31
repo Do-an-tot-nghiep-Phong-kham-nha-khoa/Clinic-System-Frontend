@@ -3,23 +3,20 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
 } from "@ant-design/icons";
-import { BsPersonVcard } from "react-icons/bs";
+import { CgProfile } from "react-icons/cg";
 import { Button, Layout, Menu, Avatar } from "antd";
 import {
-    MdDashboard,
-    MdPeople,
     MdLogout,
 } from "react-icons/md";
 import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
-import { FaClipboardList, FaFileInvoiceDollar } from "react-icons/fa";
+import { FaFileMedical, FaMoneyBill } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
-import { GiMedicines } from "react-icons/gi";
 
 const { Header, Sider, Content } = Layout;
 
 
-const AdminLayout = () => {
+const ReceptionistLayout = () => {
     const [collapsed, setCollapsed] = useState(false);
     const navigate = useNavigate();
     const { user, logout } = useAuth();
@@ -28,58 +25,37 @@ const AdminLayout = () => {
 
     const menuItems = [
         {
-            key: "dashboard",
-            icon: <MdDashboard size={20} />,
-            label: "Thống kê",
-            onClick: () => navigate("/admin/"),
-        },
-        {
-            key: "users",
-            icon: <MdPeople size={20} />,
-            label: "Quản lý tài khoản",
-            onClick: () => navigate("/admin/users"),
-        },
-        {
-            key: "roles",
-            icon: <BsPersonVcard size={20} />,
-            label: "Quản lý phân quyền",
-            onClick: () => navigate("/admin/roles"),
+            key: "profile",
+            icon: <CgProfile size={20} />,
+            label: "Thông tin cá nhân",
+            onClick: () => navigate("receptionist"),
         },
         {
             key: "appointments",
             icon: <FaListCheck size={20} />,
             label: "Quản lý lịch hẹn",
-            onClick: () => navigate("/admin/appointments"),
+            onClick: () => navigate("/receptionist/appointments"),
         },
         {
-            key: "medicines",
-            icon: <GiMedicines size={20} />,
-            label: "Quản lý kho thuốc",
-            onClick: () => navigate("/admin/medicines"),
-        },
-        {
-            key: "services",
-            icon: <FaClipboardList size={20} />,
-            label: "Quản lý dịch vụ",
-            onClick: () => navigate("/admin/services"),
+            key: "treatments",
+            icon: <FaFileMedical size={20} />,
+            label: "Quản lý ca khám",
+            onClick: () => navigate("/receptionist/treatments"),
         },
         {
             key: "invoices",
-            icon: <FaFileInvoiceDollar size={20} />,
+            icon: <FaMoneyBill size={20} />,
             label: "Quản lý hoá đơn",
-            onClick: () => navigate("/admin/invoices"),
+            onClick: () => navigate("/receptionist/invoices"),
         },
     ];
 
     const pathname = location.pathname || "";
-    let selectedKey = "dashboard";
-    if (pathname.startsWith("/admin/medicines")) selectedKey = "medicines";
-    else if (pathname.startsWith("/admin/users")) selectedKey = "users";
-    else if (pathname.startsWith("/admin/appointments")) selectedKey = "appointments";
-    else if (pathname.startsWith("/admin/services")) selectedKey = "services";
-    else if (pathname.startsWith("/admin/invoices")) selectedKey = "invoices";
-    else if (pathname.startsWith("/admin/roles")) selectedKey = "roles";
-    else if (pathname === "/admin" || pathname === "/admin/") selectedKey = "dashboard";
+    let selectedKey = "profile";
+    if (pathname.startsWith("/receptionist/treatments")) selectedKey = "treatments";
+    else if (pathname.startsWith("/receptionist/invoices")) selectedKey = "invoices";
+    else if (pathname.startsWith("/receptionist/appointments")) selectedKey = "appointments";
+    else if (pathname === "/patient" || pathname === "/patient/") selectedKey = "profile";
 
     return (
         <Layout className="h-screen">
@@ -93,7 +69,7 @@ const AdminLayout = () => {
                 <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-slate-800 text-white">
                     <div className="px-4 py-6">
                         <div className="text-white text-xl font-bold text-center pb-4 align-middle justify-center flex items-center">
-                            <Link to="/" className="!text-white">{!collapsed ? "Admin Panel" : "Admin"}</Link>
+                            <Link to="/" className="!text-white">{!collapsed ? "Receptionist Panel" : "Receptionist"}</Link>
                         </div>
 
                         <div className="!flex-1 !overflow-auto">
@@ -157,4 +133,4 @@ const AdminLayout = () => {
     );
 }
 
-export default AdminLayout;
+export default ReceptionistLayout;
