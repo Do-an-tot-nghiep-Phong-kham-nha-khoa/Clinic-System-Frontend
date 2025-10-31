@@ -78,8 +78,12 @@ const Navbar = () => {
                                         Login
                                     </Button>
                                     <Button
-                                        color="blue" variant="outlined" ghost
-                                        className='!text-base !font-bold'>
+                                        color="blue"
+                                        variant="outlined"
+                                        ghost
+                                        className='!text-base !font-bold'
+                                        onClick={() => navigate('/register')}
+                                    >
                                         Register
                                     </Button>
                                 </>

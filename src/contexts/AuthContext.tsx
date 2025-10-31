@@ -22,10 +22,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 
+    const setCookie = (name: string, value: string, maxAgeSeconds = 24 * 60 * 60) => {
+    // add Secure in production and adjust SameSite as needed
+    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+  };
+
+  const getCookie = (name: string) => {
+    const matches = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'));
+    return matches ? decodeURIComponent(matches[1]) : null;
+  };
+
+  const deleteCookie = (name: string) => {
+    document.cookie = `${encodeURIComponent(name)}=; Path=/; Max-Age=0; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+  };
+
     const login = useCallback(async (email: string, password: string) => {
         try {
             setIsLoading(true);
-            const response = await axios.post(`${BASE_URL}/patients/login`, {
+            const response = await axios.post(`${BASE_URL}/accounts/login`, {
                 email,
                 password,
             });
@@ -38,8 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     status,
                 };
                 setUser(userData);
-                // Lưu token vào localStorage nếu cần
-                localStorage.setItem('token', tokenUser);
+                setCookie('token', tokenUser);
             } else {
                 throw new Error('Đăng nhập thất bại');
             }
@@ -56,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setIsLoading(true);
             const token = user?.token || localStorage.getItem('token');
             if (token) {
-                await axios.get(`${BASE_URL}/patients/logout`, {
+                await axios.get(`${BASE_URL}/accounts/logout`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
