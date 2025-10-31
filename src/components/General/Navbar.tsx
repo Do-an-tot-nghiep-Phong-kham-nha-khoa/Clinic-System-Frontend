@@ -78,8 +78,17 @@ const Navbar = () => {
                                         Login
                                     </Button>
                                     <Button
+<<<<<<< HEAD
                                         color="blue" variant="outlined" ghost
                                         className='!text-base !font-bold'>
+=======
+                                        color="blue"
+                                        variant="outlined"
+                                        ghost
+                                        className='!text-base !font-bold'
+                                        onClick={() => navigate('/register')}
+                                    >
+>>>>>>> b8da650d43d362025ecbb97d76f351b703011414
                                         Register
                                     </Button>
                                 </>
