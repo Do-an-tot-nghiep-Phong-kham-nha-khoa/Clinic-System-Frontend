@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-const ServiceManagement = () => {
-    return (
-        <div>
-            <h1>Service Management</h1>
-=======
 import { Button, Input, message, Table, Modal } from "antd";
 import { useEffect, useState } from "react";
 import { FaSearch, FaTrash } from "react-icons/fa";
@@ -200,7 +194,6 @@ const ServiceManagement = () => {
                 onUpdated={() => fetchServices()}
             />
 
->>>>>>> b8da650d43d362025ecbb97d76f351b703011414
         </div>
     )
 }
