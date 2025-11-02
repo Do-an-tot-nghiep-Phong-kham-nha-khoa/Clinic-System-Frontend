@@ -17,8 +17,6 @@ const ModalCreateAccount: React.FC<ModalCreateAccountProps> = ({ open, onClose, 
             const values = await form.validateFields();
             setLoading(true);
             const payload: CreateAccountDto = {
-                username: values.username,
-                fullName: values.fullName,
                 email: values.email,
                 created_at: new Date().toISOString(),
                 password: values.password,
@@ -51,9 +49,6 @@ const ModalCreateAccount: React.FC<ModalCreateAccountProps> = ({ open, onClose, 
                 <Form.Item name="username" label="Tên đăng nhập"
                     rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập' }]}>
                     <Input placeholder="Nhập tên đăng nhập" />
-                </Form.Item>
-                <Form.Item name="fullName" label="Họ tên" rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}>
-                    <Input placeholder="Nhập họ tên" />
                 </Form.Item>
                 <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ' }]}>
                     <Input placeholder="Nhập email" />

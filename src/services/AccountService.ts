@@ -2,15 +2,11 @@ import axios from 'axios';
 
 export type Account = {
     _id?: string;
-    // primary identifier fields from backend
     email: string;
-    password?: string; // usually present only on create responses are omitted
-    // roles stored as array of ObjectId strings in your JSON
+    password?: string; 
     roleId?: string[];
-    // record status / soft-delete
     status?: string;
     deleted?: boolean;
-    // timestamps from backend (ISO strings)
     createdAt?: string;
     updatedAt?: string;
     __v?: number;
@@ -91,8 +87,9 @@ export async function resetPassword(payload: { email: string; otp: string; newPa
 
 // CRUD helpers
 export async function createAccount(dto: CreateAccountDto): Promise<Account> {
-    // use the auth register endpoint for creation
-    return registerAccount(dto);
+    const url = `${API}/register`;
+    const res = await axios.post(url, dto);
+    return res?.data?.data ?? res?.data;
 }
 
 export async function updateAccount(id: string, dto: UpdateAccountDto): Promise<Account> {

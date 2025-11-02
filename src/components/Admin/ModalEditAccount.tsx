@@ -40,7 +40,6 @@ const ModalEditAccount: React.FC<ModalEditAccountProps> = ({ open, id, onClose, 
             setSaving(true);
             const payload = {
                 username: values.username,
-                fullName: values.fullName,
                 email: values.email,
             };
             const updated = await updateAccount(id, payload);
@@ -71,10 +70,6 @@ const ModalEditAccount: React.FC<ModalEditAccountProps> = ({ open, id, onClose, 
                 <Form.Item name="username" label="Tên đăng nhập"
                     rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập' }]}>
                     <Input placeholder="Tên đăng nhập" />
-                </Form.Item>
-                <Form.Item name="fullName" label="Họ tên"
-                    rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}>
-                    <Input placeholder="Họ tên" />
                 </Form.Item>
                 <Form.Item name="email" label="Email"
                     rules={[{ required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ' }]}>
