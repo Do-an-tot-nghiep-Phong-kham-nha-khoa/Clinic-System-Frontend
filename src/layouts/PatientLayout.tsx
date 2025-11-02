@@ -31,10 +31,16 @@ const PatientLayout = () => {
             onClick: () => navigate("/patient"),
         },
         {
-            key: "appointments",
+            key: "appointments-specialty",
             icon: <FaListCheck size={20} />,
-            label: "Đặt lịch hẹn",
-            onClick: () => navigate("/patient/appointments"),
+            label: "Đặt lịch hẹn theo chuyên khoa",
+            onClick: () => navigate("/patient/appointments-specialty"),
+        },
+        {
+            key: "appointments-doctor",
+            icon: <FaListCheck size={20} />,
+            label: "Đặt lịch hẹn theo bác sĩ",
+            onClick: () => navigate("/patient/appointments-doctor"),
         },
         {
             key: "medical-records",
@@ -54,7 +60,8 @@ const PatientLayout = () => {
     let selectedKey = "profile";
     if (pathname.startsWith("/patient/medical-records")) selectedKey = "medical-records";
     else if (pathname.startsWith("/patient/chatbot")) selectedKey = "chatbot";
-    else if (pathname.startsWith("/patient/appointments")) selectedKey = "appointments";
+    else if (pathname.startsWith("/patient/appointments-doctor")) selectedKey = "appointments-doctor";
+    else if (pathname.startsWith("/patient/appointments-specialty")) selectedKey = "appointments-specialty";
     else if (pathname === "/patient" || pathname === "/patient/") selectedKey = "profile";
 
     return (

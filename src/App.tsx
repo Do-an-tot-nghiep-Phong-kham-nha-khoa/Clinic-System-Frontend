@@ -26,8 +26,9 @@ import DoctorTreatment from './pages/Doctor/DoctorTreatment'
 // Patient Pages & Layouts
 import PatientLayout from './layouts/PatientLayout'
 import PatientProfile from './pages/Patient/PatientProfile'
-import PatientAppointment from './pages/Patient/PatientAppointment'
 import PatientMedicalRecord from './pages/Patient/PatientMedicalRecord'
+import PatientAppointmentDoctor from './pages/Patient/PatientAppointmentDoctor'
+import PatientAppointmentSpecialty from './pages/Patient/PatientAppointmentSpecialty'
 import PatientChatbot from './pages/Patient/PatientChatbot'
 import Chat from './components/chat'
 // Receptionist Pages & Layouts
@@ -37,6 +38,7 @@ import ReceptionistAppointment from './pages/Receptionist/ReceptionistAppointmen
 import ReceptionistTreatment from './pages/Receptionist/ReceptionistTreatment'
 import ReceptionistInvoice from './pages/Receptionist/ReceptionistInvoice'
 import DoctorProfile from './pages/Doctor/DoctorProfile'
+
 
 function App() {
 
@@ -70,7 +72,8 @@ function App() {
 
         <Route path='patient' element={<PatientLayout />}>
           <Route index element={<PatientProfile />} />
-          <Route path='appointments' element={<PatientAppointment />} />
+          <Route path='appointments-doctor' element={<PatientAppointmentDoctor />} />
+          <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
           <Route path='medical-records' element={<PatientMedicalRecord />} />
           <Route path='chatbot' element={<PatientChatbot />} />
         </Route>
