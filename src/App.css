@@ -12,3 +12,35 @@ body {
     color: #333;
     font-size: 16px;
 }
+
+/* Tùy chỉnh grid cho Ant Design Calendar */
+.custom-calendar-grid .ant-picker-panel {
+    border-radius: 8px;
+}
+
+/* Ẩn viền mặc định của header */
+.custom-calendar-grid .ant-picker-body {
+    border-top: none;
+}
+
+/* Tạo đường viền cho các ô header (Thứ) */
+.custom-calendar-grid .ant-picker-content th {
+    text-align: center;
+    font-weight: 600;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Tạo đường viền cho các ô ngày */
+.custom-calendar-grid .ant-picker-cell {
+    border-right: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Xóa border thừa bên phải của cột cuối cùng (Thứ Bảy) */
+.custom-calendar-grid .ant-picker-cell:nth-child(7n) {
+    border-right: none;
+}
+
+/* Xóa border thừa bên trái của cột đầu tiên (Chủ Nhật) */
+.custom-calendar-grid .ant-picker-cell:nth-child(7n + 1) {}

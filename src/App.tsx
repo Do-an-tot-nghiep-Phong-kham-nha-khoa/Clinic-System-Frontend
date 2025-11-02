@@ -75,7 +75,7 @@ function App() {
           <Route path='appointments-doctor' element={<PatientAppointmentDoctor />} />
           <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
           <Route path='medical-records' element={<PatientMedicalRecord />} />
-          <Route path='chatbot' element={<PatientChatbot />} />
+          <Route path='chatbot' element={<Chat />} />
         </Route>
 
         <Route path='receptionist' element={<ReceptionistLayout />}>
