@@ -16,7 +16,7 @@ interface ChooseHealthProfileProps {
     onBack: () => void;
 }
 
-const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyId, specialtyName, date, timeSlot, onNext, onBack }) => {
+const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName, date, timeSlot, onNext, onBack }) => {
     const { user } = useAuth();
     const [profiles, setProfiles] = useState<HealthProfile[]>([]);
     const [loading, setLoading] = useState(true);
@@ -30,9 +30,9 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyId, 
             const fetchProfiles = async () => {
                 setLoading(true);
                 try {
-                    // SỬ DỤNG SERVICE THỰC TẾ
+                    // Lấy hồ sơ sức khỏe theo Account ID
                     const data = await getPatientByAccountId(accountId);
-                    // Normalize response to always be an array
+                    // Chuẩn hóa dữ liệu thành mảng
                     const normalized = Array.isArray(data) ? data : data ? [data] : [];
                     setProfiles(normalized);
 
@@ -56,6 +56,7 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyId, 
         }
     }, [user?.id]);
 
+    // Xử lý khi nhấn nút Tiếp tục
     const handleNext = () => {
         if (!selectedProfile) {
             message.warning("Vui lòng chọn một hồ sơ sức khỏe để tiếp tục.");
@@ -64,6 +65,7 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyId, 
         onNext(selectedProfile);
     };
 
+    // Render thẻ hồ sơ sức khỏe
     const renderProfileCard = (profile: HealthProfile) => {
         const isSelected = selectedProfile?._id === profile._id;
         const dobFormatted = dayjs(profile.dob).format('DD/MM/YYYY');

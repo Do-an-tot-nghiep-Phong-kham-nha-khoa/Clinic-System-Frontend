@@ -8,7 +8,6 @@ const { Title, Paragraph } = Typography;
 type ChooseSpecialtyProps = {
     // Callback để component cha biết chuyên khoa nào đã được chọn
     onNext: (specialtyId: string) => void;
-    // Chuyên khoa đã chọn (nếu có)
     selectedSpecialtyId: string | null;
     disabled?: boolean;
 };

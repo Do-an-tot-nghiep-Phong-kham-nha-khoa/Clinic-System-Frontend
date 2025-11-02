@@ -40,7 +40,6 @@ interface SelectedSpecialty {
 }
 
 const PatientAppointmentSpecialty = () => {
-    // State quản lý bước hiện tại và dữ liệu đã chọn
     const [currentStep, setCurrentStep] = useState(0);
     const [selectedSpecialty, setSelectedSpecialty] = useState<SelectedSpecialty | null>(null);
     const [selectedDateTime, setSelectedDateTime] = useState<{ date: string; timeSlot: string } | null>(null);
@@ -52,13 +51,12 @@ const PatientAppointmentSpecialty = () => {
     const handleSpecialtySelected = async (specialtyId: string) => {
         setLoading(true);
         try {
-            // Gọi API để lấy tên chuyên khoa
             const specialtyData = await getSpecialtyById(specialtyId);
 
             if (specialtyData && specialtyData.name) {
                 setSelectedSpecialty({
                     id: specialtyId,
-                    name: specialtyData.name // Lấy tên từ API
+                    name: specialtyData.name
                 });
                 setCurrentStep(1);
             } else {
@@ -74,23 +72,23 @@ const PatientAppointmentSpecialty = () => {
 
     const handleTimeSlotSelected = (date: string, timeSlot: string) => {
         setSelectedDateTime({ date, timeSlot });
-        setCurrentStep(2); // Chuyển sang bước 3
+        setCurrentStep(2);
     };
 
     const handleProfileSelected = (profile: HealthProfile) => {
         setSelectedProfile(profile);
-        setCurrentStep(3); // Chuyển sang bước 4 (Xác nhận)
+        setCurrentStep(3);
     };
 
     const handleAppointmentSuccess = () => {
         setIsAppointmentSuccess(true);
-        setCurrentStep(4); // Chuyển sang bước kết quả (thứ 5)
+        setCurrentStep(4);
     };
 
     // Hàm render nội dung bước hiện tại
     const renderStepContent = () => {
         if (isAppointmentSuccess && selectedSpecialty && selectedDateTime && selectedProfile) {
-            // RENDER MÀN HÌNH THÀNH CÔNG (Bước 4)
+            // RENDER MÀN HÌNH THÀNH CÔNG 
             return (
                 <SuccessScreen
                     appointmentInfo={{
@@ -117,14 +115,12 @@ const PatientAppointmentSpecialty = () => {
                     <ChooseDateAndTime
                         specialtyId={selectedSpecialty.id}
                         onNext={handleTimeSlotSelected}
-                        onBack={() => setCurrentStep(0)} // Cho phép quay lại
+                        onBack={() => setCurrentStep(0)}
                     />
                 );
             case 2:
-                // KIỂM TRA DỮ LIỆU ĐẦU VÀO
                 if (loading || !selectedSpecialty || !selectedDateTime) return <div>Dữ liệu thiếu. Vui lòng quay lại.</div>;
 
-                // RENDER COMPONENT MỚI
                 return (
                     <ChooseHealthProfile
                         specialtyId={selectedSpecialty.id}
@@ -132,11 +128,10 @@ const PatientAppointmentSpecialty = () => {
                         timeSlot={selectedDateTime.timeSlot}
                         specialtyName={selectedSpecialty.name}
                         onNext={handleProfileSelected}
-                        onBack={() => setCurrentStep(1)} // Quay lại bước 2
+                        onBack={() => setCurrentStep(1)}
                     />
                 );
             case 3:
-                // BƯỚC XÁC NHẬN CUỐI CÙNG
                 if (loading || !selectedSpecialty || !selectedDateTime || !selectedProfile) return <div>Dữ liệu thiếu. Vui lòng quay lại.</div>;
 
                 return (
@@ -145,7 +140,7 @@ const PatientAppointmentSpecialty = () => {
                         dateTime={selectedDateTime}
                         profile={selectedProfile}
                         specialtyName={selectedSpecialty.name}
-                        onBack={() => setCurrentStep(2)} // Quay lại bước 3 (Chọn hồ sơ)
+                        onBack={() => setCurrentStep(2)}
                         onSuccess={handleAppointmentSuccess}
                     />
                 );

@@ -6,7 +6,6 @@ import { createAppointment, type AppointmentPayload } from '../../../services/Ap
 import { type Patient as HealthProfile } from '../../../services/PatientService';
 import { useAuth } from '../../../contexts/AuthContext';
 
-
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
@@ -16,7 +15,7 @@ interface ConfirmAppointmentProps {
     dateTime: { date: string; timeSlot: string };
     profile: HealthProfile;
     onBack: () => void;
-    onSuccess: () => void; // Chuyển sang màn hình thành công
+    onSuccess: () => void;
 }
 
 const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, specialtyName, dateTime, profile, onBack, onSuccess }) => {
@@ -36,8 +35,6 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
             return;
         }
 
-        // Chuyển đổi ngày tháng thành ISO string
-        // Giả sử date là 'YYYY-MM-DD' và cần chuyển thành 'YYYY-MM-DDT00:00:00.000Z'
         const appointmentDateISO = dayjs(dateTime.date).startOf('day').toISOString();
 
         const payload: AppointmentPayload = {
@@ -46,7 +43,6 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
             profileModel: 'Patient', // Mặc định
             specialty_id: specialtyId,
             appointmentDate: appointmentDateISO,
-            // Giả sử timeSlot đã có dạng '14:00 - 14:30'
             timeSlot: dateTime.timeSlot,
             reason: reason.trim() || 'Trống',
         };
@@ -73,10 +69,10 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
     };
 
     return (
-        <div className="p-4 max-w-2xl mx-auto">
+        <div className="p-4 mx-auto">
             <Title level={3} className="!mb-6 text-center">4. Xác nhận Đặt lịch Khám</Title>
 
-            <Card title="Thông tin Lịch hẹn" bordered className="mb-6 shadow-sm">
+            <Card title="Thông tin Lịch hẹn" variant='outlined' className="mb-6 ">
                 <Descriptions column={1} bordered size="small">
                     <Descriptions.Item label="Chuyên khoa" labelStyle={{ fontWeight: 'bold' }}>
                         {specialtyName}
@@ -90,7 +86,7 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
                 </Descriptions>
             </Card>
 
-            <Card title="Thông tin Hồ sơ Sức khỏe" bordered className="mb-6 shadow-sm bg-blue-50">
+            <Card title="Thông tin Hồ sơ Sức khỏe" variant='outlined' className="mb-6 bg-blue-50">
                 <Descriptions column={1} bordered size="small">
                     <Descriptions.Item label="Tên Bệnh nhân" labelStyle={{ fontWeight: 'bold' }}>
                         {profile.name}
@@ -104,7 +100,7 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
                 </Descriptions>
             </Card>
 
-            <div className="mb-6">
+            <div className="mb-6 mt-4">
                 <Title level={5} className="!mb-2">Lý do khám bệnh <Text type="danger">*</Text></Title>
                 <TextArea
                     rows={4}
