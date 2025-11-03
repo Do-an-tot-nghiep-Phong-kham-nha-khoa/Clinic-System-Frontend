@@ -97,6 +97,9 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
                     <Descriptions.Item label="SĐT" labelStyle={{ fontWeight: 'bold' }}>
                         {profile.phone}
                     </Descriptions.Item>
+                    <Descriptions.Item label="email" labelStyle={{ fontWeight: 'bold' }}>
+                        {user?.email || 'Chưa có'}
+                    </Descriptions.Item>
                 </Descriptions>
             </Card>
 

@@ -38,6 +38,8 @@ import ReceptionistAppointment from './pages/Receptionist/ReceptionistAppointmen
 import ReceptionistTreatment from './pages/Receptionist/ReceptionistTreatment'
 import ReceptionistInvoice from './pages/Receptionist/ReceptionistInvoice'
 import DoctorProfile from './pages/Doctor/DoctorProfile'
+import HealthProfile from './pages/Patient/HealthProfile'
+import LoginPage from './pages/Auth/LoginPage'
 
 
 function App() {
@@ -51,6 +53,7 @@ function App() {
           <Route path='contact' element={<Contact />} />
           <Route path='chat' element={<Chat />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </ Route>
 
         <Route path='admin' element={<AdminLayout />}>
@@ -76,6 +79,7 @@ function App() {
           <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
           <Route path='medical-records' element={<PatientMedicalRecord />} />
           <Route path='chatbot' element={<Chat />} />
+          <Route path='health-profile' element={<HealthProfile />} />
         </Route>
 
         <Route path='receptionist' element={<ReceptionistLayout />}>

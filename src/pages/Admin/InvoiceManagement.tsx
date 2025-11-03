@@ -47,22 +47,27 @@ const InvoiceManagement = () => {
     // Hàm ánh xạ status sang màu sắc hiển thị
     const getStatusTag = (status: InvoiceStatus) => {
         let color;
+        let statusText;
         switch (status) {
             case 'Paid':
                 color = 'green';
+                statusText = 'Đã thanh toán';
                 break;
             case 'Cancelled':
                 color = 'red';
+                statusText = 'Đã hủy';
                 break;
             case 'Refunded':
                 color = 'volcano';
+                statusText = 'Đã hoàn tiền';
                 break;
             case 'Pending':
             default:
                 color = 'gold';
+                statusText = 'Chờ thanh toán';
                 break;
         }
-        return <Tag color={color}>{status}</Tag>;
+        return <Tag color={color}>{statusText}</Tag>;
     };
 
     // Hàm xử lý thay đổi của Table (phân trang, sắp xếp)

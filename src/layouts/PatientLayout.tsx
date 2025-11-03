@@ -4,6 +4,7 @@ import {
     MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import { CgProfile } from "react-icons/cg";
+import { ImProfile } from "react-icons/im";
 import { Button, Layout, Menu, Avatar } from "antd";
 import {
     MdLogout,
@@ -31,9 +32,15 @@ const PatientLayout = () => {
             onClick: () => navigate("/patient"),
         },
         {
+            key: "health-profile",
+            icon: <ImProfile size={20} />,
+            label: "Hồ sơ sức khỏe",
+            onClick: () => navigate("/patient/health-profile"),
+        },
+        {
             key: "appointments-specialty",
             icon: <FaListCheck size={20} />,
-            label: "Đặt lịch hẹn theo chuyên khoa",
+            label: "Đặt lịch chuyên khoa",
             onClick: () => navigate("/patient/appointments-specialty"),
         },
         {
@@ -60,6 +67,7 @@ const PatientLayout = () => {
     let selectedKey = "profile";
     if (pathname.startsWith("/patient/medical-records")) selectedKey = "medical-records";
     else if (pathname.startsWith("/patient/chatbot")) selectedKey = "chatbot";
+    else if (pathname.startsWith("/patient/health-profile")) selectedKey = "health-profile";
     else if (pathname.startsWith("/patient/appointments-doctor")) selectedKey = "appointments-doctor";
     else if (pathname.startsWith("/patient/appointments-specialty")) selectedKey = "appointments-specialty";
     else if (pathname === "/patient" || pathname === "/patient/") selectedKey = "profile";

@@ -1,4 +1,4 @@
-import { Button, Card, Divider, Typography } from 'antd';
+import { Button, Card, Divider, Space, Typography } from 'antd';
 import React from 'react';
 import { FaCalendarCheck, FaClock, FaMedkit, FaUserTie } from 'react-icons/fa';
 import dayjs from 'dayjs';
@@ -43,7 +43,7 @@ const SuccessScreen: React.FC<AppointmentSuccessScreenProps> = ({ appointmentInf
             </Paragraph>
 
             <Divider orientation="center" className="!my-6">
-                <Text strong className="text-blue-600">THÔNG TIN CHI TIẾT LỊCH HẸN</Text>
+                <Text strong className="text-blue-600 text-lg">THÔNG TIN CHI TIẾT LỊCH HẸN</Text>
             </Divider>
 
             <Card className="text-center border-2 border-dashed border-blue-200 bg-white">

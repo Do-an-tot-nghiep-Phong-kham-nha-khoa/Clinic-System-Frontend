@@ -1,5 +1,4 @@
 import axios from 'axios';
-import dayjs from 'dayjs';
 
 const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 
