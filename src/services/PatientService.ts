@@ -27,8 +27,8 @@ export async function getPatientByAccountId(accountId: string): Promise<Patient 
 }
 
 // update patient info
-export async function updatePatient(accountId: string, data: UpdatePatientDTO): Promise<Patient> {
-    const url = `${BASE_URL}/patients/${accountId}`;
+export async function updatePatient(patientId: string, data: UpdatePatientDTO): Promise<Patient> {
+    const url = `${BASE_URL}/patients/${patientId}`;
     const res = await axios.put(url, data);
     return res.data;
 }

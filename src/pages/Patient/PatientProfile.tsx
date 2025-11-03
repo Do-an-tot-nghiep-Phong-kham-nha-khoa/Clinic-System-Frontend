@@ -1,144 +1,16 @@
-import React, { useState, useEffect, use } from 'react';
-import { Card, Spin, Skeleton, Alert, Tag, Button, Descriptions, Empty, Form, Input, Radio, DatePicker, Modal, message } from 'antd';
-import { UserOutlined, PhoneOutlined, CalendarOutlined, IdcardOutlined, EnvironmentOutlined, SaveOutlined, EditOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Card, Spin, Skeleton, Alert, Tag, Button, Descriptions, Empty } from 'antd';
+import { UserOutlined, PhoneOutlined, CalendarOutlined, IdcardOutlined, EnvironmentOutlined, EditOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import { getPatientByAccountId, type Patient, updatePatient, type UpdatePatientDTO } from "../../services/PatientService";
+import { getPatientByAccountId, type Patient } from "../../services/PatientService";
 import { useAuth } from '../../contexts/AuthContext';
 import { MdEmail } from 'react-icons/md';
+import UpdateInfoModal from '../../components/Patient/UpdateInfoModal';
 
 // Hàm tính tuổi
 const calculateAge = (dob: string): number | null => {
     if (!dob) return null;
     return moment().diff(moment(dob), 'years');
-};
-
-interface PatientEditModalProps {
-    visible: boolean;
-    patient: Patient;
-    onClose: () => void;
-    onUpdate: (updatedPatient: Patient) => void;
-    accountId: string;
-}
-
-const PatientEditModal: React.FC<PatientEditModalProps> = ({ visible, patient, onClose, onUpdate, accountId }) => {
-    type FormValues = Omit<UpdatePatientDTO, 'dob'> & { dob?: moment.Moment | null };
-    const [form] = Form.useForm<FormValues>();
-    const [loading, setLoading] = useState(false);
-
-    // Load dữ liệu bệnh nhân vào form khi modal mở
-    useEffect(() => {
-        if (visible && patient) {
-            form.setFieldsValue({
-                name: patient.name,
-                phone: patient.phone,
-                gender: (patient as any).gender || 'other', // Thêm gender giả định nếu API không trả về
-                address: (patient as any).address || '',    // Thêm address giả định
-                // Chuyển chuỗi ngày ISO sang đối tượng moment cho DatePicker
-                dob: patient.dob ? moment(patient.dob) : undefined,
-            });
-        }
-    }, [visible, patient, form]);
-
-    const handleFormSubmit = async (values: FormValues) => {
-        setLoading(true);
-        try {
-            // Chuẩn bị DTO: chuyển đổi moment object về chuỗi ngày ISO
-            const { dob, ...rest } = values;
-            const dataToUpdate: UpdatePatientDTO = {
-                ...rest,
-                dob: dob ? dob.toISOString() : undefined,
-            };
-
-            const updatedPatient = await updatePatient(accountId, dataToUpdate);
-
-            message.success('Cập nhật hồ sơ thành công!');
-            onUpdate(updatedPatient); // Gọi callback để component cha làm mới dữ liệu
-            onClose();
-
-        } catch (error) {
-            message.error('Cập nhật hồ sơ thất bại. Vui lòng thử lại.');
-            console.error('Update failed:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <Modal
-            title="Chỉnh Sửa Thông Tin Bệnh Nhân"
-            open={visible}
-            onCancel={onClose}
-            footer={null}
-            destroyOnClose={true} // Đảm bảo form được reset khi đóng
-        >
-            <Form
-                form={form}
-                layout="vertical"
-                onFinish={handleFormSubmit}
-                initialValues={{ gender: 'other' }}
-            >
-                <Form.Item
-                    name="name"
-                    label="Họ và Tên"
-                    rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
-                >
-                    <Input placeholder="Tào A Mân" />
-                </Form.Item>
-
-                <Form.Item
-                    name="dob"
-                    label="Ngày Sinh"
-                    rules={[{ required: true, message: 'Vui lòng chọn ngày sinh!' }]}
-                >
-                    <DatePicker
-                        format="DD/MM/YYYY"
-                        placeholder="Chọn ngày"
-                        className="w-full"
-                    />
-                </Form.Item>
-
-                <Form.Item
-                    name="gender"
-                    label="Giới Tính"
-                    rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
-                >
-                    <Radio.Group>
-                        <Radio value="male">Nam</Radio>
-                        <Radio value="female">Nữ</Radio>
-                        <Radio value="other">Khác</Radio>
-                    </Radio.Group>
-                </Form.Item>
-
-                <Form.Item
-                    name="phone"
-                    label="Số Điện Thoại"
-                    rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
-                >
-                    <Input placeholder="0901234567" />
-                </Form.Item>
-
-                <Form.Item
-                    name="address"
-                    label="Địa Chỉ"
-                >
-                    <Input.TextArea rows={2} placeholder="Nhập địa chỉ hiện tại..." />
-                </Form.Item>
-
-
-                <Form.Item className="mt-6 mb-0">
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={loading}
-                        icon={<SaveOutlined />}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700"
-                    >
-                        Lưu Thay Đổi
-                    </Button>
-                </Form.Item>
-            </Form>
-        </Modal>
-    );
 };
 
 const PatientProfile: React.FC = () => {
@@ -300,12 +172,12 @@ const PatientProfile: React.FC = () => {
             </div>
 
             {patient && (
-                <PatientEditModal
-                    visible={isEditModalVisible}
+                <UpdateInfoModal
+                    open={isEditModalVisible}
                     patient={patient}
-                    accountId={currentAccountId}
+                    patientId={patient._id}
                     onClose={() => setIsEditModalVisible(false)}
-                    onUpdate={handlePatientUpdate}
+                    onUpdated={handlePatientUpdate}
                 />
             )}
         </div>
