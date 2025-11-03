@@ -3,15 +3,12 @@ import logo from '../../assets/logo.svg';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button, message } from 'antd';
-import LoginModal from './LoginModal';
 import { FaUserLarge } from 'react-icons/fa6';
 
 const Navbar = () => {
     const [isTop, setIsTop] = useState(true);
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const [loginVisible, setLoginVisible] = useState(false);
-    const [registerVisible, setRegisterVisible] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -52,7 +49,7 @@ const Navbar = () => {
                             }`}
                     >
                         <>
-                            <a href="/appointment" className='text-base font-semibold'>APPOINTMENT</a>
+                            <a href="/patient/" className='text-base font-semibold'>APPOINTMENT</a>
                             <a href="/doctors" className='text-base font-semibold'>DOCTORS</a>
                             <a href="/about" className='text-base font-semibold'>ABOUT</a>
                             <a href="/contact" className='text-base font-semibold'>CONTACT</a>
@@ -72,7 +69,7 @@ const Navbar = () => {
                                 </>
                             ) : (
                                 <>
-                                    <Button onClick={() => setLoginVisible(true)}
+                                    <Button onClick={() => navigate('/login')}
                                         variant="solid" color="blue"
                                         className='!text-base !font-bold'>
                                         Login
@@ -93,7 +90,6 @@ const Navbar = () => {
                 </div>
             </header>
 
-            <LoginModal visible={loginVisible} onClose={() => setLoginVisible(false)} />
         </>
     );
 }
