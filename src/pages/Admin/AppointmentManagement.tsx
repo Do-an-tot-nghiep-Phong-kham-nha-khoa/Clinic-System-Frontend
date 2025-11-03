@@ -9,6 +9,10 @@ import ButtonPrimary from "../../utils/ButtonPrimary";
 import { AiFillEdit } from "react-icons/ai";
 import ModalCreateAppointment from "../../components/Admin/ModalCreateAppointment";
 import ModalEditAppointment from "../../components/Admin/ModalEditAppointment";
+import { getPatient } from "../../services/PatientService";
+import type { Patient } from "../../services/PatientService";
+
+
 
 const AppointmentManagement = () => {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -26,6 +30,8 @@ const AppointmentManagement = () => {
 
     const [editOpen, setEditOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | undefined>(undefined);
+    // cache of patients keyed by id to avoid refetching per-row
+    const [patientCache, setPatientCache] = useState<Record<string, Patient | null>>({});
 
     useEffect(() => {
         fetchAppointments();
@@ -40,6 +46,58 @@ const AppointmentManagement = () => {
                 : result?.items ?? result?.data ?? result?.appointments ?? [];
             const meta: AppointmentMeta | null = result?.meta ?? null;
             setAppointments(items);
+            // prefetch patient records for any profile ids found in appointments
+            try {
+                // Build a set of patient ids to prefetch.
+                // If appointment.profileModel === 'Patient', profile is expected to be the patient id (or an object containing it).
+                const idsSet = new Set<string>();
+                for (const it of items as any[]) {
+                    try {
+                        if (it && it.profileModel && String(it.profileModel).toLowerCase() === 'patient') {
+                            const prof: any = it.profile;
+                            if (typeof prof === 'string') idsSet.add(prof);
+                            else if (prof && typeof prof === 'object') {
+                                const id: any = prof._id ?? prof.patient_id ?? prof.$oid ?? prof.id;
+                                if (typeof id === 'string') idsSet.add(id);
+                            }
+                            continue;
+                        }
+
+                        // fallback: check common fields (profile, booker, patient_id, booker_id)
+                        const candidates: any[] = [it.profile, it.booker, it.patient_id, it.booker_id];
+                        for (const c of candidates) {
+                            if (typeof c === 'string') { idsSet.add(c); break; }
+                            if (c && typeof c === 'object') {
+                                const id: any = c._id ?? c.patient_id ?? c.$oid ?? c.id;
+                                if (typeof id === 'string') { idsSet.add(id); break; }
+                            }
+                        }
+                    } catch (e) {
+                        // ignore per-item errors
+                    }
+                }
+                const ids = Array.from(idsSet);
+                const missing = ids.filter((id: string) => !(id in patientCache));
+                if (missing.length > 0) {
+                    const fetched = await Promise.all(missing.map(async (id) => {
+                        try {
+                            const p = await getPatient(id);
+                            return [id, p] as const;
+                        } catch (e) {
+                            return [id, null] as const;
+                        }
+                    }));
+                    if (fetched.length > 0) {
+                        setPatientCache(prev => {
+                            const copy = { ...prev };
+                            for (const [id, p] of fetched) copy[id] = p;
+                            return copy;
+                        });
+                    }
+                }
+            } catch (e) {
+                // ignore prefetch errors
+            }
             setMeta(meta);
             return items;
         }
@@ -114,18 +172,50 @@ const AppointmentManagement = () => {
 
     const getPatientName = (record: any): string => {
         if (!record) return '-';
-        if (record.patientName) return String(record.patientName);
-        // profile may be an object or string
-        const profile = record.profile ?? record.booker ?? record.booker_id;
-        if (!profile) {
-            // fallback to nested patient object
-            const p = record.patient ?? record.booker_data ?? record.bookerData;
-            if (p) return (p.fullName ?? p.name ?? p.username ?? p.email) || JSON.stringify(p);
-            return '-';
+
+        // If appointment explicitly includes a populated patient-like object, prefer that
+        const populated = record.patient ?? record.patientData ?? record.profile ?? record.booker;
+        if (populated && typeof populated === 'object') {
+            return String(populated.fullName ?? populated.name ?? populated.username ?? populated.email ?? JSON.stringify(populated));
         }
-        if (typeof profile === 'string') return profile;
-        if (typeof profile === 'object') return (profile.fullName ?? profile.name ?? profile.username ?? profile.email) || JSON.stringify(profile);
-        return String(profile);
+
+        // If profileModel === 'Patient', profile is (or contains) the patient id
+        try {
+            if (record.profileModel && String(record.profileModel).toLowerCase() === 'patient') {
+                // extract id from profile which may be a string or object
+                const prof: any = record.profile;
+                let id: string | undefined;
+                if (typeof prof === 'string') id = prof;
+                else if (prof && typeof prof === 'object') id = prof._id ?? prof.patient_id ?? prof.$oid ?? prof.id;
+
+                if (id) {
+                    const cached = (patientCache as any)[id];
+                    if (cached) return String(cached.name ?? cached.fullName ?? cached.email ?? id);
+
+                    // not cached yet: mark as pending and fetch in background
+                    if (!(id in patientCache)) {
+                        // mark as loading (null) to avoid duplicate fetches
+                        setPatientCache(prev => ({ ...(prev as any), [id]: null }));
+                        getPatient(id).then(p => {
+                            setPatientCache(prev => ({ ...(prev as any), [id]: p }));
+                        }).catch(() => {
+                            setPatientCache(prev => ({ ...(prev as any), [id]: null }));
+                        });
+                    }
+
+                    // return id as temporary placeholder
+                    return String(id);
+                }
+            }
+        } catch (e) {
+            // ignore extraction errors
+        }
+
+        // fallback: primitive fields
+        const primitive = record.patientName ?? record.name ?? record.username ?? record.email;
+        if (primitive) return String(primitive);
+
+        return '-';
     };
 
     const getDoctorName = (record: any): string => {

@@ -11,7 +11,12 @@ export type Account = {
     updatedAt?: string;
     __v?: number;
 };
-
+export type Role = {
+    _id?: string;
+    name: string;
+    description?: string;
+    permissions?: string[];
+}   
 export type AccountMeta = {
     total: number;
     page: number;
@@ -86,9 +91,10 @@ export async function resetPassword(payload: { email: string; otp: string; newPa
 }
 
 // CRUD helpers
-export async function createAccount(dto: CreateAccountDto): Promise<Account> {
-    const url = `${API}/register`;
-    const res = await axios.post(url, dto);
+
+export async function getAccount(id: string): Promise<Account> {
+    const url = `${API}/${id}`;
+    const res = await axios.get(url);
     return res?.data?.data ?? res?.data;
 }
 
@@ -103,8 +109,8 @@ export async function deleteAccount(id: string): Promise<void> {
     await axios.delete(url);
 }
 
-export async function getAccount(id: string): Promise<Account> {
-    const url = `${API}/${id}`;
+export async function getRole(id: string): Promise<Role> {
+    const url = `${BASE_URL}/role/${id}`;
     const res = await axios.get(url);
     return res?.data?.data ?? res?.data;
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, message } from 'antd';
-import { getAccount, updateAccount, type Account } from '../../services/AccountService';
+import { getAccount,updateAccount, type Account } from '../../services/AccountService';
 
 interface ModalEditAccountProps {
     open: boolean;

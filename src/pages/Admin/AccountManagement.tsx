@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { FaSearch, FaTrash } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
 import { formatDateDDMMYYYY } from "../../utils/date";
-import { getAccounts, type Account, type AccountMeta, deleteAccount } from "../../services/AccountService";
+import { getAccounts, deleteAccount, getRole } from "../../services/AccountService";
+import type { Account, AccountMeta, Role } from "../../services/AccountService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
 import { AiFillEdit } from "react-icons/ai";
 import ModalCreateAccount from "../../components/Admin/ModalCreateAccount";
@@ -25,6 +26,8 @@ const AccountManagement = () => {
 
     const [editOpen, setEditOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | undefined>(undefined);
+    // cache of roles keyed by id to avoid refetching
+    const [roleCache, setRoleCache] = useState<Record<string, Role | null>>({});
 
     useEffect(() => {
         fetchAccounts();
@@ -40,6 +43,32 @@ const AccountManagement = () => {
             const { items, meta } = result;
             setAccounts(items);
             setMeta(meta);
+            // prefetch role objects for accounts
+            try {
+                const roleIds = Array.from(new Set(items
+                    .flatMap((a: any) => Array.isArray(a.roleId) ? a.roleId : (a.roleId ? [a.roleId] : []))
+                    .filter((id: any) => typeof id === 'string')));
+                const missing = roleIds.filter((id: string) => !(id in roleCache));
+                if (missing.length > 0) {
+                    const fetched = await Promise.all(missing.map(async (id) => {
+                        try {
+                            const r = await getRole(id);
+                            return [id, r] as const;
+                        } catch (e) {
+                            return [id, null] as const;
+                        }
+                    }));
+                    if (fetched.length > 0) {
+                        setRoleCache(prev => {
+                            const copy = { ...prev };
+                            for (const [id, r] of fetched) copy[id] = r;
+                            return copy;
+                        });
+                    }
+                }
+            } catch (e) {
+                // ignore role prefetch errors
+            }
             return items;
         }
         catch (error) {
@@ -88,7 +117,29 @@ const AccountManagement = () => {
     };
 
     type ID = string | number;
+    const getRoleName = (account: Account): string => {
+        const ids = Array.isArray(account.roleId) ? account.roleId : (account.roleId ? [account.roleId] : []);
+        if (ids.length === 0) return 'Người dùng';
 
+        const names: string[] = [];
+        const missing: string[] = [];
+        for (const id of ids) {
+            const cached = (roleCache as any)[id];
+            if (cached && cached.name) names.push(cached.name);
+            else if (!(id in roleCache)) missing.push(id);
+        }
+
+        // Fetch missing roles in background and mark as pending to avoid duplicate requests
+        if (missing.length > 0) {
+            for (const id of missing) {
+                setRoleCache(prev => ({ ...(prev as any), [id]: null }));
+                getRole(id).then(r => setRoleCache(prev => ({ ...(prev as any), [id]: r }))).catch(() => setRoleCache(prev => ({ ...(prev as any), [id]: null })));
+            }
+        }
+
+        if (names.length > 0) return names.join(', ');
+        return 'Người dùng';
+    }
     const handleDelete = async (_id: ID | undefined): Promise<void> => {
         Modal.confirm({
             title: 'Xoá tài khoản',
@@ -111,7 +162,7 @@ const AccountManagement = () => {
 
     const columns = [
         { title: 'Email', dataIndex: 'email', key: 'email' },
-        { title: 'Roles', dataIndex: 'roleId', key: 'roleId', render: (roles: string[] = []) => (Array.isArray(roles) ? roles.join(', ') : String(roles)) },
+    { title: 'Roles', dataIndex: 'roleId', key: 'roleId', render: (_: any, record: Account) => getRoleName(record) },
         {
             title: 'Ngày tạo',
             dataIndex: 'createdAt',

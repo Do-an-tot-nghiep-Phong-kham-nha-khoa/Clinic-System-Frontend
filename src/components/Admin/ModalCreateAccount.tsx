@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Form, Input, message } from 'antd';
-import { createAccount, type CreateAccountDto, type Account } from '../../services/AccountService';
+import { registerAccount, type CreateAccountDto, type Account } from '../../services/AccountService';
 
 interface ModalCreateAccountProps {
     open: boolean;
@@ -21,7 +21,7 @@ const ModalCreateAccount: React.FC<ModalCreateAccountProps> = ({ open, onClose, 
                 created_at: new Date().toISOString(),
                 password: values.password,
             } as CreateAccountDto;
-            const created = await createAccount(payload);
+            const created = await registerAccount(payload);
             message.success('Tạo tài khoản thành công');
             form.resetFields();
             onCreated?.(created);
