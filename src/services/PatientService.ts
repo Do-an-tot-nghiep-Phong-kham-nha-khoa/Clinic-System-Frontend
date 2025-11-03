@@ -34,8 +34,16 @@ export type CreatePatientDto = {
     address?: string;
     gender?: 'male' | 'female' | 'other' | string;
 };
+export type UpdatePatientDTO = {
+    accountId?: string;
+    name?: string;
+    dob?: string;
+    phone?: string;
+    address?: string;
+    gender?: 'male' | 'female' | 'other' | string;
+};
 
-export type UpdatePatientDto = Partial<CreatePatientDto>;
+
 
 const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 const API = `${BASE_URL}/patients`;
@@ -92,12 +100,6 @@ export async function createPatient(dto: CreatePatientDto): Promise<Patient> {
     return res?.data?.data ?? res?.data;
 }
 
-export async function updatePatient(id: string, dto: UpdatePatientDto): Promise<Patient> {
-    const url = `${API}/${id}`;
-    const res = await axios.put(url, dto);
-    return res?.data?.data ?? res?.data;
-}
-
 export async function deletePatient(id: string): Promise<void> {
     const url = `${API}/${id}`;
     await axios.delete(url);
@@ -113,4 +115,18 @@ export async function getAllPatients(): Promise<Patient[]> {
     const url = `${API}`;
     const res = await axios.get(url);
     return res?.data?.data ?? res?.data;
+}
+
+
+export async function getPatientByAccountId(accountId: string): Promise<Patient | null> {
+    const url = `${API}/account/${accountId}`;
+    const res = await axios.get(url);
+    return res?.data ?? null;
+}
+
+// update patient info
+export async function updatePatient(patientId: string, data: UpdatePatientDTO): Promise<Patient> {
+    const url = `${API}/${patientId}`;
+    const res = await axios.put(url, data);
+    return res.data;
 }

@@ -111,7 +111,10 @@ const MedicineManagement = () => {
 
     const columns = [
         { title: 'Tên thuốc', dataIndex: 'name', key: 'name' },
-        { title: 'Giá', dataIndex: 'price', key: 'price', sorter: true },
+        {
+            title: 'Giá (VNĐ)', dataIndex: 'price', key: 'price', sorter: true,
+            render: (value: number) => value.toLocaleString('vi-VN')
+        },
         { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', sorter: true },
         { title: 'Dạng thuốc', dataIndex: 'dosageForm', key: 'dosageForm' },
         { title: 'Nhà sản xuất', dataIndex: 'manufacturer', key: 'manufacturer' },
