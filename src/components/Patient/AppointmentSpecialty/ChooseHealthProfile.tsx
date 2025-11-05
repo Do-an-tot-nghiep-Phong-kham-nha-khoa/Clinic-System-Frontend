@@ -147,7 +147,7 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({
                     onClick={handleNext}
                     disabled={!selectedProfile || loading}
                 >
-                    Tiếp tục ({selectedProfile ? selectedProfile._id : 'Chọn Hồ Sơ'})
+                    Tiếp tục ({selectedProfile ? (selectedProfile.type === 'Patient' ? 'Chính chủ' : selectedProfile.familyMemberName) : 'Chọn Hồ Sơ'})
                 </Button>
             </div>
         </div>
