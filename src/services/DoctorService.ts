@@ -40,7 +40,7 @@ export async function getDoctors(params: { page?: number; limit?: number; q?: st
     if (params.specialtyId) sendParams.specialtyId = params.specialtyId;
     else if (params.specialty) sendParams.specialtyId = params.specialty;
 
-    const res = await axios.get(url, { params: sendParams });
+    const res = await axios.get(url, { params: sendParams, withCredentials: true });
     const body = res?.data ?? {};
 
     // Expected backend shape (based on your example): { message, data: [...], pagination: { page, pageSize, totalItems, totalPages } }
@@ -77,7 +77,7 @@ export async function getDoctors(params: { page?: number; limit?: number; q?: st
 export async function getDoctorById(id: string): Promise<Doctor | null> {
     const url = `${BASE_URL}/doctors/${id}`;
     try {
-        const res = await axios.get(url);
+    const res = await axios.get(url, { withCredentials: true });
             if (res?.data?.data) {
                 // Some APIs return { data: { doctor: { ... }, schedules: [...] } }
                 if (res.data.data.doctor) return res.data.data.doctor;
@@ -120,7 +120,7 @@ export async function deleteDoctor(id: string): Promise<void> {
 // search doctors by query params (e.g., ?q=smith&page=1&limit=10)
 export async function searchDoctors(params: { q?: string; page?: number; limit?: number } = {}): Promise<Doctor[]> {
     const url = `${BASE_URL}/doctors/search`;
-    const res = await axios.get(url, { params });
+    const res = await axios.get(url, { params, withCredentials: true });
     return res?.data?.data ?? res?.data ?? [];
 }
 
