@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, message } from 'antd';
 import * as AppointmentService from '../../services/AppointmentService';
-import type { Appointment } from '../../services/AppointmentService';
+import type { AppointmentPayload } from '../../services/AppointmentService';
 
 interface ModalEditAppointmentProps {
     open: boolean;
     id?: string;
     onClose: () => void;
-    onUpdated?: (updated: Appointment) => void;
+    onUpdated?: (updated: AppointmentPayload) => void;
 }
 
 const ModalEditAppointment: React.FC<ModalEditAppointmentProps> = ({ open, id, onClose, onUpdated }) => {

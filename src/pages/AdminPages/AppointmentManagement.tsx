@@ -1,13 +1,11 @@
 import { Button, Input, message, Table, Modal } from "antd";
 import { useEffect, useState } from "react";
 import { FaSearch, FaTrash } from "react-icons/fa";
-import { MdAdd } from "react-icons/md";
 import { formatDateDDMMYYYY } from "../../utils/date";
 import * as AppointmentService from "../../services/AppointmentService";
-import type { Appointment, AppointmentMeta } from "../../services/AppointmentService";
+import type { AppointmentPayload, AppointmentMeta } from "../../services/AppointmentService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
 import { AiFillEdit } from "react-icons/ai";
-import ModalCreateAppointment from "../../components/Admin/ModalCreateAppointment";
 import ModalEditAppointment from "../../components/Admin/ModalEditAppointment";
 import { getPatient } from "../../services/PatientService";
 import type { Patient } from "../../services/PatientService";
@@ -15,7 +13,7 @@ import type { Patient } from "../../services/PatientService";
 
 
 const AppointmentManagement = () => {
-    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [appointments, setAppointments] = useState<AppointmentPayload[]>([]);
     const [meta, setMeta] = useState<AppointmentMeta | null>(null);
 
     // table query state
@@ -25,9 +23,6 @@ const AppointmentManagement = () => {
     const [q, setQ] = useState("");
     const [searchInput, setSearchInput] = useState("");
     const [loading, setLoading] = useState(false);
-
-    const [createOpen, setCreateOpen] = useState(false);
-
     const [editOpen, setEditOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | undefined>(undefined);
     // cache of patients keyed by id to avoid refetching per-row
@@ -41,7 +36,7 @@ const AppointmentManagement = () => {
         try {
             setLoading(true);
             const result: any = await (AppointmentService as any).getAppointments({ page, limit: pageSize, sort, q });
-            const items: Appointment[] = Array.isArray(result)
+            const items: AppointmentPayload[] = Array.isArray(result)
                 ? result
                 : result?.items ?? result?.data ?? result?.appointments ?? [];
             const meta: AppointmentMeta | null = result?.meta ?? null;
@@ -138,11 +133,7 @@ const AppointmentManagement = () => {
         setQ(searchInput.trim());
     };
 
-    const handleOpenCreate = () => {
-        setCreateOpen(true);
-    };
-
-    const openEditModal = async (record: Appointment) => {
+    const openEditModal = async (record: AppointmentPayload) => {
         const id = String(record._id);
         setEditingId(id);
         setEditOpen(true);
@@ -247,7 +238,7 @@ const AppointmentManagement = () => {
             title: 'Actions',
             key: 'actions',
             width: 100,
-            render: (record: Appointment) => (
+            render: (record: AppointmentPayload) => (
                 <span className='flex gap-2'>
                     <ButtonPrimary type="link" shape="round" icon={<AiFillEdit />} onClick={() => openEditModal(record)}>Sửa</ButtonPrimary>
                     <Button type="link" color="danger" variant="solid" shape="round" icon={<FaTrash />} onClick={() => handleDelete(record._id)}>Xoá</Button>
@@ -260,11 +251,6 @@ const AppointmentManagement = () => {
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-4">Quản lý lịch hẹn</h1>
             <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div>
-                    <ButtonPrimary icon={<MdAdd />} size="large" onClick={handleOpenCreate}>
-                        Thêm lịch hẹn
-                    </ButtonPrimary>
-                </div>
                 <div style={{ minWidth: 240, width: '100%', maxWidth: 420 }}>
                     <Input.Search
                         value={searchInput}
@@ -299,16 +285,6 @@ const AppointmentManagement = () => {
                 }}
                 onChange={handleTableChange}
             />
-
-            <ModalCreateAppointment
-                open={createOpen}
-                onClose={() => setCreateOpen(false)}
-                onCreated={() => {
-                    setPage(1);
-                    fetchAppointments();
-                }}
-            />
-
             <ModalEditAppointment
                 open={editOpen}
                 id={editingId}
