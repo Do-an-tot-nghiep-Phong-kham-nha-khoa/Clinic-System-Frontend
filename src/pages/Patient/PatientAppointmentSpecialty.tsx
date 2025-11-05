@@ -145,7 +145,7 @@ const PatientAppointmentSpecialty = () => {
                         specialtyName: selectedSpecialty.name,
                         date: selectedDateTime.date,
                         timeSlot: selectedDateTime.timeSlot,
-                        patientName: selectedProfile.displayName ?? selectedProfile.familyMemberName ?? "Người khám"
+                        patientName: selectedProfile.displayName ?? "Người khám"
                     }}
                 />
             );
