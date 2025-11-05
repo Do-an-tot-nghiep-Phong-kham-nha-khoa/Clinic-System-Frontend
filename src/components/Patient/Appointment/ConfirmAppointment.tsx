@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import dayjs from 'dayjs';
 import { createAppointment, type AppointmentPayload } from '../../../services/AppointmentService';
-import { type Patient as HealthProfile } from '../../../services/PatientService';
 import { useAuth } from '../../../contexts/AuthContext';
 
 const { Title, Text } = Typography;
@@ -13,12 +12,15 @@ interface ConfirmAppointmentProps {
     specialtyId: string;
     specialtyName: string;
     dateTime: { date: string; timeSlot: string };
-    profile: HealthProfile;
+    // profile is the healthProfile presentation object (contains _id and patient info)
+    profile: any;
+    doctorName?: string;
+    doctorId?: string;
     onBack: () => void;
     onSuccess: () => void;
 }
 
-const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, specialtyName, dateTime, profile, onBack, onSuccess }) => {
+const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, specialtyName, dateTime, profile, doctorName, doctorId, onBack, onSuccess }) => {
     const { user } = useAuth();
     const [reason, setReason] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -39,8 +41,8 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
 
         const payload: AppointmentPayload = {
             booker_id: user.id,
-            profileId: profile._id,
-            profileModel: 'Patient', // Mặc định
+            healthProfile_id: profile._id,
+            doctor_id: doctorId,
             specialty_id: specialtyId,
             appointmentDate: appointmentDateISO,
             timeSlot: dateTime.timeSlot,
@@ -74,6 +76,9 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
 
             <Card title="Thông tin Lịch hẹn" variant='outlined' className="mb-6 ">
                 <Descriptions column={1} bordered size="small">
+                    <Descriptions.Item label="Bác sĩ" labelStyle={{ fontWeight: 'bold' }}>
+                        {doctorName || '---'}
+                    </Descriptions.Item>
                     <Descriptions.Item label="Chuyên khoa" labelStyle={{ fontWeight: 'bold' }}>
                         {specialtyName}
                     </Descriptions.Item>

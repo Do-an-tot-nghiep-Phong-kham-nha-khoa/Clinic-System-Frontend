@@ -1,13 +1,13 @@
 import { Button, message, Steps, Typography } from "antd";
 import { useState } from "react";
 import { FaCalendarAlt, FaCalendarCheck, FaUserCheck, FaUserMd } from "react-icons/fa";
-import ChooseSpecialty from "../../components/Patient/AppointmentSpecialty/ChooseSpecialty";
-import ChooseDateAndTime from "../../components/Patient/AppointmentSpecialty/ChooseDateAndTime";
-import { type Patient as HealthProfile } from "../../services/PatientService";
-import ChooseHealthProfile from "../../components/Patient/AppointmentSpecialty/ChooseHealthProfile";
-import ConfirmAppointment from "../../components/Patient/AppointmentSpecialty/ConfirmAppointment";
+import ChooseSpecialty from "../../components/Patient/Appointment/ChooseSpecialty";
+import ChooseDateAndTime from "../../components/Patient/Appointment/ChooseDateAndTime";
+import { type Patient as PatientType } from "../../services/PatientService";
+import ChooseHealthProfile from "../../components/Patient/Appointment/ChooseProfile";
+import ConfirmAppointment from "../../components/Patient/Appointment/ConfirmAppointment";
 import { getSpecialtyById, type Specialty } from "../../services/SpecialtyService";
-import SuccessScreen from "../../components/Patient/AppointmentSpecialty/SucessScreen";
+import SuccessScreen from "../../components/Patient/Appointment/SucessScreen";
 
 const { Title } = Typography;
 
@@ -43,7 +43,8 @@ const PatientAppointmentSpecialty = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [selectedSpecialty, setSelectedSpecialty] = useState<SelectedSpecialty | null>(null);
     const [selectedDateTime, setSelectedDateTime] = useState<{ date: string; timeSlot: string } | null>(null);
-    const [selectedProfile, setSelectedProfile] = useState<HealthProfile | null>(null);
+    // selectedProfile is the presentation object coming from ChooseProfile: { _id, name, dob, phone }
+    const [selectedProfile, setSelectedProfile] = useState<{ _id: string; name: string; dob: string; phone?: string } | null>(null);
     const [isAppointmentSuccess, setIsAppointmentSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -75,7 +76,7 @@ const PatientAppointmentSpecialty = () => {
         setCurrentStep(2);
     };
 
-    const handleProfileSelected = (profile: HealthProfile) => {
+    const handleProfileSelected = (profile: { _id: string; name: string; dob: string; phone?: string }) => {
         setSelectedProfile(profile);
         setCurrentStep(3);
     };

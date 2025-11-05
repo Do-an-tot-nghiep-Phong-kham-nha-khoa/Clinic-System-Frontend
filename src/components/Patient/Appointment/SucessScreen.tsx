@@ -6,7 +6,8 @@ import dayjs from 'dayjs';
 const { Title, Text, Paragraph } = Typography;
 
 interface AppointmentInfo {
-    specialtyName: string;
+    doctorName?: string;
+    specialtyName?: string;
     date: string;
     timeSlot: string;
     patientName: string;
@@ -52,9 +53,13 @@ const SuccessScreen: React.FC<AppointmentSuccessScreenProps> = ({ appointmentInf
                         <FaUserTie className="text-blue-500 mr-3" />
                         <Text strong>Bệnh nhân: </Text> {appointmentInfo.patientName}
                     </p>
+                    <p className="flex items-center text-base text-center justify-center">
+                        <FaUserTie className="text-blue-500 mr-3" />
+                        <Text strong>Bác sĩ: </Text> {appointmentInfo.doctorName || '---'}
+                    </p>
                     <p className="flex items-center text-base justify-center">
                         <FaMedkit className="text-green-500 mr-3" />
-                        <Text strong>Chuyên khoa: </Text> {appointmentInfo.specialtyName}
+                        <Text strong>Chuyên khoa: </Text> {appointmentInfo.specialtyName || '---'}
                     </p>
                     <p className="flex items-center text-base justify-center">
                         <FaCalendarCheck className="text-red-500 mr-3" />

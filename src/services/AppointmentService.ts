@@ -4,8 +4,8 @@ const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 
 export interface AppointmentPayload {
     booker_id: string;
-    profileId: string;
-    profileModel: 'Patient'; // Mặc định là 'Patient'
+    healthProfile_id: string;
+    doctor_id?: string;
     specialty_id: string;
     appointmentDate: string;
     timeSlot: string;

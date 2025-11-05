@@ -1,26 +1,39 @@
-import { Button, Card, Col, Row, Typography, Spin, message } from 'antd';
+import { Button, Card, Col, Row, Typography, Spin, message, Modal, Form, Input, Select, InputNumber, Space } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { FaArrowLeft, FaHeartbeat, FaPhone, FaUser } from 'react-icons/fa';
 import dayjs from 'dayjs';
 import { useAuth } from '../../../contexts/AuthContext';
-import { getPatientByAccountId, type Patient as HealthProfile } from '../../../services/PatientService';
+import { getPatientByAccountId, type Patient as PatientType } from '../../../services/PatientService';
+import { getHealthProfileByPatientId, createHealthProfile } from '../../../services/HealthProfileService';
 
 const { Title, Text } = Typography;
 
 interface ChooseHealthProfileProps {
     specialtyId: string;
     specialtyName: string;
+    doctorName?: string;
     date: string;
     timeSlot: string;
-    onNext: (profile: HealthProfile) => void;
+    onNext: (profile: any) => void;
     onBack: () => void;
 }
 
-const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName, date, timeSlot, onNext, onBack }) => {
+const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyId, specialtyName, doctorName, date, timeSlot, onNext, onBack }) => {
     const { user } = useAuth();
-    const [profiles, setProfiles] = useState<HealthProfile[]>([]);
+    // presentation object where _id is healthProfile._id but includes patient info
+    type HealthProfileView = {
+        _id: string; // healthProfile id
+        name: string;
+        dob: string;
+        phone?: string;
+    };
+
+    const [profiles, setProfiles] = useState<HealthProfileView[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedProfile, setSelectedProfile] = useState<HealthProfile | null>(null);
+    const [selectedProfile, setSelectedProfile] = useState<HealthProfileView | null>(null);
+    const [patientInfo, setPatientInfo] = useState<PatientType | null>(null);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [form] = Form.useForm();
 
     // Lấy dữ liệu hồ sơ sức khỏe
     useEffect(() => {
@@ -30,15 +43,33 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName
             const fetchProfiles = async () => {
                 setLoading(true);
                 try {
-                    // Lấy hồ sơ sức khỏe theo Account ID
-                    const data = await getPatientByAccountId(accountId);
-                    // Chuẩn hóa dữ liệu thành mảng
-                    const normalized = Array.isArray(data) ? data : data ? [data] : [];
-                    setProfiles(normalized);
+                    // Lấy patient bằng accountId
+                    const patient = await getPatientByAccountId(accountId);
+                    if (!patient) {
+                        message.warning('Không tìm thấy thông tin bệnh nhân.');
+                        setProfiles([]);
+                        setPatientInfo(null);
+                        return;
+                    }
+                    setPatientInfo(patient);
 
-                    if (normalized.length > 0) {
-                        // Tự động chọn hồ sơ đầu tiên (nếu có)
-                        setSelectedProfile(normalized[0]);
+                    // Lấy health profile theo patient._id
+                    const hp = await getHealthProfileByPatientId(patient._id);
+
+                    if (!hp) {
+                        // Không có health profile
+                        setProfiles([]);
+                        setSelectedProfile(null);
+                    } else {
+                        // Build view model where _id is healthProfile id but include patient info
+                        const view = {
+                            _id: hp._id,
+                            name: (patient as PatientType).name,
+                            dob: (patient as PatientType).dob,
+                            phone: (patient as PatientType).phone,
+                        };
+                        setProfiles([view]);
+                        setSelectedProfile(view);
                     }
                 } catch (error) {
                     console.error("Lỗi khi tải hồ sơ sức khỏe:", error);
@@ -66,7 +97,7 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName
     };
 
     // Render thẻ hồ sơ sức khỏe
-    const renderProfileCard = (profile: HealthProfile) => {
+    const renderProfileCard = (profile: HealthProfileView) => {
         const isSelected = selectedProfile?._id === profile._id;
         const dobFormatted = dayjs(profile.dob).format('DD/MM/YYYY');
         const age = dayjs().diff(profile.dob, 'year');
@@ -104,6 +135,51 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName
         );
     };
 
+    // Create profile inline (when none exists)
+    const handleCreateProfile = async () => {
+        if (!patientInfo) {
+            message.error('Không tìm thấy thông tin bệnh nhân để tạo hồ sơ.');
+            return;
+        }
+
+        try {
+            const values = await form.validateFields();
+            const payload = {
+                height: values.height || undefined,
+                weight: values.weight || undefined,
+                bloodType: values.bloodType || undefined,
+                allergies: values.allergies ? values.allergies.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
+                chronicConditions: values.chronicConditions ? values.chronicConditions.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
+                medications: values.medications ? values.medications.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
+                emergencyContact: values.emergencyContactName || values.emergencyContactPhone ? {
+                    name: values.emergencyContactName || undefined,
+                    relationship: values.emergencyContactRelationship || undefined,
+                    phone: values.emergencyContactPhone || undefined,
+                } : undefined,
+            };
+
+            const created = await createHealthProfile(patientInfo._id, payload as any);
+            if (created) {
+                const view: HealthProfileView = {
+                    _id: created._id,
+                    name: patientInfo.name || '',
+                    dob: patientInfo.dob || '',
+                    phone: patientInfo.phone || undefined,
+                };
+                setProfiles([view]);
+                setSelectedProfile(view);
+                setCreateModalOpen(false);
+                message.success('Tạo hồ sơ sức khỏe thành công.');
+                onNext(view);
+            } else {
+                message.error('Tạo hồ sơ thất bại. Vui lòng thử lại.');
+            }
+        } catch (err: any) {
+            console.error('Error creating health profile', err);
+            if (!err?.errorFields) message.error('Có lỗi khi tạo hồ sơ.');
+        }
+    };
+
     return (
         <div className="p-4">
             <div className="flex justify-between items-center mb-4">
@@ -114,7 +190,8 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName
 
             <div className="bg-blue-50 p-3 mb-6 rounded-lg border-l-4 border-blue-500 text-base">
                 <h1 className='font-bold'>Lịch hẹn đã chọn</h1>
-                <p className="">Chuyên khoa: {specialtyName}</p>
+                <p className="">Chuyên khoa: {specialtyName || '---'}</p>
+                <p className="">Bác sĩ: {doctorName || '---'}</p>
                 <p className="">Ngày & Giờ: {dayjs(date).format('dddd, DD/MM/YYYY')} lúc {timeSlot}</p>
             </div>
 
