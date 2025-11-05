@@ -2,8 +2,8 @@ import { Button, Card, Descriptions, Input, Typography, message, Spin, notificat
 import React, { useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import dayjs from 'dayjs';
-import { createAppointment, type AppointmentPayload } from '../../../services/AppointmentService';
-import { type Patient as HealthProfile } from '../../../services/PatientService';
+import { createAppointmentBySpecialty, type AppointmentPayload } from '../../../services/AppointmentService';
+import { type HealthProfile } from '../../../services/HealthProfileService';
 import { useAuth } from '../../../contexts/AuthContext';
 
 const { Title, Text } = Typography;
@@ -14,11 +14,15 @@ interface ConfirmAppointmentProps {
     specialtyName: string;
     dateTime: { date: string; timeSlot: string };
     profile: HealthProfile;
+    patientId: string;
+    displayName?: string;
+    displayPhone?: string;
     onBack: () => void;
     onSuccess: () => void;
 }
 
-const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, specialtyName, dateTime, profile, onBack, onSuccess }) => {
+
+const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, specialtyName, dateTime, patientId, displayName, displayPhone, profile, onBack, onSuccess }) => {
     const { user } = useAuth();
     const [reason, setReason] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -30,43 +34,37 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
             return;
         }
 
-        if (!user?.id) {
-            message.error("Không tìm thấy thông tin người đặt lịch (Booker ID).");
-            return;
-        }
-
         const appointmentDateISO = dayjs(dateTime.date).startOf('day').toISOString();
 
         const payload: AppointmentPayload = {
-            booker_id: user.id,
-            profileId: profile._id,
-            profileModel: 'Patient', // Mặc định
+            booker_id: patientId,                 // <= lấy từ props, không dùng user.id
+            healthProfile_id: profile._id,        // <= API mới
             specialty_id: specialtyId,
             appointmentDate: appointmentDateISO,
             timeSlot: dateTime.timeSlot,
-            reason: reason.trim() || 'Trống',
+            reason: reason.trim(),
         };
 
         setLoading(true);
         try {
-            await createAppointment(payload);
+            await createAppointmentBySpecialty(payload);
 
             notification.success({
                 message: 'Đặt lịch thành công!',
-                description: `Lịch hẹn khám cho bệnh nhân ${profile.name} đã được xác nhận.`,
-                icon: <FaCheckCircle style={{ color: '#52c41a' }} />,
+                description: `Lịch hẹn đã được xác nhận.`,
             });
-            onSuccess(); // Chuyển đến màn hình thông báo thành công
+
+            onSuccess();
         } catch (error: any) {
             notification.error({
                 message: 'Đặt lịch thất bại',
                 description: error.message || "Đã xảy ra lỗi trong quá trình gửi yêu cầu.",
-                icon: <FaExclamationTriangle style={{ color: '#faad14' }} />,
             });
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="p-4 mx-auto">
@@ -88,20 +86,18 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
 
             <Card title="Thông tin Hồ sơ Sức khỏe" variant='outlined' className="mb-6 bg-blue-50">
                 <Descriptions column={1} bordered size="small">
-                    <Descriptions.Item label="Tên Bệnh nhân" labelStyle={{ fontWeight: 'bold' }}>
-                        {profile.name}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Ngày sinh" labelStyle={{ fontWeight: 'bold' }}>
-                        {dayjs(profile.dob).format('DD/MM/YYYY')}
+                    <Descriptions.Item label="Tên" labelStyle={{ fontWeight: 'bold' }}>
+                        {displayName}
                     </Descriptions.Item>
                     <Descriptions.Item label="SĐT" labelStyle={{ fontWeight: 'bold' }}>
-                        {profile.phone}
+                        {displayPhone}
                     </Descriptions.Item>
                     <Descriptions.Item label="email" labelStyle={{ fontWeight: 'bold' }}>
                         {user?.email || 'Chưa có'}
                     </Descriptions.Item>
                 </Descriptions>
             </Card>
+
 
             <div className="mb-6 mt-4">
                 <Title level={5} className="!mb-2">Lý do khám bệnh <Text type="danger">*</Text></Title>

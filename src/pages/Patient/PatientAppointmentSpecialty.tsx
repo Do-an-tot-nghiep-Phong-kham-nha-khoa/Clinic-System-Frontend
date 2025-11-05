@@ -1,13 +1,15 @@
-import { Button, message, Steps, Typography } from "antd";
-import { useState } from "react";
+import { message, Steps, Typography } from "antd";
+import { useEffect, useState } from "react";
 import { FaCalendarAlt, FaCalendarCheck, FaUserCheck, FaUserMd } from "react-icons/fa";
 import ChooseSpecialty from "../../components/Patient/AppointmentSpecialty/ChooseSpecialty";
 import ChooseDateAndTime from "../../components/Patient/AppointmentSpecialty/ChooseDateAndTime";
-import { type Patient as HealthProfile } from "../../services/PatientService";
+import { type Patient, getPatientByAccountId } from "../../services/PatientService";
 import ChooseHealthProfile from "../../components/Patient/AppointmentSpecialty/ChooseHealthProfile";
 import ConfirmAppointment from "../../components/Patient/AppointmentSpecialty/ConfirmAppointment";
-import { getSpecialtyById, type Specialty } from "../../services/SpecialtyService";
+import { getSpecialtyById } from "../../services/SpecialtyService";
 import SuccessScreen from "../../components/Patient/AppointmentSpecialty/SucessScreen";
+import { useAuth } from "../../contexts/AuthContext";
+import type { HealthProfile } from "../../services/HealthProfileService";
 
 const { Title } = Typography;
 
@@ -39,13 +41,43 @@ interface SelectedSpecialty {
     name: string;
 }
 
+export interface SelectedProfile extends HealthProfile {
+    displayName?: string;
+    displayPhone?: string;
+}
+
 const PatientAppointmentSpecialty = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [selectedSpecialty, setSelectedSpecialty] = useState<SelectedSpecialty | null>(null);
     const [selectedDateTime, setSelectedDateTime] = useState<{ date: string; timeSlot: string } | null>(null);
-    const [selectedProfile, setSelectedProfile] = useState<HealthProfile | null>(null);
+    const [selectedProfile, setSelectedProfile] = useState<SelectedProfile | null>(null);
     const [isAppointmentSuccess, setIsAppointmentSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { user } = useAuth();
+    const [patient, setPatient] = useState<Patient | null>(null);
+
+    // Hàm lấy patient theo account id (account id = user.id)
+    const fetchPatientByAccountId = async (): Promise<Patient | null> => {
+        const accountId = user?.id;
+        if (!accountId) {
+            message.error("Không tìm thấy tài khoản hiện tại.");
+            return null;
+        }
+        try {
+            const data = await getPatientByAccountId(accountId);
+            setPatient(data || null);
+            return data;
+        } catch (err) {
+            console.error("Lỗi khi lấy hồ sơ bệnh nhân theo account id:", err);
+            message.error("Không thể tải hồ sơ bệnh nhân. Vui lòng thử lại.");
+            return null;
+        }
+    };
+
+    // Gọi để đảm bảo hàm được sử dụng và có thể tận dụng dữ liệu sau này
+    useEffect(() => {
+        void fetchPatientByAccountId();
+    }, [user?.id]);
 
     // Hàm xử lý khi người dùng chọn chuyên khoa và chuyển sang bước tiếp theo
     const handleSpecialtySelected = async (specialtyId: string) => {
@@ -76,7 +108,25 @@ const PatientAppointmentSpecialty = () => {
     };
 
     const handleProfileSelected = (profile: HealthProfile) => {
-        setSelectedProfile(profile);
+
+        // normalize name / phone
+        if (profile.type === "FamilyMember") {
+            setSelectedProfile({
+                ...profile,
+                displayName: profile.familyMemberName,
+                displayPhone: profile.familyMemberPhone
+            });
+        } else {
+            // type = Patient
+            // lấy từ bên patient data global (đã fetch từ account id trước đó)
+            // patient data nằm ở fetchPatientByAccountId
+            setSelectedProfile({
+                ...profile,
+                displayName: patient?.name,
+                displayPhone: patient?.phone
+            });
+        }
+
         setCurrentStep(3);
     };
 
@@ -95,7 +145,7 @@ const PatientAppointmentSpecialty = () => {
                         specialtyName: selectedSpecialty.name,
                         date: selectedDateTime.date,
                         timeSlot: selectedDateTime.timeSlot,
-                        patientName: selectedProfile.name
+                        patientName: selectedProfile.displayName ?? selectedProfile.familyMemberName ?? "Người khám"
                     }}
                 />
             );
@@ -127,6 +177,7 @@ const PatientAppointmentSpecialty = () => {
                         date={selectedDateTime.date}
                         timeSlot={selectedDateTime.timeSlot}
                         specialtyName={selectedSpecialty.name}
+                        patientId={patient?._id || ""}
                         onNext={handleProfileSelected}
                         onBack={() => setCurrentStep(1)}
                     />
@@ -140,6 +191,9 @@ const PatientAppointmentSpecialty = () => {
                         dateTime={selectedDateTime}
                         profile={selectedProfile}
                         specialtyName={selectedSpecialty.name}
+                        patientId={patient?._id || ""}
+                        displayName={selectedProfile.displayName}
+                        displayPhone={selectedProfile.displayPhone}
                         onBack={() => setCurrentStep(2)}
                         onSuccess={handleAppointmentSuccess}
                     />

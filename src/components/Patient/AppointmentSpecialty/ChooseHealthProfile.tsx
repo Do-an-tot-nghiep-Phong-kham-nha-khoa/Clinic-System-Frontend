@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { FaArrowLeft, FaHeartbeat, FaPhone, FaUser } from 'react-icons/fa';
 import dayjs from 'dayjs';
 import { useAuth } from '../../../contexts/AuthContext';
-import { getPatientByAccountId, type Patient as HealthProfile } from '../../../services/PatientService';
+import { getAllHealthProfiles, type HealthProfile } from '../../../services/HealthProfileService';
 
 const { Title, Text } = Typography;
 
@@ -12,11 +12,18 @@ interface ChooseHealthProfileProps {
     specialtyName: string;
     date: string;
     timeSlot: string;
+    patientId: string;
     onNext: (profile: HealthProfile) => void;
     onBack: () => void;
 }
 
-const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName, date, timeSlot, onNext, onBack }) => {
+const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({
+    specialtyName,
+    date,
+    timeSlot,
+    patientId,
+    onNext,
+    onBack }) => {
     const { user } = useAuth();
     const [profiles, setProfiles] = useState<HealthProfile[]>([]);
     const [loading, setLoading] = useState(true);
@@ -24,37 +31,28 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName
 
     // Lấy dữ liệu hồ sơ sức khỏe
     useEffect(() => {
-        const accountId = user?.id;
+        if (!patientId) return;
 
-        if (accountId) {
-            const fetchProfiles = async () => {
-                setLoading(true);
-                try {
-                    // Lấy hồ sơ sức khỏe theo Account ID
-                    const data = await getPatientByAccountId(accountId);
-                    // Chuẩn hóa dữ liệu thành mảng
-                    const normalized = Array.isArray(data) ? data : data ? [data] : [];
-                    setProfiles(normalized);
+        const fetchProfiles = async () => {
+            setLoading(true);
+            try {
+                const data = await getAllHealthProfiles(patientId);
+                setProfiles(data);
 
-                    if (normalized.length > 0) {
-                        // Tự động chọn hồ sơ đầu tiên (nếu có)
-                        setSelectedProfile(normalized[0]);
-                    }
-                } catch (error) {
-                    console.error("Lỗi khi tải hồ sơ sức khỏe:", error);
-                    message.error("Không thể tải hồ sơ sức khỏe. Vui lòng thử lại.");
-                    setProfiles([]);
-                } finally {
-                    setLoading(false);
+                if (data.length > 0) {
+                    setSelectedProfile(data[0]);
                 }
-            };
+            } catch (error) {
+                console.error("Lỗi khi tải hồ sơ sức khỏe:", error);
+                message.error("Không thể tải hồ sơ sức khỏe. Vui lòng thử lại.");
+                setProfiles([]);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-            fetchProfiles();
-        } else {
-            setLoading(false);
-            message.warning("Không tìm thấy Account ID để tải hồ sơ.");
-        }
-    }, [user?.id]);
+        fetchProfiles();
+    }, [patientId]);
 
     // Xử lý khi nhấn nút Tiếp tục
     const handleNext = () => {
@@ -68,23 +66,18 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName
     // Render thẻ hồ sơ sức khỏe
     const renderProfileCard = (profile: HealthProfile) => {
         const isSelected = selectedProfile?._id === profile._id;
-        const dobFormatted = dayjs(profile.dob).format('DD/MM/YYYY');
-        const age = dayjs().diff(profile.dob, 'year');
 
         return (
             <Col xs={24} sm={12} lg={8} key={profile._id}>
                 <Card
                     hoverable
-                    className={`
-                        transition-all duration-200 border-2
-                        ${isSelected ? 'border-blue-500 shadow-xl' : 'border-gray-200'}
-                    `}
+                    className={`transition-all duration-200 border-2 ${isSelected ? 'border-blue-500 shadow-xl' : 'border-gray-200'}`}
                     onClick={() => setSelectedProfile(profile)}
                     title={
                         <div className="flex items-center">
                             <FaUser className="mr-2 text-blue-500" />
                             <Title level={5} className="!mb-0 !text-blue-600 truncate">
-                                {profile.name}
+                                {profile.type === "Patient" ? "Chính chủ" : profile.familyMemberName}
                             </Title>
                         </div>
                     }
@@ -92,17 +85,23 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName
                     <div className="space-y-2 text-base text-gray-700">
                         <p className="flex items-center">
                             <FaHeartbeat className="mr-2 text-red-500" />
-                            Ngày sinh (Tuổi): {dobFormatted} ({age} tuổi)
+                            Nhóm máu: {profile.bloodType ?? "Không rõ"}
                         </p>
                         <p className="flex items-center">
-                            <FaPhone className="mr-2 text-green-500" />
-                            Số điện thoại: {profile.phone}
+                            Chiều cao: {profile.height ?? "-"} cm &nbsp;|&nbsp; Cân nặng: {profile.weight ?? "-"} kg
                         </p>
+                        {profile.emergencyContact && (
+                            <p className="flex items-center">
+                                <FaPhone className="mr-2 text-green-500" />
+                                Người liên hệ khẩn cấp: {profile.emergencyContact.name} ({profile.emergencyContact.relationship})
+                            </p>
+                        )}
                     </div>
                 </Card>
             </Col>
         );
     };
+
 
     return (
         <div className="p-4">
@@ -148,7 +147,7 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({ specialtyName
                     onClick={handleNext}
                     disabled={!selectedProfile || loading}
                 >
-                    Tiếp tục ({selectedProfile ? selectedProfile.name : 'Chọn Hồ Sơ'})
+                    Tiếp tục ({selectedProfile ? selectedProfile._id : 'Chọn Hồ Sơ'})
                 </Button>
             </div>
         </div>
