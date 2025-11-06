@@ -1,10 +1,10 @@
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Spin, Skeleton, Alert, Tag, Button, Descriptions, Empty } from 'antd';
-import { UserOutlined, PhoneOutlined, CalendarOutlined, IdcardOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import { UserOutlined, PhoneOutlined, IdcardOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { MdEmail } from 'react-icons/md';
 import { getReceptionistByAccountId, type Receptionist } from '../../services/ReceptionistService';
+import UpdateReceptionistProfileModal from '../../components/Receptionist/UpdateProfileModal';
 
 const ReceptionistProfile: React.FC = () => {
     const [receptionist, setReceptionist] = useState<Receptionist | null>(null);
@@ -12,6 +12,7 @@ const ReceptionistProfile: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const { user } = useAuth();
     const currentAccountId = user?.id || '';
+    const [openEdit, setOpenEdit] = useState(false);
 
     useEffect(() => {
         const fetchReceptionistData = async () => {
@@ -20,8 +21,8 @@ const ReceptionistProfile: React.FC = () => {
                 const data = await getReceptionistByAccountId(currentAccountId);
                 setReceptionist(data);
             } catch (err) {
-                console.error("Lỗi khi tải dữ liệu bệnh nhân:", err);
-                setError("Không thể tải thông tin bệnh nhân. Vui lòng thử lại.");
+                console.error("Lỗi khi tải dữ liệu lễ tân:", err);
+                setError("Không thể tải thông tin lễ tân. Vui lòng thử lại.");
             } finally {
                 setLoading(false);
             }
@@ -82,7 +83,7 @@ const ReceptionistProfile: React.FC = () => {
                         </div>
                     }
                     extra={
-                        <Button type="primary" icon={<UserOutlined />} className="bg-indigo-600 hover:bg-indigo-700 rounded-lg">
+                        <Button type="primary" icon={<UserOutlined />} className="bg-indigo-600 hover:bg-indigo-700 rounded-lg" onClick={() => setOpenEdit(true)}>
                             Chỉnh Sửa Hồ Sơ
                         </Button>
                     }
@@ -129,6 +130,13 @@ const ReceptionistProfile: React.FC = () => {
 
                 </Card>
             </div>
+
+            <UpdateReceptionistProfileModal
+                open={openEdit}
+                accountId={currentAccountId}
+                onClose={() => setOpenEdit(false)}
+                onUpdated={(updated) => setReceptionist(updated)}
+            />
         </div>
     );
 };
