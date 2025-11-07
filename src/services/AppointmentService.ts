@@ -1,19 +1,26 @@
 import axios from 'axios';
 export type AppointmentPayload = {
     _id?: string;
+
     booker_id?: string;
     healthProfile_id?: string;
+
     doctor_id?: string;
     specialty_id?: string;
-    appointment_date?: string; // ISO date
+
+    // DB fields
+    appointment_date?: string;
     time_slot?: string;
-    appointmentDate?: string; // ISO date
+
+    // FE convenience alias
+    appointmentDate?: string;
+    timeSlot?: string;
+
     reason?: string;
     notes?: string;
     status?: string;
     createdAt?: string;
 };
-
 export type AppointmentMeta = {
     total: number;
     page: number;

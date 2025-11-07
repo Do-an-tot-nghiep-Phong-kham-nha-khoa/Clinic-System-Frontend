@@ -47,7 +47,6 @@ const ReceptionistAppointment = () => {
                     ? result
                     : result?.items ?? result?.data ?? [];
 
-            // chỉ lấy appointment chưa có doctor
             const doctorless = items.filter(a => !a.doctor_id);
 
             setAppointments(doctorless);

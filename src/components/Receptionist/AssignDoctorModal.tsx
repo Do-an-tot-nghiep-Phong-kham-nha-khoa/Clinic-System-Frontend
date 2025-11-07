@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
-import { Modal, Select, Spin, message, Empty } from "antd";
+import { Modal, Select, Spin, Empty, message } from "antd";
 import * as ScheduleService from "../../services/ScheduleService";
 import * as AppointmentService from "../../services/AppointmentService";
+import * as DoctorService from "../../services/DoctorService";
 
 const { Option } = Select;
 
-type DoctorOption = { _id: string; name: string };
+type Doctor = { _id: string; name: string };
 
 type AppointmentLike = {
   _id: string;
-  specialtyId?: string;
   specialty_id?: string;
-  appointmentDate?: string; // ISO
+  appointmentDate?: string;
   appointment_date?: string;
-  timeSlot?: string;        // "HH:MM-HH:MM"
   time_slot?: string;
+  timeSlot?: string;
 };
 
 type Props = {
@@ -25,91 +25,107 @@ type Props = {
 };
 
 export default function AssignDoctorModal({ open, appointment, onClose, onAssigned }: Props) {
+
   const [loading, setLoading] = useState(false);
-  const [doctors, setDoctors] = useState<DoctorOption[]>([]);
-  const [doctorId, setDoctorId] = useState<string | undefined>(undefined);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [doctorId, setDoctorId] = useState<string>();
 
   useEffect(() => {
     if (!open || !appointment) return;
+
     (async () => {
+      setLoading(true);
+      setDoctors([]);
+      setDoctorId(undefined);
+
       try {
-        setLoading(true);
-        setDoctors([]);
-        setDoctorId(undefined);
+        // 1. Lấy specialty_id dạng string
+        const specialty_id_raw: any = appointment.specialty_id;
+        const specialty_id =
+          typeof specialty_id_raw === "string" ? specialty_id_raw : specialty_id_raw?._id;
 
-        const specialty = appointment.specialtyId ?? appointment.specialty_id;
-        const date = (appointment.appointmentDate ?? appointment.appointment_date ?? "").slice(0, 10);
-        const timeSlot = appointment.timeSlot ?? appointment.time_slot;
-
-        if (!specialty || !date || !timeSlot) {
-          message.error("Thiếu dữ liệu lịch hẹn");
-          return;
+        // 2. Lấy appointment date chuẩn YYYY-MM-DD
+        const rawDate = appointment.appointmentDate ?? appointment.appointment_date ?? "";
+        let date = "";
+        if (rawDate) {
+          const d = new Date(rawDate);
+          date = !isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : String(rawDate).slice(0, 10);
         }
 
-        // 1) Lấy toàn bộ slot trống theo specialty+date
-        const avail = await ScheduleService.getAvailableTimeSlotsBySpecialty(String(specialty), date);
-
-        // 2) Lọc đúng khung giờ đang cần
+        // 3. Lấy timeSlot
+        const timeSlot = appointment.time_slot ?? appointment.timeSlot;
+        if (!specialty_id || !date || !timeSlot) {
+          message.error("Thiếu dữ liệu cuộc hẹn");
+          return;
+        }
         const [startTime, endTime] = timeSlot.split("-").map(s => s.trim());
-        const matched = avail.filter((item) => item.startTime === startTime && item.endTime === endTime);
 
-        if (matched.length === 0) {
+        // 4. Gọi API lấy tất cả slot trống theo specialty
+        const slots = await ScheduleService.getAvailableTimeSlotsBySpecialty(specialty_id, date);
+
+        // 5. Lọc slot đúng giờ
+        const matched = slots.filter(s => s.startTime === startTime && s.endTime === endTime);
+        console.log("matched slots", matched);
+
+        if (!matched.length) {
           setDoctors([]);
           return;
         }
 
-        // 3) Loại bác sĩ bận (đã có appointment trùng date+timeSlot)
-        const final: DoctorOption[] = [];
-        for (const slot of matched) {
-          const appts = await AppointmentService.getAppointmentsByDoctor(slot.doctor_id);
-          const busy = (Array.isArray(appts) ? appts : []).some((a: any) => {
-            const aDate = String(a.appointmentDate ?? a.appointment_date ?? "").slice(0, 10);
-            const aTime = String(a.timeSlot ?? a.time_slot ?? "");
-            return aDate === date && aTime === timeSlot;
-          });
-          if (!busy) final.push({ _id: slot.doctor_id, name: slot.doctor_name ?? "Bác sĩ" });
-        }
+        // 6. Lấy danh sách doctor_id
+        const doctorIds = matched.map(s => s.doctor_id);
+        console.log("doctorIds", doctorIds);
 
-        setDoctors(final);
-        if (final.length === 0) message.info("Không có bác sĩ khả dụng cho khung giờ này");
+        // 7. Fetch thông tin doctor
+        const doctorList = await DoctorService.getDoctorsByIds(doctorIds);
+        setDoctors(doctorList);
+
       } catch (err) {
-        console.error("AssignDoctorModal loadDoctors error", err);
+        console.error(err);
         message.error("Không thể tải danh sách bác sĩ");
       } finally {
         setLoading(false);
       }
     })();
   }, [open, appointment]);
-
-  const handleOk = async () => {
-    if (!appointment) return;
-    if (!doctorId) return message.warning("Chọn bác sĩ");
+  const handleAssign = async () => {
+    console.log("Assigning doctor", doctorId, "to appointment", appointment);
+    if (!doctorId || !appointment) return message.warning("Chọn bác sĩ");
 
     try {
       setLoading(true);
-      await AppointmentService.assignDoctor(String(appointment._id), String(doctorId));
+      await AppointmentService.assignDoctor(String(appointment._id), doctorId);
       message.success("Gán bác sĩ thành công");
       onAssigned?.();
       onClose();
-    } catch (e) {
-      console.error('AssignDoctorModal.assignDoctor error', e);
-      message.error("Gán bác sĩ thất bại");
+    } catch {
+      message.error("Gán thất bại");
     } finally {
       setLoading(false);
     }
   };
-
+  const handleOk = () => {
+    if (!doctorId) return message.warning("Chọn bác sĩ trước khi gán");
+    handleAssign();
+  };
   return (
-    <Modal open={open} onCancel={onClose} onOk={handleOk} okText="Gán bác sĩ" title="Chọn bác sĩ">
+    <Modal
+      open={open}
+      onCancel={onClose}
+      onOk={handleOk}
+      okText="Gán bác sĩ"
+      title="Chọn bác sĩ">
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 24 }}><Spin /></div>
+        <div style={{ padding: 24, textAlign: "center" }}>
+          <Spin />
+        </div>
       ) : doctors.length === 0 ? (
         <Empty description="Không có bác sĩ khả dụng" />
       ) : (
         <Select
-          style={{ width: '100%' }}
           value={doctorId}
-          onChange={(v) => setDoctorId(String(v))}
+          onChange={setDoctorId}
+          style={{ width: "100%" }}
           placeholder="Chọn bác sĩ"
         >
           {doctors.map((d) => (

@@ -73,7 +73,17 @@ export async function getDoctors(params: { page?: number; limit?: number; q?: st
     const items = (body?.data?.doctors ?? body?.doctors ?? []) as Doctor[];
     return { items, total: Array.isArray(items) ? items.length : 0, page: params.page ?? 1, limit: params.limit ?? (items.length || 10) };
 }
-
+export async function getDoctorsByIds(ids: string[]): Promise<Doctor[]> {
+    if (!ids || !ids.length) return [];
+    const url = `${BASE_URL}/doctors/batch`;
+    try {
+        const res = await axios.post(url, { ids }, { withCredentials: true });
+        return res?.data?.data ?? res?.data ?? [];
+    } catch (e) {
+        console.error('Error fetching doctors by ids', e);
+        return [];
+    }
+}
 export async function getDoctorById(id: string): Promise<Doctor | null> {
     const url = `${BASE_URL}/doctors/${id}`;
     try {
