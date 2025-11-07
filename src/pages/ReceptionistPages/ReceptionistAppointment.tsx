@@ -31,7 +31,7 @@ const ReceptionistAppointment = () => {
         try {
             const res = await SpecialtyService.getSpecialties();
             setSpecialties(Array.isArray(res) ? res : []);
-        } catch {}
+        } catch { }
     };
 
     const fetchAppointments = async () => {
@@ -42,21 +42,23 @@ const ReceptionistAppointment = () => {
             if (filterSpecialty) params.specialtyId = filterSpecialty;
 
             const result: any = await AppointmentService.getAppointments(params);
-            const items: AppointmentPayload[] =
-                Array.isArray(result)
-                    ? result
-                    : result?.items ?? result?.data ?? [];
 
-            const doctorless = items.filter(a => !a.doctor_id);
+            // đảm bảo lấy array
+            const items: AppointmentPayload[] = Array.isArray(result)
+                ? result
+                : result?.items ?? result?.data ?? [];
+
+            // filter appointment chưa có doctor
+            const doctorless = items.filter(a => a.doctor_id == null || a.doctor_id === "" || a.doctor_id === undefined);
 
             setAppointments(doctorless);
-        } catch {
+        } catch (err) {
+            console.error(err);
             message.error("Lỗi khi lấy lịch hẹn");
         } finally {
             setLoading(false);
         }
     };
-
     const openAssignModal = async (appointment: AppointmentPayload) => {
         try {
             if (appointment.status !== "waiting_assigned") {
