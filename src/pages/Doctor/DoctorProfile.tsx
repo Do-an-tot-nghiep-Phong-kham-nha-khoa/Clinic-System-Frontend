@@ -92,10 +92,9 @@ const DoctorProfileComponent: React.FC = () => {
     const phone = doctor.phone || 'N/A';
 
     return (
-        <div className="p-4 sm:p-8 min-h-screen">
+        <div className="p-4 sm:p-8 ">
             <div className="container mx-auto">
                 <Card
-                    // Dùng màu Cyan cho chủ đề Bác sĩ
                     className="shadow-2xl rounded-2xl border-t-4 border-cyan-600"
                     title={
                         <div className="flex items-center space-x-3 text-2xl font-bold text-gray-800">
@@ -104,7 +103,6 @@ const DoctorProfileComponent: React.FC = () => {
                         </div>
                     }
                     extra={
-                        // Thay đổi nút thành hành động liên quan đến Bác sĩ
                         <ButtonPrimary
                             type="default"
                             icon={<ScheduleOutlined />}
@@ -196,5 +194,4 @@ const DoctorProfileComponent: React.FC = () => {
     );
 };
 
-// Export component mới
 export default DoctorProfileComponent;
