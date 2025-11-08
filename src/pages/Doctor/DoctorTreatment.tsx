@@ -97,7 +97,7 @@ const DoctorTreatment = () => {
             bloodPressure: precheckData.bloodPressure,
             heartRate: parseInt(precheckData.heartRate) || 0,
             temperature: parseFloat(precheckData.temperature) || 0,
-            symtoms: precheckData.symptoms,
+            symptoms: precheckData.symptoms,
 
             // ID tùy chọn
             prescription: currentPrescriptionId,

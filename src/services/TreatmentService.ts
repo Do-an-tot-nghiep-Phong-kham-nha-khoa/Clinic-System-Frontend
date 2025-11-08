@@ -11,7 +11,7 @@ export type CreateTreatmentDto = {
     bloodPressure: string;
     heartRate: number;
     temperature: number;
-    symtoms: string;
+    symptoms: string;
 
     // optional
     prescription?: string | null;
