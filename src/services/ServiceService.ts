@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export type Service = {
-    _id?: string;
+    _id: string;
     name: string;
     price: number;
     description?: string;

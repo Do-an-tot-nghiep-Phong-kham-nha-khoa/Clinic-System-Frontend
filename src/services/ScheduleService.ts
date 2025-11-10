@@ -61,7 +61,7 @@ export async function getAvailableBySpecialty(
     date: string,
     shift?: "morning" | "afternoon" | "evening"
 ) {
-    let url = `${API}/specialty/${specialtyId}/${date}`;
+    let url = `${BASE_URL}/schedules/specialty/${specialtyId}/${date}`;
 
     if (shift) {
         url += `?shift=${shift}`;
