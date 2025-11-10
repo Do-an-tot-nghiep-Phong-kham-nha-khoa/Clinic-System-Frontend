@@ -7,6 +7,7 @@ const { Title, Text, Paragraph } = Typography;
 
 interface AppointmentInfo {
     specialtyName: string;
+    doctorName: string;
     date: string | Date;
     timeSlot: string;
     patientName: string;
@@ -56,6 +57,11 @@ const SuccessScreen: React.FC<AppointmentSuccessScreenProps> = ({ appointmentInf
                     <p className="flex items-center justify-center gap-2">
                         <FaMedkit />
                         <Text strong>Chuyên khoa: </Text> {appointmentInfo.specialtyName}
+                    </p>
+
+                    <p className="flex items-center justify-center gap-2">
+                        <FaMedkit />
+                        <Text strong>Bác sĩ: </Text> {appointmentInfo.doctorName}
                     </p>
 
                     <p className="flex items-center justify-center gap-2">

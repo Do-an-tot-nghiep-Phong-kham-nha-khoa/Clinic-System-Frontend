@@ -2,7 +2,7 @@ import { Button, Card, Descriptions, Input, Typography, message, Spin, notificat
 import React, { useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import dayjs from 'dayjs';
-import { createAppointmentBySpecialty, type AppointmentPayload } from '../../../services/AppointmentService';
+import { createAppointmentBySpecialty, type AppointmentPayload, type AppointmentByDoctorPayload, createAppointmentByDoctor } from '../../../services/AppointmentService';
 import { type HealthProfile } from '../../../services/HealthProfileService';
 import { useAuth } from '../../../contexts/AuthContext';
 
@@ -10,8 +10,10 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 interface ConfirmAppointmentProps {
-    specialtyId: string;
+    specialtyId?: string;
     specialtyName: string;
+    doctorId: string;
+    doctorName: string;
     dateTime: { date: string; timeSlot: string };
     profile: HealthProfile;
     patientId: string;
@@ -22,7 +24,7 @@ interface ConfirmAppointmentProps {
 }
 
 
-const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, specialtyName, dateTime, patientId, displayName, displayPhone, profile, onBack, onSuccess }) => {
+const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ doctorId, doctorName, specialtyId, specialtyName, dateTime, patientId, displayName, displayPhone, profile, onBack, onSuccess }) => {
     const { user } = useAuth();
     const [reason, setReason] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -36,10 +38,10 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
 
         const appointmentDateISO = dayjs(dateTime.date).startOf('day').toISOString();
 
-        const payload: AppointmentPayload = {
+        const payload: AppointmentByDoctorPayload = {
             booker_id: patientId,                 // <= lấy từ props, không dùng user.id
             healthProfile_id: profile._id,        // <= API mới
-            specialty_id: specialtyId,
+            doctor_id: doctorId,
             appointmentDate: appointmentDateISO,
             timeSlot: dateTime.timeSlot,
             reason: reason.trim(),
@@ -47,7 +49,7 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
 
         setLoading(true);
         try {
-            await createAppointmentBySpecialty(payload);
+            await createAppointmentByDoctor(payload);
 
             notification.success({
                 message: 'Đặt lịch thành công!',
@@ -74,6 +76,9 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
                 <Descriptions column={1} bordered size="small">
                     <Descriptions.Item label="Chuyên khoa" labelStyle={{ fontWeight: 'bold' }}>
                         {specialtyName}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Bác sĩ" labelStyle={{ fontWeight: 'bold' }}>
+                        {doctorName}
                     </Descriptions.Item>
                     <Descriptions.Item label="Ngày khám" labelStyle={{ fontWeight: 'bold' }}>
                         {dayjs(dateTime.date).format('dddd, DD/MM/YYYY')}

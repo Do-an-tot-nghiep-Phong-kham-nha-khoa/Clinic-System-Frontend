@@ -1,54 +1,56 @@
 import { message, Steps, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { FaCalendarAlt, FaCalendarCheck, FaUserCheck, FaUserMd } from "react-icons/fa";
-import ChooseSpecialty from "../../components/Patient/AppointmentSpecialty/ChooseSpecialty";
-import ChooseDateAndTime from "../../components/Patient/AppointmentSpecialty/ChooseDateAndTime";
-import { type Patient, getPatientByAccountId } from "../../services/PatientService";
-import ChooseHealthProfile from "../../components/Patient/AppointmentSpecialty/ChooseHealthProfile";
-import ConfirmAppointment from "../../components/Patient/AppointmentSpecialty/ConfirmAppointment";
-import { getSpecialtyById } from "../../services/SpecialtyService";
-import SuccessScreen from "../../components/Patient/AppointmentSpecialty/SucessScreen";
+import ChooseDoctor from "../../components/Patient/AppointmentDoctor/ChooseDoctor";
+import ChooseDateAndTimeDoctor from "../../components/Patient/AppointmentDoctor/ChooseDateAndTime";
+import ChooseHealthProfile from "../../components/Patient/AppointmentDoctor/ChooseHealthProfile";
+import ConfirmAppointment from "../../components/Patient/AppointmentDoctor/ConfirmAppointment";
+import SuccessScreen from "../../components/Patient/AppointmentDoctor/SucessScreen";
 import { useAuth } from "../../contexts/AuthContext";
+import { type Patient, getPatientByAccountId } from "../../services/PatientService";
+import { getDoctorById } from "../../services/DoctorService";
 import type { HealthProfile } from "../../services/HealthProfileService";
 
 const { Title } = Typography;
 
 const APPOINTMENT_STEPS = [
     {
-        title: 'Chuyên khoa',
+        title: "Bác sĩ",
         icon: <FaUserMd />,
-        description: 'Chọn chuyên khoa khám'
+        description: "Chọn bác sĩ muốn khám"
     },
     {
-        title: 'Thời gian & Ca khám',
+        title: "Thời gian & Ca khám",
         icon: <FaCalendarAlt />,
-        description: 'Chọn ngày và giờ khám'
+        description: "Chọn ngày và giờ khám"
     },
     {
-        title: 'Thông tin cá nhân',
+        title: "Thông tin cá nhân",
         icon: <FaUserCheck />,
-        description: 'Chọn hồ sơ sức khỏe'
+        description: "Chọn hồ sơ sức khỏe"
     },
     {
-        title: 'Xác nhận',
+        title: "Xác nhận",
         icon: <FaCalendarCheck />,
-        description: 'Hoàn tất đặt lịch'
-    },
+        description: "Hoàn tất đặt lịch"
+    }
 ];
-
-interface SelectedSpecialty {
-    id: string;
-    name: string;
-}
 
 export interface SelectedProfile extends HealthProfile {
     displayName?: string;
     displayPhone?: string;
 }
 
-const PatientAppointmentSpecialty = () => {
+interface SelectedDoctor {
+    id: string;
+    name: string;
+    specialtyId?: string;
+    specialtyName?: string;
+}
+
+const PatientAppointmentDoctor = () => {
     const [currentStep, setCurrentStep] = useState(0);
-    const [selectedSpecialty, setSelectedSpecialty] = useState<SelectedSpecialty | null>(null);
+    const [selectedDoctor, setSelectedDoctor] = useState<SelectedDoctor | null>(null);
     const [selectedDateTime, setSelectedDateTime] = useState<{ date: string; timeSlot: string } | null>(null);
     const [selectedProfile, setSelectedProfile] = useState<SelectedProfile | null>(null);
     const [isAppointmentSuccess, setIsAppointmentSuccess] = useState(false);
@@ -56,7 +58,7 @@ const PatientAppointmentSpecialty = () => {
     const { user } = useAuth();
     const [patient, setPatient] = useState<Patient | null>(null);
 
-    // Hàm lấy patient theo account id (account id = user.id)
+    // ✅ Hàm lấy Patient theo accountId
     const fetchPatientByAccountId = async (): Promise<Patient | null> => {
         const accountId = user?.id;
         if (!accountId) {
@@ -74,42 +76,43 @@ const PatientAppointmentSpecialty = () => {
         }
     };
 
-    // Gọi để đảm bảo hàm được sử dụng và có thể tận dụng dữ liệu sau này
+    // ✅ Gọi fetchPatientByAccountId khi có user
     useEffect(() => {
         void fetchPatientByAccountId();
     }, [user?.id]);
 
-    // Hàm xử lý khi người dùng chọn chuyên khoa và chuyển sang bước tiếp theo
-    const handleSpecialtySelected = async (specialtyId: string) => {
+    // ✅ Khi chọn bác sĩ
+    const handleDoctorSelected = async (doctorId: string) => {
         setLoading(true);
         try {
-            const specialtyData = await getSpecialtyById(specialtyId);
+            const doctorData = await getDoctorById(doctorId);
 
-            if (specialtyData && specialtyData.name) {
-                setSelectedSpecialty({
-                    id: specialtyId,
-                    name: specialtyData.name
+            if (doctorData) {
+                setSelectedDoctor({
+                    id: doctorId,
+                    name: doctorData.name,
+                    specialtyName: doctorData.specialtyId?.name ?? "Không rõ chuyên khoa"
                 });
                 setCurrentStep(1);
             } else {
-                message.error("Không thể lấy thông tin tên chuyên khoa.");
+                message.error("Không thể lấy thông tin bác sĩ.");
             }
         } catch (error) {
-            console.error("Lỗi khi fetch Specialty Name:", error);
-            message.error("Lỗi hệ thống khi tải thông tin chuyên khoa.");
+            console.error("Lỗi khi lấy thông tin bác sĩ:", error);
+            message.error("Lỗi hệ thống khi tải thông tin bác sĩ.");
         } finally {
             setLoading(false);
         }
     };
 
+    // ✅ Khi chọn thời gian
     const handleTimeSlotSelected = (date: string, timeSlot: string) => {
         setSelectedDateTime({ date, timeSlot });
         setCurrentStep(2);
     };
 
+    // ✅ Khi chọn hồ sơ sức khỏe
     const handleProfileSelected = (profile: HealthProfile) => {
-
-        // normalize name / phone
         if (profile.type === "FamilyMember") {
             setSelectedProfile({
                 ...profile,
@@ -117,9 +120,6 @@ const PatientAppointmentSpecialty = () => {
                 displayPhone: profile.familyMemberPhone
             });
         } else {
-            // type = Patient
-            // lấy từ bên patient data global (đã fetch từ account id trước đó)
-            // patient data nằm ở fetchPatientByAccountId
             setSelectedProfile({
                 ...profile,
                 displayName: patient?.name,
@@ -130,19 +130,20 @@ const PatientAppointmentSpecialty = () => {
         setCurrentStep(3);
     };
 
+    // ✅ Khi đặt lịch thành công
     const handleAppointmentSuccess = () => {
         setIsAppointmentSuccess(true);
         setCurrentStep(4);
     };
 
-    // Hàm render nội dung bước hiện tại
+    // ✅ Render nội dung theo từng bước
     const renderStepContent = () => {
-        if (isAppointmentSuccess && selectedSpecialty && selectedDateTime && selectedProfile) {
-            // RENDER MÀN HÌNH THÀNH CÔNG 
+        if (isAppointmentSuccess && selectedDoctor && selectedDateTime && selectedProfile) {
             return (
                 <SuccessScreen
                     appointmentInfo={{
-                        specialtyName: selectedSpecialty.name,
+                        specialtyName: selectedDoctor.specialtyName ?? "Không rõ chuyên khoa",
+                        doctorName: selectedDoctor.name,
                         date: selectedDateTime.date,
                         timeSlot: selectedDateTime.timeSlot,
                         patientName: selectedProfile.displayName ?? "Người khám"
@@ -153,44 +154,42 @@ const PatientAppointmentSpecialty = () => {
 
         switch (currentStep) {
             case 0:
-                return (
-                    <ChooseSpecialty
-                        onNext={handleSpecialtySelected}
-                        selectedSpecialtyId={selectedSpecialty?.id || null}
-                    />
-                );
+                return <ChooseDoctor onNext={handleDoctorSelected} selectedDoctorId={selectedDoctor?.id || null} />;
             case 1:
-                if (loading || !selectedSpecialty) return <div>Vui lòng quay lại Bước 1 để chọn Chuyên khoa.</div>;
+                if (!selectedDoctor) return <div>Vui lòng chọn bác sĩ trước.</div>;
                 return (
-                    <ChooseDateAndTime
-                        specialtyId={selectedSpecialty.id}
+                    <ChooseDateAndTimeDoctor
+                        doctorId={selectedDoctor.id}
                         onNext={handleTimeSlotSelected}
                         onBack={() => setCurrentStep(0)}
                     />
                 );
             case 2:
-                if (loading || !selectedSpecialty || !selectedDateTime) return <div>Dữ liệu thiếu. Vui lòng quay lại.</div>;
-
+                if (!selectedDoctor || !selectedDateTime)
+                    return <div>Thiếu dữ liệu. Vui lòng quay lại bước trước.</div>;
                 return (
                     <ChooseHealthProfile
-                        specialtyId={selectedSpecialty.id}
+                        specialtyId={selectedDoctor.id} // bác sĩ có thể mapping với chuyên khoa nội bộ
+                        specialtyName={selectedDoctor.specialtyName ?? ""}
+                        doctorId={selectedDoctor.id}
+                        doctorName={selectedDoctor.name}
                         date={selectedDateTime.date}
                         timeSlot={selectedDateTime.timeSlot}
-                        specialtyName={selectedSpecialty.name}
                         patientId={patient?._id || ""}
                         onNext={handleProfileSelected}
                         onBack={() => setCurrentStep(1)}
                     />
                 );
             case 3:
-                if (loading || !selectedSpecialty || !selectedDateTime || !selectedProfile) return <div>Dữ liệu thiếu. Vui lòng quay lại.</div>;
-
+                if (!selectedDoctor || !selectedDateTime || !selectedProfile)
+                    return <div>Thiếu dữ liệu. Vui lòng quay lại.</div>;
                 return (
                     <ConfirmAppointment
-                        specialtyId={selectedSpecialty.id}
+                        doctorId={selectedDoctor.id}
                         dateTime={selectedDateTime}
                         profile={selectedProfile}
-                        specialtyName={selectedSpecialty.name}
+                        doctorName={selectedDoctor.name}
+                        specialtyName={selectedDoctor.specialtyName ?? ""}
                         patientId={patient?._id || ""}
                         displayName={selectedProfile.displayName}
                         displayPhone={selectedProfile.displayPhone}
@@ -205,19 +204,19 @@ const PatientAppointmentSpecialty = () => {
 
     return (
         <div className="container mx-auto p-4 max-w-6xl">
-            <Title level={2} className="text-center !mb-6 !font-bold">Đặt Lịch Khám Theo Chuyên Khoa</Title>
+            <Title level={2} className="text-center !mb-6 !font-bold">
+                Đặt Lịch Khám Theo Bác Sĩ
+            </Title>
 
-            {/* Steps Component: Hiển thị tiến trình */}
+            {/* Steps hiển thị tiến trình */}
             <div className="mb-8">
                 <Steps current={currentStep} items={APPOINTMENT_STEPS} />
             </div>
 
             {/* Nội dung của bước hiện tại */}
-            <div className="bg-white p-6 shadow-md rounded-lg">
-                {renderStepContent()}
-            </div>
+            <div className="bg-white p-6 shadow-md rounded-lg">{renderStepContent()}</div>
         </div>
     );
 };
 
-export default PatientAppointmentSpecialty;
+export default PatientAppointmentDoctor;

@@ -10,6 +10,8 @@ const { Title, Text } = Typography;
 interface ChooseHealthProfileProps {
     specialtyId: string;
     specialtyName: string;
+    doctorId: string;
+    doctorName: string;
     date: string;
     timeSlot: string;
     patientId: string;
@@ -19,6 +21,8 @@ interface ChooseHealthProfileProps {
 
 const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({
     specialtyName,
+    doctorId,
+    doctorName,
     date,
     timeSlot,
     patientId,
@@ -114,6 +118,7 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({
             <div className="bg-blue-50 p-3 mb-6 rounded-lg border-l-4 border-blue-500 text-base">
                 <h1 className='font-bold'>Lịch hẹn đã chọn</h1>
                 <p className="">Chuyên khoa: {specialtyName}</p>
+                <p className="">Bác sĩ: {doctorName}</p>
                 <p className="">Ngày & Giờ: {dayjs(date).format('dddd, DD/MM/YYYY')} lúc {timeSlot}</p>
             </div>
 
