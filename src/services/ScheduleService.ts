@@ -56,7 +56,20 @@ export async function getDoctorSchedule(doctorId: string): Promise<ScheduleEntry
         return [];
     }
 }
+export async function getAvailableBySpecialty(
+    specialtyId: string,
+    date: string,
+    shift?: "morning" | "afternoon" | "evening"
+) {
+    let url = `${API}/specialty/${specialtyId}/${date}`;
 
+    if (shift) {
+        url += `?shift=${shift}`;
+    }
+
+    const res = await axios.get(url);
+    return res.data; // [{startTime, endTime, doctor_ids:[...] }]
+}
 /* ---------------------------------------------------
    GET: /schedules/:doctorId/:date
 ---------------------------------------------------- */

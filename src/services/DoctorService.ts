@@ -7,7 +7,14 @@ export type DoctorScheduleItem = {
     day: string;
     timeSlots: string[];
 };
-
+export type Specialty = {
+  _id: string;
+  name: string;
+};
+export interface Account {
+  _id: string;
+  email: string;
+}
 export type SpecialtyRef = {
     _id: string;
     name: string;
@@ -28,7 +35,19 @@ export type Doctor = {
     bio?: string;
     __v?: number;
 };
+export interface DoctorProfile {
+  _id: string;
+  accountId: Account;
+  name: string;
+  specialtyId: Specialty;
+  phone: string;
+  experience: number; // Số năm kinh nghiệm
+}
 
+interface DoctorResponse {
+  message: string;
+  data: DoctorProfile;
+}
 export async function getDoctors(params: { page?: number; limit?: number; q?: string; specialty?: string; specialtyId?: string; name?: string } = {}): Promise<{ items: Doctor[]; total: number; page: number; limit: number }> {
     const url = `${BASE_URL}/doctors`;
     // Map frontend params to backend query names: 'q' -> 'name', 'specialty'|'specialtyId' -> 'specialtyId'
@@ -139,5 +158,19 @@ export async function getDoctorsBySpecialty(specialtyId: string, params: { page?
     const res = await axios.get(url, { params });
     return res?.data?.data ?? res?.data ?? [];
 }
+export async function getDoctorByAccountId(accountId: string): Promise<DoctorProfile> {
+  const url = `${BASE_URL}/doctors/account/${accountId}`;
 
+  try {
+    const res = await axios.get<DoctorResponse>(url);
+    return res.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || `Lỗi khi gọi API: ${error.message}`;
+      console.error(`Error fetching doctor profile for accountId ${accountId}:`, errorMessage);
+      throw new Error(errorMessage);
+    }
+    throw new Error('Lỗi không xác định khi tải hồ sơ bác sĩ.');
+  }
+}
 export default {} as const;
