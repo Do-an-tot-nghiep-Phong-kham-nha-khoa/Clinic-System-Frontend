@@ -2,7 +2,7 @@ import { Button, Card, Descriptions, Input, Typography, message, Spin, notificat
 import React, { useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import dayjs from 'dayjs';
-import { createAppointmentBySpecialty, type AppointmentPayload } from '../../../services/AppointmentService';
+import { createAppointmentBySpecialty, type AppointmentBySpecialtyPayload } from '../../../services/AppointmentService';
 import { type HealthProfile } from '../../../services/HealthProfileService';
 import { useAuth } from '../../../contexts/AuthContext';
 
@@ -36,7 +36,7 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ specialtyId, sp
 
         const appointmentDateISO = dayjs(dateTime.date).startOf('day').toISOString();
 
-        const payload: AppointmentPayload = {
+        const payload: AppointmentBySpecialtyPayload = {
             booker_id: patientId,                 // <= lấy từ props, không dùng user.id
             healthProfile_id: profile._id,        // <= API mới
             specialty_id: specialtyId,

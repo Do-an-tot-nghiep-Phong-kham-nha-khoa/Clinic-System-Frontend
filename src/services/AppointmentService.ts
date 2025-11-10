@@ -100,11 +100,6 @@ export async function updateAppointment(id: string, status: string): Promise<App
     const res = await axios.put(url, { status }, { withCredentials: true });
     return res?.data ?? null;
 }
-export async function getAppointmentsByDoctor(doctorId: string): Promise<AppointmentPayload[]> {
-    const url = `${API}/doctor/${doctorId}`;
-    const res = await axios.get(url, { withCredentials: true });
-    return res?.data?.data ?? res?.data ?? [];
-}
 export async function getAppointmentsByBooker(patientId: string): Promise<AppointmentPayload[]> {
     const url = `${API}/booker/${patientId}`;
     const res = await axios.get(url, { withCredentials: true });

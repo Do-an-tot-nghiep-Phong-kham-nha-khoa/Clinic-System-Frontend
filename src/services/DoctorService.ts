@@ -161,21 +161,6 @@ export async function getDoctorsBySpecialty(specialtyId: string, params: { page?
   const res = await axios.get(url, { params });
   return res?.data?.data ?? res?.data ?? [];
 }
-export async function getDoctorByAccountId(accountId: string): Promise<DoctorProfile> {
-  const url = `${BASE_URL}/doctors/account/${accountId}`;
-
-  try {
-    const res = await axios.get<DoctorResponse>(url);
-    return res.data.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const errorMessage = error.response?.data?.message || `Lỗi khi gọi API: ${error.message}`;
-      console.error(`Error fetching doctor profile for accountId ${accountId}:`, errorMessage);
-      throw new Error(errorMessage);
-    }
-    throw new Error('Lỗi không xác định khi tải hồ sơ bác sĩ.');
-  }
-}
 
 export interface Account {
   _id: string;
