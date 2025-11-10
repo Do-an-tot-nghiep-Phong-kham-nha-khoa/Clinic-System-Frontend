@@ -6,7 +6,7 @@ import { getDoctors, type Doctor } from '../../services/DoctorService';
 import { getSpecialties, type Specialty } from '../../services/SpecialtyService';
 import { useNavigate } from 'react-router-dom';
 import NavbarDark from '../../components/General/NavbarDark';
-
+import { CacheService } from '../../services/CacheService';
 const { Title } = Typography;
 const { Option } = Select;
 
@@ -38,9 +38,23 @@ const DoctorsPage: React.FC = () => {
       // ignore
     }
   };
+  const buildCacheKey = () => {
+    return `${page}|${limit}|${selectedSpecialty ?? 'all'}|${search}`;
+  };
 
   const fetchDoctors = async () => {
     setLoading(true);
+    const cacheKey = buildCacheKey();
+
+    const cached = CacheService.get<any>(cacheKey);
+    if (cached) {
+      setDoctors(cached.items);
+      setTotal(cached.total);
+      setPage(cached.page);
+      setLimit(cached.limit);
+      setLoading(false);
+      return;
+    }
     try {
       // Call backend with explicit param names expected by the API
       let res;
@@ -50,11 +64,20 @@ const DoctorsPage: React.FC = () => {
         res = await getDoctors({ page, limit, name: search });
       }
 
-      const items = res.items ?? [];
-      setDoctors(items as any[]);
-      setTotal(res.total ?? items.length ?? 0);
-      setPage(res.page ?? page);
-      setLimit(res.limit ?? limit);
+      const payload = {
+        items: res.items ?? [],
+        total: res.total ?? 0,
+        page: res.page ?? page,
+        limit: res.limit ?? limit,
+      };
+
+      CacheService.set(cacheKey, payload);
+
+      setDoctors(payload.items);
+      setTotal(payload.total);
+      setPage(payload.page);
+      setLimit(payload.limit);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching doctors', error);
       setDoctors([]);
