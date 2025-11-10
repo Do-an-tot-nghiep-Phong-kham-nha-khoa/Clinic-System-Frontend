@@ -1,4 +1,4 @@
-import { useState } from 'react'
+
 import { Routes, Route } from 'react-router-dom'
 import './App.css'
 // Contexts
@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext'
 // General Layouts & Pages
 import UserLayout from './layouts/UserLayout'
 import Home from './pages/General/Home'
+import DoctorsPage from './pages/General/Doctors'
 import About from './pages/General/About'
 import Contact from './pages/General/Contact'
 // Admin Pages & Layouts
@@ -27,9 +28,7 @@ import DoctorTreatment from './pages/Doctor/DoctorTreatment'
 import PatientLayout from './layouts/PatientLayout'
 import PatientProfile from './pages/Patient/PatientProfile'
 import PatientMedicalRecord from './pages/Patient/PatientMedicalRecord'
-import PatientAppointmentDoctor from './pages/Patient/PatientAppointmentDoctor'
 import PatientAppointmentSpecialty from './pages/Patient/PatientAppointmentSpecialty'
-import PatientChatbot from './pages/Patient/PatientChatbot'
 import Chat from './components/chat'
 // Receptionist Pages & Layouts
 import ReceptionistLayout from './layouts/ReceptionistLayout'
@@ -40,6 +39,7 @@ import ReceptionistInvoice from './pages/Receptionist/ReceptionistInvoice'
 import DoctorProfile from './pages/Doctor/DoctorProfile'
 import HealthProfile from './pages/Patient/HealthProfile'
 import LoginPage from './pages/Auth/LoginPage'
+import PatientAppointmentDoctor from './pages/Patient/PatientAppointmentDoctor'
 
 
 function App() {
@@ -49,6 +49,7 @@ function App() {
       <Routes>
         <Route path='/' element={<UserLayout />}>
           <Route index element={<Home />} />
+          <Route path='doctors' element={<DoctorsPage />} />
           <Route path='about' element={<About />} />
           <Route path='contact' element={<Contact />} />
           <Route path='chat' element={<Chat />} />
@@ -75,8 +76,8 @@ function App() {
 
         <Route path='patient' element={<PatientLayout />}>
           <Route index element={<PatientProfile />} />
-          <Route path='appointments-doctor' element={<PatientAppointmentDoctor />} />
           <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
+          <Route path='appointments-doctor' element={<PatientAppointmentDoctor />} />
           <Route path='medical-records' element={<PatientMedicalRecord />} />
           <Route path='chatbot' element={<Chat />} />
           <Route path='health-profile' element={<HealthProfile />} />
