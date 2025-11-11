@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Space, Table, Tag, Typography } from "antd";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { getAppointmentsByDoctor } from "../../../services/AppointmentService";
 import { ClockCircleOutlined, UserOutlined, CalendarOutlined, SolutionOutlined, SyncOutlined, CheckCircleOutlined, ExclamationCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+dayjs.extend(utc);
 
 const { Title, Text } = Typography;
 
@@ -10,6 +12,19 @@ interface Props {
     doctorId: string;
     onSelect: (app: any) => void;
 }
+
+const getGenderLabel = (gender?: string): string => {
+    switch ((gender || "").toLowerCase()) {
+        case "male":
+            return "Nam";
+        case "female":
+            return "Nữ";
+        case "other":
+            return "Khác";
+        default:
+            return "Chưa cập nhật";
+    }
+};
 
 const getStatusTag = (status: string) => {
     switch (status.toLowerCase()) {
@@ -47,13 +62,13 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
             dataIndex: ["healthProfile_id", "owner_detail"],
             key: "patient",
             render: (owner: any, record: any) => {
-                const dob = owner?.dob ? dayjs().diff(dayjs(owner.dob), 'year') : 'N/A';
+                const dob = owner?.dob ? dayjs().diff(dayjs(owner.dob), "year") : "N/A";
                 return (
                     <div>
                         <Text strong>{owner?.name || "N/A"}</Text>
                         <br />
                         <Text type="secondary" style={{ fontSize: '0.85em' }}>
-                            {owner?.gender} - {dob} tuổi
+                            {getGenderLabel(owner?.gender)} - {dob} tuổi
                         </Text>
                     </div>
                 );
@@ -66,7 +81,7 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
             key: "dateTime",
             render: (date: string, record: any) => (
                 <Space direction="vertical" size={2}>
-                    <Text><CalendarOutlined /> {dayjs(date).format("DD/MM/YYYY")}</Text>
+                    <Text><CalendarOutlined /> {dayjs.utc(date).format("DD/MM/YYYY")}</Text>
                     <Text strong><ClockCircleOutlined /> {record.timeSlot}</Text>
                 </Space>
             ),

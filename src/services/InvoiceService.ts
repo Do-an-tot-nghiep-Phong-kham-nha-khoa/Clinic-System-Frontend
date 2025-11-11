@@ -4,10 +4,11 @@ const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 
 export type InvoiceStatus = 'Paid' | 'Cancelled' | 'Pending' | 'Refunded';
 
-export type PatientInfo = {
-    _id: string;
+export type OwnerDetail = {
     name: string;
+    dob: string;
     phone: string;
+    gender: 'male' | 'female' | 'other';
 };
 
 export type MedicineItem = {
@@ -23,7 +24,6 @@ export type MedicineItem = {
 export type PrescriptionInfo = {
     _id: string;
     totalPrice: number;
-    patientId?: string;
     items: MedicineItem[];
 };
 
@@ -40,9 +40,7 @@ export type ServiceItem = {
 
 export type LabOrderInfo = {
     _id: string;
-    testTime: string;
     totalPrice: number;
-    patientId?: string;
     items: ServiceItem[];
 };
 
@@ -53,8 +51,8 @@ export type Invoice = {
     status: InvoiceStatus;
 
     // Thông tin bệnh nhân đã populate
-    patient: PatientInfo;
-    patientId: string;
+    healthProfile_id: string;
+    owner_detail: OwnerDetail;
 
     // Chi tiết đơn thuốc (có thể null)
     prescription: PrescriptionInfo | null;
@@ -80,7 +78,6 @@ export type InvoiceQuery = {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
     q?: string;
-    patientId?: string;
     status?: InvoiceStatus;
     dateFrom?: string;
     dateTo?: string;

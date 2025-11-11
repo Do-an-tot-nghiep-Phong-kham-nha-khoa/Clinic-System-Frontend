@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Pagination, Select, Input, Skeleton, Typography } from 'antd';
 import Footer from '../../components/General/Footer';
 import DoctorCard from '../../components/Doctor/DoctorCard';
-import { getDoctors, type Doctor } from '../../services/DoctorService';
+import { getDoctorsWithPaging, type Doctor } from '../../services/DoctorService';
 import { getSpecialties, type Specialty } from '../../services/SpecialtyService';
 import { useNavigate } from 'react-router-dom';
 import NavbarDark from '../../components/General/NavbarDark';
@@ -59,9 +59,9 @@ const DoctorsPage: React.FC = () => {
       // Call backend with explicit param names expected by the API
       let res;
       if (selectedSpecialty) {
-        res = await getDoctors({ page, limit, specialtyId: selectedSpecialty, name: search });
+        res = await getDoctorsWithPaging({ page, limit, specialtyId: selectedSpecialty, name: search });
       } else {
-        res = await getDoctors({ page, limit, name: search });
+        res = await getDoctorsWithPaging({ page, limit, name: search });
       }
 
       const payload = {

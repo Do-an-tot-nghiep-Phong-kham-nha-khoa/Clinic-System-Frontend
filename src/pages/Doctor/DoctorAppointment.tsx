@@ -5,7 +5,8 @@ import { getAppointmentsByDoctor, type AppointmentModel } from "../../services/A
 import type { Dayjs } from "dayjs";
 import { Badge, Calendar, Modal, type CalendarProps } from "antd";
 import dayjs from "dayjs";
-
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const DoctorAppointment = () => {
     const { user } = useAuth();
@@ -40,7 +41,10 @@ const DoctorAppointment = () => {
     };
 
     const getAppointmentsForDate = (date: Dayjs) => {
-        return appointments.filter((a) => dayjs(a.appointmentDate).isSame(date, "day"));
+        // Dùng UTC để không bị lệch ngày khi parse từ DB
+        return appointments.filter((a) =>
+            dayjs.utc(a.appointmentDate).isSame(date, "day")
+        );
     };
 
     const statusToBadge = (status: string) => {
@@ -119,7 +123,7 @@ const DoctorAppointment = () => {
             </div>
 
             <Modal
-                title={`Appointments on ${selectedDate ? selectedDate.format("YYYY-MM-DD") : ""}`}
+                title={`Lịch hẹn vào ngày ${selectedDate ? selectedDate.format("YYYY-MM-DD") : ""}`}
                 open={isModalVisible}
                 onCancel={handleClose}
                 footer={null}

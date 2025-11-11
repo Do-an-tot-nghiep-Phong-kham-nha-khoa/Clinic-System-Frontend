@@ -131,7 +131,7 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
             setLoading(true);
             const result = await createPrescription(payload);
             message.success("Tạo đơn thuốc thành công!");
-            onCreated(result._id);
+            onCreated(result.id);
         } catch (error) {
             message.error("Tạo đơn thuốc thất bại. Vui lòng thử lại.");
         } finally {

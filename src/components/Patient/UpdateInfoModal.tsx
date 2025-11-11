@@ -24,7 +24,7 @@ const UpdateInfoModal: React.FC<UpdateInfoModalProps> = ({ open, patient, patien
                 phone: patient.phone,
                 gender: (patient as any).gender || 'other',
                 address: (patient as any).address || '',
-                dob: patient.dob ? moment(patient.dob) : undefined,
+                dob: patient.dob ? moment.utc(patient.dob) : undefined,
             });
         }
     }, [open, patient, form]);
@@ -35,9 +35,9 @@ const UpdateInfoModal: React.FC<UpdateInfoModalProps> = ({ open, patient, patien
             const { dob, ...rest } = values;
             const dto: UpdatePatientDTO = {
                 ...rest,
-                dob: dob ? dob.toISOString() : undefined,
+                dob: dob ? moment.utc(dob.format('YYYY-MM-DD')).toISOString() : undefined,
             };
-            const updated = await updatePatient(patientId, dto);
+            const updated = await updatePatient(patientId as string, dto);
             message.success('Cập nhật hồ sơ thành công!');
             onUpdated(updated);
             onClose();
