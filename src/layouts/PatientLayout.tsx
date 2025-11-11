@@ -11,7 +11,7 @@ import {
 } from "react-icons/md";
 import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
-import { FaFileMedical, FaRobot } from "react-icons/fa";
+import { FaFileMedical, FaRegCalendarPlus, FaRobot } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 
 const { Header, Sider, Content } = Layout;
@@ -38,6 +38,12 @@ const PatientLayout = () => {
             onClick: () => navigate("/patient/health-profile"),
         },
         {
+            key: "appointments",
+            icon: <FaRegCalendarPlus size={20} />,
+            label: "Xem lịch hẹn",
+            onClick: () => navigate("/patient/appointments"),
+        },
+        {
             key: "appointments-specialty",
             icon: <FaListCheck size={20} />,
             label: "Đặt lịch chuyên khoa",
@@ -52,7 +58,7 @@ const PatientLayout = () => {
         {
             key: "medical-records",
             icon: <FaFileMedical size={20} />,
-            label: "Xem hồ sơ bệnh án",
+            label: "Xem lịch sử khám",
             onClick: () => navigate("/patient/medical-records"),
         },
         {
@@ -67,6 +73,7 @@ const PatientLayout = () => {
     let selectedKey = "profile";
     if (pathname.startsWith("/patient/medical-records")) selectedKey = "medical-records";
     else if (pathname.startsWith("/patient/chatbot")) selectedKey = "chatbot";
+    else if (pathname.startsWith("/patient/appointments")) selectedKey = "appointments";
     else if (pathname.startsWith("/patient/health-profile")) selectedKey = "health-profile";
     else if (pathname.startsWith("/patient/appointments-doctor")) selectedKey = "appointments-doctor";
     else if (pathname.startsWith("/patient/appointments-specialty")) selectedKey = "appointments-specialty";

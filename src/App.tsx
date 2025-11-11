@@ -40,6 +40,7 @@ import DoctorProfile from './pages/Doctor/DoctorProfile'
 import HealthProfile from './pages/Patient/HealthProfile'
 import LoginPage from './pages/Auth/LoginPage'
 import PatientAppointmentDoctor from './pages/Patient/PatientAppointmentDoctor'
+import PatientAppointment from './pages/Patient/PatientAppointment'
 
 
 function App() {
@@ -76,6 +77,7 @@ function App() {
 
         <Route path='patient' element={<PatientLayout />}>
           <Route index element={<PatientProfile />} />
+          <Route path='appointments' element={<PatientAppointment />} />
           <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
           <Route path='appointments-doctor' element={<PatientAppointmentDoctor />} />
           <Route path='medical-records' element={<PatientMedicalRecord />} />
