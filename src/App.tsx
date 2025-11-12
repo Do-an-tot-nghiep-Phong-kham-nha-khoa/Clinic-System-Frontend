@@ -9,6 +9,7 @@ import Home from './pages/General/Home'
 import DoctorsPage from './pages/General/Doctors'
 import About from './pages/General/About'
 import Contact from './pages/General/Contact'
+import DoctorProfileView from './components/Doctor/DoctorProfileView'
 // Admin Pages & Layouts
 import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/Admin/AdminDashboard'
@@ -51,6 +52,7 @@ function App() {
         <Route path='/' element={<UserLayout />}>
           <Route index element={<Home />} />
           <Route path='doctors' element={<DoctorsPage />} />
+          <Route path='doctors/:doctorId' element={<DoctorProfileView />} />
           <Route path='about' element={<About />} />
           <Route path='contact' element={<Contact />} />
           <Route path='chat' element={<Chat />} />

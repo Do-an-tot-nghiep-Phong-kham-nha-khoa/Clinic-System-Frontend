@@ -1,32 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar } from 'antd';
-import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, ScheduleOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import { MdEmail } from 'react-icons/md';
-import { useAuth } from '../../contexts/AuthContext';
-import { getDoctorByAccountId, type DoctorProfile } from "../../services/DoctorService";
-import UpdateProfileModal from '../../components/Doctor/UpdateProfileModal';
-import ButtonPrimary from '../../utils/ButtonPrimary';
+import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { useParams } from 'react-router-dom';
+import { getDoctorById, type Doctor } from "../../services/DoctorService";
 
-const DoctorProfileComponent: React.FC = () => {
-    const [doctor, setDoctor] = useState<DoctorProfile | null>(null);
+const DoctorProfileView: React.FC = () => {
+    const [doctor, setDoctor] = useState<Doctor | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const { user } = useAuth();
-    const currentAccountId = user?.id
-    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    // Lấy doctorId từ URL
+    const { doctorId } = useParams<{ doctorId: string }>();
 
     const fetchDoctorData = async () => {
-        if (!currentAccountId) {
-            setError("Không tìm thấy Account ID để tải hồ sơ.");
+        if (!doctorId) {
+            setError("Không tìm thấy Doctor ID để tải hồ sơ.");
             setLoading(false);
             return;
         }
         try {
             setLoading(true);
-            // Gọi hàm service của Doctor
-            const data = await getDoctorByAccountId(currentAccountId);
+            const data = await getDoctorById(doctorId);
             setDoctor(data);
+            console.log(data)
             setError(null);
         } catch (err) {
             console.error("Lỗi khi tải dữ liệu bác sĩ:", err);
@@ -38,9 +34,8 @@ const DoctorProfileComponent: React.FC = () => {
 
     useEffect(() => {
         fetchDoctorData();
-    }, [currentAccountId]);
+    }, [doctorId]);
 
-    // --- Xử lý trạng thái tải và lỗi ---
     if (loading) {
         return (
             <div className="p-4 sm:p-8 flex justify-center bg-gray-50 min-h-screen">
@@ -81,18 +76,13 @@ const DoctorProfileComponent: React.FC = () => {
         );
     }
 
-    const handleDoctorUpdate = (updatedDoctor: DoctorProfile) => {
-        setDoctor(updatedDoctor);
-    };
-
     const specialtyName = doctor.specialtyId?.name || 'Chưa xác định';
     const specialtyId = doctor.specialtyId?._id || 'N/A';
     const experience = doctor.experience;
-    const email = doctor.accountId?.email || 'N/A';
     const phone = doctor.phone || 'N/A';
 
     return (
-        <div className="p-4 sm:p-8 ">
+        <div className="p-4 sm:p-8">
             <div className="container mx-auto">
                 <Card
                     className="shadow-2xl rounded-2xl border-t-4 border-cyan-600"
@@ -102,20 +92,8 @@ const DoctorProfileComponent: React.FC = () => {
                             <span>Hồ Sơ Bác Sĩ</span>
                         </div>
                     }
-                    extra={
-                        <ButtonPrimary
-                            type="default"
-                            icon={<ScheduleOutlined />}
-                            className="text-cyan-600 border-cyan-600 hover:bg-cyan-50 rounded-lg"
-                            onClick={() => setIsEditModalVisible(true)}
-                        >
-                            Sửa hồ sơ
-                        </ButtonPrimary>
-                    }
                 >
-                    {/* Phần Thông tin Cơ bản (Tên, Avatar, Tags) */}
                     <div className="flex flex-col md:flex-row items-start md:items-center mb-6 border-b pb-4">
-                        {/* Avatar */}
                         <Avatar
                             size={96}
                             icon={<UserOutlined />}
@@ -127,7 +105,6 @@ const DoctorProfileComponent: React.FC = () => {
                         <div className="mt-4 md:mt-0 mx-4">
                             <h3 className="text-3xl font-extrabold text-gray-900 leading-tight">{doctor.name}</h3>
                             <div className="mt-1 space-x-2">
-                                <Tag color="blue" icon={<IdcardOutlined />}>ID Tài Khoản: {doctor.accountId?._id}</Tag>
                                 <Tag color="processing" icon={<ExperimentOutlined />} className="text-base px-3 py-1 font-semibold">
                                     {specialtyName}
                                 </Tag>
@@ -135,7 +112,6 @@ const DoctorProfileComponent: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Phần Chi tiết Chuyên môn và Liên hệ */}
                     <h4 className="text-xl font-semibold text-gray-700 mb-3 border-l-4 border-indigo-500 pl-2">Thông Tin Chuyên Môn & Liên Hệ</h4>
 
                     <Descriptions
@@ -149,12 +125,6 @@ const DoctorProfileComponent: React.FC = () => {
                             label={<span className="font-medium flex items-center"><RocketOutlined className="mr-2" /> Kinh Nghiệm</span>}
                         >
                             <span className="font-bold text-indigo-600">{experience} năm</span>
-                        </Descriptions.Item>
-
-                        <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><MdEmail className="mr-2" /> Email</span>}
-                        >
-                            <span className="font-semibold">{email}</span>
                         </Descriptions.Item>
 
                         <Descriptions.Item
@@ -181,17 +151,8 @@ const DoctorProfileComponent: React.FC = () => {
                     </Descriptions>
                 </Card>
             </div>
-
-            {doctor && (
-                <UpdateProfileModal
-                    open={isEditModalVisible}
-                    accountId={user?.id || ""}
-                    onClose={() => setIsEditModalVisible(false)}
-                    onUpdated={handleDoctorUpdate}
-                />
-            )}
         </div>
     );
 };
 
-export default DoctorProfileComponent;
+export default DoctorProfileView;
