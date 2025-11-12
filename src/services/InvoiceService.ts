@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
+import api from './Api';
 
 export type InvoiceStatus = 'Paid' | 'Cancelled' | 'Pending' | 'Refunded';
 
@@ -97,8 +95,8 @@ export type CreateInvoiceDto = {
 
 // Lấy danh sách hóa đơn với phân trang và lọc
 export async function getInvoices(params: InvoiceQuery = {}): Promise<{ items: Invoice[]; meta: InvoiceMeta | null }> {
-    const url = `${BASE_URL}/invoices`;
-    const res = await axios.get(url, { params });
+    const url = `/invoices`;
+    const res = await api.get(url, { params });
     const items: Invoice[] = res?.data?.data ?? [];
     const meta: InvoiceMeta | null = res?.data?.meta ?? null;
     return { items, meta };
@@ -106,28 +104,28 @@ export async function getInvoices(params: InvoiceQuery = {}): Promise<{ items: I
 
 // Lấy chi tiết một hóa đơn theo ID
 export async function getInvoiceById(id: string): Promise<Invoice> {
-    const url = `${BASE_URL}/invoices/${id}`;
-    const res = await axios.get(url);
+    const url = `/invoices/${id}`;
+    const res = await api.get(url);
     return res?.data ?? res?.data?.data;
 }
 
 // Lấy danh sách hóa đơn theo Patient ID
 export async function getInvoicesByPatientId(patientId: string): Promise<Invoice[]> {
-    const url = `${BASE_URL}/invoices/patient`;
-    const res = await axios.get(url, { params: { patientId } });
+    const url = `/invoices/patient`;
+    const res = await api.get(url, { params: { patientId } });
     return res?.data?.data ?? [];
 }
 
 // Câp nhật trạng thái của một hóa đơn
 export async function updateInvoiceStatus(id: string, dto: UpdateInvoiceStatusDto): Promise<Invoice> {
-    const url = `${BASE_URL}/invoices/${id}/status`;
-    const res = await axios.patch(url, dto);
+    const url = `/invoices/${id}/status`;
+    const res = await api.patch(url, dto);
     return res?.data ?? res?.data?.data;
 }
 
 // Tạo mới một hóa đơn
 export async function createInvoice(dto: CreateInvoiceDto): Promise<Invoice> {
-    const url = `${BASE_URL}/invoices`;
-    const res = await axios.post(url, dto);
+    const url = `/invoices`;
+    const res = await api.post(url, dto);
     return res?.data ?? res?.data?.data;
 }

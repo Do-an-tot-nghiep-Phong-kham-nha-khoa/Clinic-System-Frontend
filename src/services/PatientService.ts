@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './Api';
 
 export type Patient = {
     _id?: string;
@@ -119,14 +119,14 @@ export async function getAllPatients(): Promise<Patient[]> {
 
 
 export async function getPatientByAccountId(accountId: string): Promise<Patient | null> {
-    const url = `${API}/account/${accountId}`;
-    const res = await axios.get(url);
+    const url = `/patients/account/${accountId}`;
+    const res = await api.get(url);
     return res?.data ?? null;
 }
 
 // update patient info
 export async function updatePatient(patientId: string, data: UpdatePatientDTO): Promise<Patient> {
-    const url = `${API}/${patientId}`;
-    const res = await axios.put(url, data);
+    const url = `/patients/${patientId}`;
+    const res = await api.put(url, data);
     return res.data;
 }

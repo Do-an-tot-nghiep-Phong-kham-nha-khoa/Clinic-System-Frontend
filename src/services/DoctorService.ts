@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
+import api from './Api';
 
 export type DoctorScheduleItem = {
   _id?: string;
@@ -191,9 +189,9 @@ export interface UpdateDoctorPayload {
 export async function getDoctors(specialtyId?: string): Promise<Doctor[]> {
   try {
     const url = specialtyId
-      ? `${BASE_URL}/doctors/specialty/${specialtyId}`
-      : `${BASE_URL}/doctors`;
-    const res = await axios.get(url);
+      ? `/doctors/specialty/${specialtyId}`
+      : `/doctors`;
+    const res = await api.get(url);
 
     // backend trả về { message, data: [...] }
     const data = res?.data?.data;

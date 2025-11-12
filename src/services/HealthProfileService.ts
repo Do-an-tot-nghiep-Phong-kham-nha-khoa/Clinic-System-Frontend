@@ -1,7 +1,4 @@
-import axios from 'axios';
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-
+import api from './Api';
 export interface HealthProfile {
     _id: string;
     ownerId: string;
@@ -27,9 +24,9 @@ export interface HealthProfile {
 
 // Lấy tất cả hồ sơ sức khỏe của bệnh nhân theo Patient ID
 export async function getAllHealthProfiles(patientId: string): Promise<HealthProfile[]> {
-    const url = `${BASE_URL}/health-profiles/all/${patientId}`;
+    const url = `/health-profiles/all/${patientId}`;
     try {
-        const res = await axios.get(url);
+        const res = await api.get(url);
         // API trả về list trực tiếp => return res.data
         return Array.isArray(res.data) ? res.data : [];
     } catch (error) {
