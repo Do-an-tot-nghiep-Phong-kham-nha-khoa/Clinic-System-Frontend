@@ -8,9 +8,9 @@ import { MdEmail } from 'react-icons/md';
 import UpdateInfoModal from '../../components/Patient/UpdateInfoModal';
 
 // Hàm tính tuổi
-const calculateAge = (dob: string): number | null => {
+const calculateAge = (dob?: string | null): number | null => {
     if (!dob) return null;
-    return moment().diff(moment(dob), 'years');
+    return moment.utc().diff(moment.utc(dob), 'years');
 };
 
 const PatientProfile: React.FC = () => {
@@ -79,7 +79,9 @@ const PatientProfile: React.FC = () => {
     }
 
     const age = calculateAge(patient.dob);
-    const formattedDob = patient.dob ? moment(patient.dob).format('DD/MM/YYYY') : 'N/A';
+    const formattedDob = patient.dob
+        ? moment(patient.dob.split('T')[0]).format('DD/MM/YYYY')
+        : 'N/A';
     const gender = (patient as any).gender || 'N/A';
     const address = (patient as any).address || 'Chưa cập nhật';
 
@@ -175,7 +177,7 @@ const PatientProfile: React.FC = () => {
                 <UpdateInfoModal
                     open={isEditModalVisible}
                     patient={patient}
-                    patientId={patient._id}
+                    patientId={patient._id ?? ''}
                     onClose={() => setIsEditModalVisible(false)}
                     onUpdated={handlePatientUpdate}
                 />

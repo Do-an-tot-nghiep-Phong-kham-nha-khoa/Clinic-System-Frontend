@@ -81,6 +81,39 @@ export interface ListAppointmentByDoctorResponse {
     appointments: AppointmentModel[];
 }
 
+export interface DoctorDetail {
+    _id: string;
+    accountId: string;
+    name: string;
+    specialtyId: string;
+    phone: string;
+    experience: number;
+}
+
+export interface SpecialtyDetail {
+    _id: string;
+    name: string;
+    description: string;
+}
+
+export interface BookerAppointmentModel {
+    _id: string;
+    doctor_id: DoctorDetail;
+    specialty_id: SpecialtyDetail;
+    booker_id: string;
+    healthProfile_id: HealthProfile;
+    appointmentDate: string;
+    timeSlot: string;
+    reason: string;
+    status: string;
+    createdAt: string;
+}
+
+export interface ListAppointmentByBookerResponse {
+    count: number;
+    appointments: BookerAppointmentModel[];
+}
+
 const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 const API = `${BASE_URL}/appointments`;
 export async function getAppointments(params: any = {}): Promise<{ items: AppointmentPayload[]; meta: AppointmentMeta | null }> {
@@ -99,16 +132,6 @@ export async function updateAppointment(id: string, status: string): Promise<App
     const url = `${API}/${id}`;
     const res = await axios.put(url, { status }, { withCredentials: true });
     return res?.data ?? null;
-}
-export async function getAppointmentsByDoctor(doctorId: string): Promise<AppointmentPayload[]> {
-    const url = `${API}/doctor/${doctorId}`;
-    const res = await axios.get(url, { withCredentials: true });
-    return res?.data?.data ?? res?.data ?? [];
-}
-export async function getAppointmentsByBooker(patientId: string): Promise<AppointmentPayload[]> {
-    const url = `${API}/booker/${patientId}`;
-    const res = await axios.get(url, { withCredentials: true });
-    return res?.data?.data ?? res?.data ?? [];
 }
 export async function assignDoctor(appointment_id: string, doctor_id: string) {
     const url = `${API}/${appointment_id}/assign-doctor`;
@@ -161,6 +184,20 @@ export async function getAppointmentsByDoctor(doctorId: string): Promise<ListApp
         if (axios.isAxiosError(error) && error.response) {
             console.error("Lỗi GET lịch hẹn theo doctor:", error.response.data);
             throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn bác sĩ.");
+        }
+        throw new Error("Lỗi kết nối server");
+    }
+}
+
+export async function getAppointmentsByBooker(bookerId: string): Promise<ListAppointmentByBookerResponse> {
+    const url = `${BASE_URL}/appointments/booker/${bookerId}`;
+    try {
+        const res = await axios.get(url);
+        return res.data;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            console.error("Lỗi GET lịch hẹn theo booker:", error.response.data);
+            throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn người đặt.");
         }
         throw new Error("Lỗi kết nối server");
     }

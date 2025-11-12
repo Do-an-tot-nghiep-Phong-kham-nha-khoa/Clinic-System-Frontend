@@ -6,7 +6,7 @@ export type CreateTreatmentDto = {
     healthProfile: string;
     doctor: string;
     appointment: string;
-    treatmentDate: string;   // ISO date string
+    treatmentDate?: string;   // ISO date string
     diagnosis: string;
     bloodPressure: string;
     heartRate: number;

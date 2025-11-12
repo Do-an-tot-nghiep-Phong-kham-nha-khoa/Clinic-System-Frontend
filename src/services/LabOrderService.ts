@@ -9,7 +9,7 @@ export type LabOrderItemInput = {
 };
 
 export type CreateLabOrderInput = {
-    testTime: string; // ISO string
+    testTime?: string; // ISO string
     healthProfile_id: string;
     items: LabOrderItemInput[];
 };

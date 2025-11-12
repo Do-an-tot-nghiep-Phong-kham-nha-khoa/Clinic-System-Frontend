@@ -1,6 +1,6 @@
 import { Button, Input, message, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
-import { FaSearch, FaRegEdit } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { formatDateDDMMYYYY } from "../../utils/date";
 import {
     getInvoices,
@@ -9,10 +9,16 @@ import {
     type InvoiceStatus
 } from "../../services/InvoiceService";
 
+const formatGender = (gender: 'male' | 'female' | 'other'): string => {
+    switch (gender) {
+        case 'male': return 'Nam';
+        case 'female': return 'Nữ';
+        default: return 'Khác';
+    }
+}
+
 const InvoiceManagement = () => {
-    // Sửa state từ medicines sang invoices
     const [invoices, setInvoices] = useState<Invoice[]>([]);
-    // Sửa meta type
     const [meta, setMeta] = useState<InvoiceMeta | null>(null);
 
     // table query state
@@ -27,7 +33,7 @@ const InvoiceManagement = () => {
         fetchInvoices();
     }, [page, pageSize, sort, q]);
 
-    // Sửa tên hàm fetchInvoices và logic gọi service
+    // Hàm lấy danh sách hóa đơn từ API
     const fetchInvoices = async () => {
         try {
             setLoading(true);
@@ -110,14 +116,13 @@ const InvoiceManagement = () => {
             render: (value: string) => value.slice(0, 8)
         },
         {
-            title: 'Bệnh nhân',
-            dataIndex: ['patient', 'name'],
-            key: 'patientName',
+            title: 'Chủ Hồ sơ Sức khỏe',
+            dataIndex: ['owner_detail', 'name'],
+            key: 'ownerName',
             render: (_: any, record: Invoice) => (
                 <>
-                    <strong>{record.patient?.name}</strong>
-                    <br />
-                    <small>SĐT: {record.patient?.phone}</small>
+                    <strong className="block">{record.owner_detail?.name}</strong>
+                    <small className="block">SĐT: {record.owner_detail?.phone}</small>
                 </>
             )
         },
