@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import api from './api';
 const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 
 export interface AppointmentPayload {
@@ -26,10 +26,10 @@ export interface AppointmentResponse {
 }
 
 export async function createAppointmentBySpecialty(payload: AppointmentPayload): Promise<AppointmentResponse> {
-    const url = `${BASE_URL}/appointments/by-specialty`;
+    const url = `/appointments/by-specialty`;
 
     try {
-        const res = await axios.post(url, payload);
+        const res = await api.post(url, payload);
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
@@ -41,10 +41,10 @@ export async function createAppointmentBySpecialty(payload: AppointmentPayload):
 }
 
 export async function createAppointmentByDoctor(payload: AppointmentByDoctorPayload): Promise<AppointmentResponse> {
-    const url = `${BASE_URL}/appointments/by-doctor`;
+    const url = `/appointments/by-doctor`;
 
     try {
-        const res = await axios.post(url, payload);
+        const res = await api.post(url, payload);
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
