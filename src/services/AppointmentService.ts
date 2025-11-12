@@ -176,10 +176,10 @@ export async function createAppointmentByDoctor(payload: AppointmentByDoctorPayl
 }
 
 export async function getAppointmentsByDoctor(doctorId: string): Promise<ListAppointmentByDoctorResponse> {
-    const url = `${BASE_URL}/appointments/doctor/${doctorId}`;
+    const url = `/appointments/doctor/${doctorId}`;
 
     try {
-        const res = await axios.get(url);
+        const res = await api.get(url);
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
@@ -191,9 +191,9 @@ export async function getAppointmentsByDoctor(doctorId: string): Promise<ListApp
 }
 
 export async function getAppointmentsByBooker(bookerId: string): Promise<ListAppointmentByBookerResponse> {
-    const url = `${BASE_URL}/appointments/booker/${bookerId}`;
+    const url = `/appointments/booker/${bookerId}`;
     try {
-        const res = await axios.get(url);
+        const res = await api.get(url);
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
