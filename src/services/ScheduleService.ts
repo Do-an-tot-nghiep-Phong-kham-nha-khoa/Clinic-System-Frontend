@@ -1,7 +1,6 @@
 import axios from 'axios';
-
-const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
-const API = `${BASE_URL}/schedules`;
+import api from './Api';
+const URL = `/schedules`;
 
 export type TimeSlot = {
     startTime: string;
@@ -31,8 +30,8 @@ export async function getAvailableTimeSlotsBySpecialty(
     specialtyId: string,
     date: string
 ): Promise<AvailableSlot[]> {
-    const url = `${API}/specialty/${encodeURIComponent(specialtyId)}/${encodeURIComponent(date)}`;
-    const res = await axios.get(url, { withCredentials: true });
+    const url = `${URL}/specialty/${encodeURIComponent(specialtyId)}/${encodeURIComponent(date)}`;
+    const res = await api.get(url);
     const body = res?.data ?? [];
     if (Array.isArray(body)) return body as AvailableSlot[];
     if (Array.isArray(body?.data)) return body.data as AvailableSlot[];
@@ -43,8 +42,8 @@ export async function getAvailableTimeSlotsBySpecialty(
 ---------------------------------------------------- */
 export async function getDoctorSchedule(doctorId: string): Promise<ScheduleEntry[]> {
     try {
-        const url = `${API}/${doctorId}`;
-        const res = await axios.get(url, { withCredentials: true });
+        const url = `${URL}/${doctorId}`;
+        const res = await api.get(url);
 
         const data = res?.data;
         if (!data) return [];
@@ -61,39 +60,27 @@ export async function getAvailableBySpecialty(
     date: string,
     shift?: "morning" | "afternoon" | "evening"
 ) {
-    let url = `${BASE_URL}/schedules/specialty/${specialtyId}/${date}`;
+    let url = `${URL}/specialty/${specialtyId}/${date}`;
 
     if (shift) {
         url += `?shift=${shift}`;
     }
 
-    const res = await axios.get(url);
+    const res = await api.get(url);
     return res.data; // [{startTime, endTime, doctor_ids:[...] }]
 }
 /* ---------------------------------------------------
    GET: /schedules/:doctorId/:date
 ---------------------------------------------------- */
-export async function getDoctorScheduleByDate(
-    doctorId: string,
-    date: string
-): Promise<TimeSlot[]> {
-    try {
-        const url = `${API}/${doctorId}/${encodeURIComponent(date)}`;
-        const res = await axios.get(url, { withCredentials: true });
-
-        const data = res?.data;
-
-        if (Array.isArray(data)) return data;
-        if (Array.isArray(data?.availableSlots)) return data.availableSlots;
-
-        return [];
-    } catch (e: any) {
-        if (e?.response?.status === 404) return [];
-        console.error("getDoctorScheduleByDate error:", e);
-        return [];
-    }
+export async function getDoctorScheduleByDate(doctorId: string, date: string, shift?: 'morning' | 'afternoon') {
+    let url = `${URL}/${doctorId}/${encodeURIComponent(date)}`;
+    if (shift) url += `?shift=${shift}`;
+    const res = await api.get(url);
+    return res?.data ?? [];
 }
-
+export async function getAvailableSlotsByDoctor(doctorId: string, date: string, shift?: 'morning' | 'afternoon') {
+    return getDoctorScheduleByDate(doctorId, date, shift);
+}
 /* ---------------------------------------------------
    GET: /schedules/available-doctors?specialtyId=...&date=...&timeSlot=...
 ---------------------------------------------------- */
@@ -103,7 +90,7 @@ export async function getAvailableDoctors(
     timeSlot: string
 ) {
     try {
-        const res = await axios.get(`${API}/available-doctors`, {
+        const res = await api.get(`${URL}/available-doctors`, {
             params: {
                 specialty_id: specialtyId,
                 date: date,           // phải là yyyy-mm-dd
@@ -126,7 +113,7 @@ export async function createSchedule(payload: {
     date: string;
     timeSlots: TimeSlot[];
 }) {
-    const res = await axios.post(API, payload, { withCredentials: true });
+    const res = await api.post(URL, payload);
     return res?.data ?? null;
 }
 
