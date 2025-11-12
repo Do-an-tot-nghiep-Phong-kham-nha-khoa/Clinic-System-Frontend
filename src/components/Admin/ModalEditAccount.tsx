@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, message } from 'antd';
-import { getAccount,updateAccount, type Account } from '../../services/AccountService';
+import { getAccountById,updateAccount, type Account } from '../../services/AccountService';
 
 interface ModalEditAccountProps {
     open: boolean;
@@ -19,9 +19,9 @@ const ModalEditAccount: React.FC<ModalEditAccountProps> = ({ open, id, onClose, 
             if (!open || !id) return;
             try {
                 setLoading(true);
-                const data = await getAccount(id);
+                const data = await getAccountById(id);
                 form.setFieldsValue({
-                    email: data.email,
+                    email: data ? data.email : '',
                 });
             } catch (e) {
                 message.error('Không thể tải dữ liệu tài khoản');

@@ -1,22 +1,21 @@
 import axios from 'axios';
 
-export type Account = {
-    _id?: string;
-    email: string;
-    password?: string; 
-    roleId?: string[];
-    status?: string;
-    deleted?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
-    __v?: number;
-};
 export type Role = {
-    _id?: string;
-    name: string;
-    description?: string;
-    permissions?: string[];
-}   
+  _id: string;
+  name: string;
+};
+
+export type Account = {
+  _id: string;
+  email: string;
+  password?: string;
+  roleId?: Role | null; // object role hoặc null
+  status?: string;
+  deleted?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+}; 
 export type AccountMeta = {
     total: number;
     page: number;
@@ -43,15 +42,6 @@ export type UpdateAccountDto = Partial<CreateAccountDto> & { deleted?: boolean }
 const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 const API = `${BASE_URL}/accounts`;
 
-export async function getAccounts(params: AccountQuery = {}): Promise<{ items: Account[]; meta: AccountMeta | null }> {
-    const url = `${API}`;
-    const res = await axios.get(url, { params });
-    // normalize response shapes: support { data: [...] }, { items: [...] }, { users: [...] }, { accounts: [...] }
-    const items: Account[] = res?.data?.data ?? res?.data?.accounts ?? res?.data?.items ?? res?.data?.users ?? [];
-    const meta: AccountMeta | null = res?.data?.meta ?? null;
-    console.log("Get Accounts Response:", res);
-    return { items, meta };
-}
 
 // Auth related endpoints
 export async function registerAccount(dto: CreateAccountDto): Promise<Account> {
@@ -92,25 +82,45 @@ export async function resetPassword(payload: { email: string; otp: string; newPa
 
 // CRUD helpers
 
-export async function getAccount(id: string): Promise<Account> {
-    const url = `${API}/${id}`;
-    const res = await axios.get(url);
-    return res?.data?.data ?? res?.data;
+export async function getAccounts(params: AccountQuery = {}): Promise<{ items: Account[]; meta: AccountMeta | null }> {
+    const url = `${API}`;
+    const res = await axios.get(url, { params });
+    const items: Account[] = res?.data?.data ?? res?.data?.accounts ?? res?.data?.items ?? res?.data?.users ?? [];
+    const meta: AccountMeta | null = res?.data?.meta ?? null;
+    console.log("Get Accounts Response:", res);
+    return { items, meta };
 }
 
-export async function updateAccount(id: string, dto: UpdateAccountDto): Promise<Account> {
-    const url = `${API}/${id}`;
-    const res = await axios.put(url, dto);
-    return res?.data?.data ?? res?.data;
+export async function getRole(id: string): Promise<Role | null> {
+    try {
+        const res = await axios.get(`${API}/role/${id}`);
+        return res?.data?.role ?? null;
+    } catch (error) {
+        console.error("Error fetching role", error);
+        return null;
+    }
 }
 
 export async function deleteAccount(id: string): Promise<void> {
-    const url = `${API}/${id}`;
-    await axios.delete(url);
+    await axios.delete(`${API}/${id}`);
 }
 
-export async function getRole(id: string): Promise<Role> {
-    const url = `${BASE_URL}/role/${id}`;
-    const res = await axios.get(url);
-    return res?.data?.data ?? res?.data;
+export async function getAccountById(id: string): Promise<Account | null> {
+    try {
+        const res = await axios.get(`${API}/${id}`);
+        return res?.data?.account ?? null;
+    } catch (error) {
+        console.error("Error fetching account", error);
+        return null;
+    }
+}
+
+export async function createAccount(data: Partial<Account>): Promise<Account> {
+    const res = await axios.post(`${API}/register`, data);
+    return res.data;
+}
+
+export async function updateAccount(id: string, data: Partial<Account>): Promise<Account> {
+    const res = await axios.put(`${API}/${id}`, data);
+    return res.data.account;
 }
