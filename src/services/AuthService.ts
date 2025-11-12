@@ -1,7 +1,5 @@
 // src/service/authService.ts
-import axios from "axios";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+import api from "./Api";
 
 export const registerUser = async (data: {
   email: string;
@@ -12,8 +10,6 @@ export const registerUser = async (data: {
   gender?: string;
   address?: string;
 }) => {
-  const response = await axios.post(`${BASE_URL}/accounts/register`, data, {
-    withCredentials: true, // để nhận cookie từ backend
-  });
-  return response.data;
+  const respone = await api.post("/auth/register", data);
+  return respone.data;
 };

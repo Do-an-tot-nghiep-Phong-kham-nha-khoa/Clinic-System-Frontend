@@ -1,6 +1,5 @@
 import axios from 'axios';
-import api from './api';
-const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
+import api from './Api';
 
 export interface AppointmentPayload {
     booker_id: string;

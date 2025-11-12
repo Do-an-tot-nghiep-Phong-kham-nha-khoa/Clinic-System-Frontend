@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+import api from './Api';
 
 export type Specialty = {
   _id: string;
@@ -19,9 +17,9 @@ export type Doctor = {
 export async function getDoctors(specialtyId?: string): Promise<Doctor[]> {
   try {
     const url = specialtyId
-      ? `${BASE_URL}/doctors/specialty/${specialtyId}`
-      : `${BASE_URL}/doctors`;
-    const res = await axios.get(url);
+      ? `/doctors/specialty/${specialtyId}`
+      : `/doctors`;
+    const res = await api.get(url);
 
     // backend trả về { message, data: [...] }
     const data = res?.data?.data;
@@ -37,8 +35,8 @@ export async function getDoctors(specialtyId?: string): Promise<Doctor[]> {
 
 export async function getDoctorById(doctorId: string): Promise<Doctor | null> {
   try {
-    const url = `${BASE_URL}/doctors/${doctorId}`;
-    const res = await axios.get(url);
+    const url = `/doctors/${doctorId}`;
+    const res = await api.get(url);
     const doctor = res?.data?.data?.doctor;
 
     if (doctor && doctor._id) return doctor as Doctor;
