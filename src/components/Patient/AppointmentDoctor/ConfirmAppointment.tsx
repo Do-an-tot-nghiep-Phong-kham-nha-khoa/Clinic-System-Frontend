@@ -36,7 +36,7 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ doctorId, docto
             return;
         }
 
-        const appointmentDateISO = dayjs(dateTime.date).startOf('day').toISOString();
+        const appointmentDateISO = dayjs(dateTime.date).format('YYYY-MM-DD');
 
         const payload: AppointmentByDoctorPayload = {
             booker_id: patientId,                 // <= lấy từ props, không dùng user.id
