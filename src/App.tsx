@@ -34,6 +34,7 @@ import Chat from './components/chat'
 import ReceptionistLayout from './layouts/ReceptionistLayout'
 import ReceptionistProfile from './pages/Receptionist/ReceptionistProfile'
 import ReceptionistAppointment from './pages/Receptionist/ReceptionistAppointment'
+import ReceptionistManageAppointment from './pages/Receptionist/ReceptionistManageAppoinment'
 import ReceptionistTreatment from './pages/Receptionist/ReceptionistTreatment'
 import ReceptionistInvoice from './pages/Receptionist/ReceptionistInvoice'
 import DoctorProfile from './pages/Doctor/DoctorProfile'
@@ -85,7 +86,8 @@ function App() {
 
         <Route path='receptionist' element={<ReceptionistLayout />}>
           <Route index element={<ReceptionistProfile />} />
-          <Route path='appointments' element={<ReceptionistAppointment />} />
+          <Route path='assignments' element={<ReceptionistAppointment />} />
+          <Route path='appointments' element={<ReceptionistManageAppointment />} />
           <Route path='treatments' element={<ReceptionistTreatment />} />
           <Route path='invoices' element={<ReceptionistInvoice />} />
         </Route>

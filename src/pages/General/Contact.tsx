@@ -1,4 +1,3 @@
-import React from 'react';
 import { FaEnvelope } from 'react-icons/fa';
 import { FiPhone } from "react-icons/fi";
 import { LuAmbulance } from "react-icons/lu";

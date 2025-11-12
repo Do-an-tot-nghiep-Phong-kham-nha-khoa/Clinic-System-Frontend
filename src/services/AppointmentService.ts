@@ -150,18 +150,3 @@ export async function createAppointmentByDoctor(payload: AppointmentByDoctorPayl
         throw new Error("Lỗi kết nối hoặc xử lý không xác định.");
     }
 }
-
-export async function getAppointmentsByDoctor(doctorId: string): Promise<ListAppointmentByDoctorResponse> {
-    const url = `${BASE_URL}/appointments/doctor/${doctorId}`;
-
-    try {
-        const res = await axios.get(url);
-        return res.data;
-    } catch (error: any) {
-        if (axios.isAxiosError(error) && error.response) {
-            console.error("Lỗi GET lịch hẹn theo doctor:", error.response.data);
-            throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn bác sĩ.");
-        }
-        throw new Error("Lỗi kết nối server");
-    }
-}
