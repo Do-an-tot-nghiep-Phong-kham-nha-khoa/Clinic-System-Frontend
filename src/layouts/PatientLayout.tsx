@@ -73,10 +73,10 @@ const PatientLayout = () => {
     let selectedKey = "profile";
     if (pathname.startsWith("/patient/medical-records")) selectedKey = "medical-records";
     else if (pathname.startsWith("/patient/chatbot")) selectedKey = "chatbot";
-    else if (pathname.startsWith("/patient/appointments")) selectedKey = "appointments";
     else if (pathname.startsWith("/patient/health-profile")) selectedKey = "health-profile";
     else if (pathname.startsWith("/patient/appointments-doctor")) selectedKey = "appointments-doctor";
     else if (pathname.startsWith("/patient/appointments-specialty")) selectedKey = "appointments-specialty";
+    else if (pathname.startsWith("/patient/appointments")) selectedKey = "appointments";
     else if (pathname === "/patient" || pathname === "/patient/") selectedKey = "profile";
 
     return (

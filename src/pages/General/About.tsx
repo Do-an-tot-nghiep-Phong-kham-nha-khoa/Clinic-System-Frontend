@@ -23,35 +23,35 @@ const AboutContent = () => {
                     <div className="w-full md:w-1/2 p-5">
                         <div className="text">
                             <span className="text-gray-500 border-b-2 border-[var(--color-primary)] 
-                            uppercase">About us
+                            uppercase">Về chúng tôi
                             </span>
                             <h2 className="my-4 font-bold text-3xl sm:text-4xl ">
-                                About <span className="text-[var(--color-primary)]">
-                                    ProHealth Clinic
+                                Về <span className="text-[var(--color-primary)]">
+                                    Phòng Khám ProHealth
                                 </span>
                             </h2>
                             <p className="text-gray-700 text-lg mb-4">
-                                ProHealth Clinic is a leading healthcare provider in Hanoi, Vietnam,
-                                dedicated to delivering comprehensive medical services with
-                                compassion and expertise.
+                                Phòng Khám ProHealth là một nhà cung cấp dịch vụ chăm sóc sức khỏe hàng đầu tại Hà Nội, Việt Nam,
+                                tận tâm mang đến các dịch vụ y tế toàn diện bằng
+                                sự tận tâm và chuyên môn cao.
                             </p>
                             <p className="text-gray-600 text-base mb-4">
-                                Founded in 2010, our clinic has grown to become a trusted name
-                                in the community, offering state-of-the-art facilities and a team of
-                                highly skilled professionals. We specialize in various departments
-                                including Emergency, Pediatrics, Gynecology, Cardiology, Neurology,
-                                and Psychiatry.
+                                Được thành lập vào năm 2010, phòng khám của chúng tôi đã phát triển thành một cái tên đáng tin cậy
+                                trong cộng đồng, cung cấp cơ sở vật chất hiện đại và đội ngũ
+                                chuyên gia có tay nghề cao. Chúng tôi chuyên sâu trong nhiều chuyên khoa
+                                bao gồm Cấp Cứu, Nhi Khoa, Sản Phụ khoa, Tim Mạch, Thần Kinh,
+                                và Tâm Thần.
                             </p>
                             <p className="text-gray-600 text-base mb-4">
-                                Our mission is to provide holistic healthcare that addresses the
-                                physical, emotional, and mental well-being of our patients.
-                                We believe in preventive care, patient education, and personalized
-                                treatment plans to ensure the best outcomes.
+                                Sứ mệnh của chúng tôi là cung cấp dịch vụ chăm sóc sức khỏe toàn diện, giải quyết
+                                sự khỏe mạnh về thể chất, cảm xúc và tinh thần của bệnh nhân.
+                                Chúng tôi tin vào chăm sóc phòng ngừa, giáo dục bệnh nhân và kế hoạch
+                                điều trị cá nhân hóa để đảm bảo kết quả tốt nhất.
                             </p>
                             <div className='flex items-center gap-2 mt-5'>
                                 <Link className='!text-base !text-[var(--color-primary)] 
                                 hover:!text-[var(--color-secondary)]' href='/contact'>
-                                    Contact us for more information
+                                    Liên hệ với chúng tôi để biết thêm thông tin
                                 </Link>
                                 <FaArrowRight className='text-xs text-[var(--color-primary)]' />
                             </div>
@@ -72,35 +72,35 @@ const GlobalReach = () => {
                         <div className="text">
                             <span className="text-gray-500 border-b-2 border-[var(--color-primary)]
                              uppercase">
-                                Global Reach
+                                Phạm vi Toàn cầu
                             </span>
                             <h2 className="my-4 font-bold text-3xl sm:text-4xl ">
-                                Our <span className="text-[var(--color-primary)]">
-                                    International Presence
+                                Sự Hiện Diện <span className="text-[var(--color-primary)]">
+                                    Quốc Tế Của Chúng Tôi
                                 </span>
                             </h2>
                             <p className="text-gray-700 text-lg mb-4">
-                                ProHealth Clinic extends its expertise beyond borders,
-                                partnering with international healthcare organizations to bring
-                                world-class medical practices to Vietnam.
+                                Phòng Khám ProHealth mở rộng chuyên môn vượt ra ngoài biên giới,
+                                hợp tác với các tổ chức chăm sóc sức khỏe quốc tế để mang lại
+                                các phương pháp y tế đẳng cấp thế giới đến Việt Nam.
                             </p>
                             <p className="text-gray-600 text-base mb-4">
-                                We collaborate with leading hospitals in the US, Europe, and Asia
-                                to exchange knowledge, adopt advanced technologies, and participate
-                                in global health initiatives. Our doctors regularly attend
-                                international conferences and training programs to stay at the
-                                forefront of medical advancements.
+                                Chúng tôi hợp tác với các bệnh viện hàng đầu ở Mỹ, Châu Âu và Châu Á
+                                để trao đổi kiến thức, áp dụng công nghệ tiên tiến và tham gia
+                                vào các sáng kiến sức khỏe toàn cầu. Các bác sĩ của chúng tôi thường xuyên tham dự
+                                các hội nghị và chương trình đào tạo quốc tế để luôn đi đầu
+                                trong những tiến bộ y học.
                             </p>
                             <p className="text-gray-600 text-base mb-4">
-                                Through telemedicine services, we connect patients with specialists
-                                worldwide, ensuring access to diverse expertise. ProHealth is
-                                committed to global standards of care, holding accreditations from
-                                international bodies like JCI.
+                                Thông qua dịch vụ y học từ xa, chúng tôi kết nối bệnh nhân với các chuyên gia
+                                trên toàn thế giới, đảm bảo tiếp cận chuyên môn đa dạng. ProHealth
+                                cam kết tuân thủ các tiêu chuẩn chăm sóc toàn cầu, giữ các chứng nhận từ
+                                các tổ chức quốc tế như JCI.
                             </p>
                             <div className='flex items-center gap-2 mt-5'>
                                 <Link className='!text-base !text-[var(--color-primary)] 
                                 hover:!text-[var(--color-secondary)]'>
-                                    Learn more about our global partnerships</Link>
+                                    Tìm hiểu thêm về quan hệ đối tác toàn cầu của chúng tôi</Link>
                                 <FaArrowRight className='text-xs text-[var(--color-primary)]' />
                             </div>
                         </div>
@@ -123,27 +123,27 @@ const MissionVision = () => {
         <section id='mission-vision' className="bg-gray-100 py-20">
             <div className='container mx-auto px-4'>
                 <div className='flex flex-col items-center justify-center mb-10'>
-                    <h1 className='text-4xl font-bold uppercase'>Our Mission & Vision</h1>
+                    <h1 className='text-4xl font-bold uppercase'>Sứ Mệnh & Tầm Nhìn Của Chúng Tôi</h1>
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
                     <Card className="shadow-md p-6">
                         <h3 className="text-2xl font-bold text-[var(--color-primary)] mb-4">
-                            Mission
+                            Sứ Mệnh
                         </h3>
                         <p className="text-gray-600">
-                            To deliver accessible, high-quality healthcare services that empower
-                            individuals and communities to lead healthier lives through innovation,
-                            compassion, and excellence.
+                            Cung cấp các dịch vụ chăm sóc sức khỏe dễ tiếp cận, chất lượng cao, giúp
+                            các cá nhân và cộng đồng sống khỏe mạnh hơn thông qua đổi mới,
+                            lòng nhân ái và sự xuất sắc.
                         </p>
                     </Card>
                     <Card className="shadow-md p-6">
                         <h3 className="text-2xl font-bold text-[var(--color-primary)] mb-4">
-                            Vision
+                            Tầm Nhìn
                         </h3>
                         <p className="text-gray-600">
-                            To be the premier healthcare destination in Vietnam, setting new
-                            standards in patient care, medical research, and community health
-                            initiatives.
+                            Trở thành điểm đến chăm sóc sức khỏe hàng đầu tại Việt Nam, thiết lập các tiêu chuẩn mới
+                            trong chăm sóc bệnh nhân, nghiên cứu y học và các sáng kiến sức khỏe
+                            cộng đồng.
                         </p>
                     </Card>
                 </div>
@@ -156,32 +156,32 @@ const patients = [
     {
         name: 'Anna Lee',
         image: 'https://randomuser.me/api/portraits/women/1.jpg',
-        feedback: 'The care at ProHealth was exceptional. The staff were compassionate and professional throughout my treatment.'
+        feedback: 'Sự chăm sóc tại ProHealth là đặc biệt. Đội ngũ nhân viên rất nhân ái và chuyên nghiệp trong suốt quá trình điều trị của tôi.'
     },
     {
         name: 'Michael Chen',
         image: 'https://randomuser.me/api/portraits/men/2.jpg',
-        feedback: 'Thanks to the team at ProHealth, I recovered quickly from my illness. Highly recommended!'
+        feedback: 'Nhờ đội ngũ tại ProHealth, tôi đã hồi phục nhanh chóng sau cơn bệnh. Rất khuyến nghị!'
     },
     {
         name: 'Sophia Nguyen',
         image: 'https://randomuser.me/api/portraits/women/3.jpg',
-        feedback: 'Best pediatric care for my child. The doctors are knowledgeable and very patient.'
+        feedback: 'Dịch vụ nhi khoa tốt nhất cho con tôi. Các bác sĩ rất am hiểu và rất kiên nhẫn.'
     },
     {
         name: 'David Kim',
         image: 'https://randomuser.me/api/portraits/men/4.jpg',
-        feedback: 'Professional service and state-of-the-art facilities. Grateful for their expertise in cardiology.'
+        feedback: 'Dịch vụ chuyên nghiệp và cơ sở vật chất hiện đại. Rất biết ơn chuyên môn của họ trong lĩnh vực tim mạch.'
     },
     {
         name: 'Emma Tran',
         image: 'https://randomuser.me/api/portraits/women/5.jpg',
-        feedback: 'Excellent neurology department. They helped manage my condition effectively.'
+        feedback: 'Khoa thần kinh xuất sắc. Họ đã giúp tôi quản lý tình trạng bệnh một cách hiệu quả.'
     },
     {
         name: 'James Wong',
         image: 'https://randomuser.me/api/portraits/men/6.jpg',
-        feedback: 'Compassionate care and personalized treatment plans. ProHealth is the best in Hanoi.'
+        feedback: 'Chăm sóc tận tâm và kế hoạch điều trị cá nhân hóa. ProHealth là tốt nhất ở Hà Nội.'
     }
 ];
 
@@ -198,8 +198,8 @@ const PatientFeedback = () => {
         <section id='patient-feedback' className='bg-gray-100 py-20'>
             <div className='container mx-auto px-4'>
                 <div className='flex flex-col items-center justify-center mb-6'>
-                    <h1 className='text-4xl font-bold uppercase'>Patient Feedback</h1>
-                    <p className='text-base text-gray-400 mt-3'>What our patients say about us</p>
+                    <h1 className='text-4xl font-bold uppercase'>Phản Hồi Từ Bệnh Nhân</h1>
+                    <p className='text-base text-gray-400 mt-3'>Những gì bệnh nhân của chúng tôi nói về chúng tôi</p>
                 </div>
                 <Carousel autoplay arrows infinite={true}>
                     {chunk(patients, 2).map((pair, index) => (
