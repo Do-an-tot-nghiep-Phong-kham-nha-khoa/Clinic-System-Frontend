@@ -6,11 +6,10 @@ import doctor2 from '../../assets/doctor_2.png'
 import doctor3 from '../../assets/doctor_3.png'
 import { FiPhone } from "react-icons/fi";
 import { LuAmbulance, LuBaby } from "react-icons/lu";
-import { IoLocationOutline } from 'react-icons/io5';
+import { IoEarOutline, IoLocationOutline } from 'react-icons/io5';
 import { Button, Card } from 'antd';
 import { FaArrowRight, FaFacebook, FaInstagram, FaSyringe, FaTwitter } from 'react-icons/fa';
 import Link from 'antd/es/typography/Link';
-import { RiAlarmWarningFill } from 'react-icons/ri';
 import { LiaDnaSolid } from 'react-icons/lia';
 import { GiBrain, GiHeartOrgan } from 'react-icons/gi';
 import { AiOutlineSchedule } from 'react-icons/ai';
@@ -25,8 +24,8 @@ const HeroSection = () => {
             />
             <div className="min-h-screen flex items-center justify-center text-white relative z-10">
                 <div className="flex flex-col justify-center items-center text-center gap-5">
-                    <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl italic font-[Times_New_Roman] font-semibold">Welcome To Our Clinic!</h2>
-                    <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-9xl font-bold">IT'S NICE TO MEET YOU</h1>
+                    <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl italic font-[Times_New_Roman] font-semibold">Chào Mừng Đến Với Phòng Khám Của Chúng Tôi!</h2>
+                    <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-9xl font-bold">RẤT VUI KHI GẶP BẠN</h1>
                     <a className="p-6 bg-[var(--color-primary)] rounded-xl border-none text-white font-bold 
                         sm:text-xl md:text-3xl hover:bg-white hover:text-[var(--color-secondary)] transition duration-300 ease-in-out"
                         href="#department"
@@ -36,7 +35,7 @@ const HeroSection = () => {
                             if (el) el.scrollIntoView({ behavior: 'smooth' });
                         }}
                     >
-                        Tell Me More
+                        Tìm Hiểu Thêm
                     </a>
                 </div>
             </div>
@@ -49,7 +48,7 @@ const DepartmentSection = () => {
         <section id='department' className="bg-white py-20">
             <div className='container mx-auto px-4'>
                 <div className='flex flex-col items-center justify-center'>
-                    <h1 className='text-4xl font-bold uppercase'>Departments</h1>
+                    <h1 className='text-4xl font-bold uppercase'>Chuyên Khoa</h1>
                 </div>
                 <div className='grid grid-cols-6 gap-6 mt-10'>
                     <Card
@@ -57,10 +56,10 @@ const DepartmentSection = () => {
                     >
                         <a className='flex flex-col items-center justify-center' href="/doctors#Emergency">
                             <div className="w-[80px] h-[80px] flex items-center justify-center mb-3 bg-white rounded-full">
-                                <RiAlarmWarningFill className="w-[64px] h-[64px] text-[var(--color-primary)]  transition-colors duration-300" />
+                                <LiaDnaSolid className="w-[64px] h-[64px] text-[var(--color-primary)]  transition-colors duration-300" />
                             </div>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Emergency</p>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Department</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Khoa</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Da Liễu</p>
                         </a>
                     </Card>
                     <Card
@@ -70,8 +69,8 @@ const DepartmentSection = () => {
                             <div className="w-[80px] h-[80px] flex items-center justify-center mb-3 bg-white rounded-full">
                                 <LuBaby className="w-[64px] h-[64px] text-[var(--color-primary)]  transition-colors duration-300" />
                             </div>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Pediatric</p>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Department</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Khoa</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Nhi Khoa</p>
                         </a>
                     </Card>
                     <Card
@@ -79,10 +78,10 @@ const DepartmentSection = () => {
                     >
                         <a className='flex flex-col items-center justify-center' href="/doctors#Gynecology">
                             <div className="w-[80px] h-[80px] flex items-center justify-center mb-3 bg-white rounded-full">
-                                <LiaDnaSolid className="w-[64px] h-[64px] text-[var(--color-primary)]  transition-colors duration-300" />
+                                <IoEarOutline className="w-[64px] h-[64px] text-[var(--color-primary)]  transition-colors duration-300" />
                             </div>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Gynecology</p>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Department</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Khoa</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Tai Mũi Họng</p>
                         </a>
                     </Card>
                     <Card
@@ -92,8 +91,8 @@ const DepartmentSection = () => {
                             <div className="w-[80px] h-[80px] flex items-center justify-center mb-3 bg-white rounded-full">
                                 <GiHeartOrgan className="w-[64px] h-[64px] text-[var(--color-primary)]  transition-colors duration-300" />
                             </div>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Cardiology</p>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Department</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Khoa</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Tim Mạch</p>
                         </a>
                     </Card>
                     <Card
@@ -103,8 +102,8 @@ const DepartmentSection = () => {
                             <div className="w-[80px] h-[80px] flex items-center justify-center mb-3 bg-white rounded-full">
                                 <FaSyringe className="w-[64px] h-[64px] text-[var(--color-primary)]  transition-colors duration-300" />
                             </div>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Neurology</p>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Department</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Khoa</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Sản Phụ</p>
                         </a>
                     </Card>
                     <Card
@@ -114,8 +113,8 @@ const DepartmentSection = () => {
                             <div className="w-[80px] h-[80px] flex items-center justify-center mb-3 bg-white rounded-full">
                                 <GiBrain className="w-[64px] h-[64px] text-[var(--color-primary)]  transition-colors duration-300" />
                             </div>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Psychiatry</p>
-                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Department</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Khoa</p>
+                            <p className='text-lg font-bold uppercase text-[var(--color-primary)]  transition-colors duration-300'>Nội Tổng Quát</p>
                         </a>
                     </Card>
                 </div>
@@ -136,17 +135,17 @@ const AboutSection = () => {
                     </div>
                     <div className="sm:w-1/2 p-5">
                         <div className="text">
-                            <span className="text-gray-500 border-b-2 border-[var(--color-primary)] uppercase">About us</span>
-                            <h2 className="my-4 font-bold text-3xl sm:text-4xl ">About <span className="text-[var(--color-primary)]">Our Team</span>
+                            <span className="text-gray-500 border-b-2 border-[var(--color-primary)] uppercase">Về chúng tôi</span>
+                            <h2 className="my-4 font-bold text-3xl sm:text-4xl ">Về <span className="text-[var(--color-primary)]">Đội Ngũ Của Chúng Tôi</span>
                             </h2>
                             <p className="text-gray-400 text-xl mb-3 flex items-center">
-                                <FaArrowRight className='mr-2' />ProHealth is a team of experienced medical professionals
+                                <FaArrowRight className='mr-2' />ProHealth là một đội ngũ chuyên gia y tế giàu kinh nghiệm
                             </p>
                             <p className="text-gray-400 text-base">
-                                Dedicated to providing top-quality healthcare services. We believe in a holistic approach to healthcare that focuses on treating the whole person, not just the illness or symptoms.
+                                Tận tâm cung cấp các dịch vụ chăm sóc sức khỏe chất lượng hàng đầu. Chúng tôi tin vào phương pháp chăm sóc sức khỏe toàn diện, tập trung vào điều trị toàn bộ con người, không chỉ là bệnh tật hay triệu chứng.
                             </p>
                             <div className='flex items-center gap-2 mt-5 !text-[var(--color-primary)] hover:!text-[var(--color-secondary)]'>
-                                <Link className='!text-base' href="/about">Learn more about us </Link>
+                                <Link className='!text-base' href="/about">Tìm hiểu thêm về chúng tôi </Link>
                                 <FaArrowRight className='text-xs text-blue-500 ' />
                             </div>
                         </div>
@@ -162,7 +161,7 @@ const ContactSection = () => {
         <section id='appointment' className="bg-gray-100 py-20">
             <div className='container mx-auto px-4'>
                 <div className='flex flex-col items-center justify-center'>
-                    <h1 className='text-4xl font-bold uppercase'>Get In Touch</h1>
+                    <h1 className='text-4xl font-bold uppercase'>Liên Hệ Với Chúng Tôi</h1>
                 </div>
                 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mt-10'>
                     <div className='flex flex-row items-center justify-center gap-5 p-6'>
@@ -170,7 +169,7 @@ const ContactSection = () => {
                             <FiPhone className="text-white w-[32px] h-[32px]" />
                         </div>
                         <div>
-                            <h2 className='text-base font-bold uppercase'>Hotline</h2>
+                            <h2 className='text-base font-bold uppercase'>Đường Dây Nóng</h2>
                             <p className='text-gray-400 text-xl'>1900-0091</p>
                         </div>
                     </div>
@@ -179,7 +178,7 @@ const ContactSection = () => {
                             <LuAmbulance className="text-white w-[32px] h-[32px]" />
                         </div>
                         <div>
-                            <h2 className='text-base font-bold uppercase'>Ambulance</h2>
+                            <h2 className='text-base font-bold uppercase'>Xe Cấp Cứu</h2>
                             <p className='text-gray-400 text-xl'>876-256-876</p>
                         </div>
                     </div>
@@ -188,8 +187,8 @@ const ContactSection = () => {
                             <IoLocationOutline className="text-white w-[32px] h-[32px]" />
                         </div>
                         <div>
-                            <h2 className='text-base font-bold uppercase'>Location</h2>
-                            <p className='text-gray-400 text-xl'>Hanoi, Vietnam</p>
+                            <h2 className='text-base font-bold uppercase'>Địa Chỉ</h2>
+                            <p className='text-gray-400 text-xl'>Hà Nội, Việt Nam</p>
                         </div>
                     </div>
                     <div className='flex flex-row items-center justify-center gap-5 p-6'>
@@ -202,7 +201,7 @@ const ContactSection = () => {
                                 !font-bold uppercase hover:opacity-60"
                             onClick={() => window.location.href = '/contact'}
                         >
-                            Contact us
+                            Liên hệ
                         </Button>
                     </div>
                 </div>
@@ -221,22 +220,22 @@ type Doctor = {
 
 const doctors: Doctor[] = [
     {
-        name: "Dr. Nguyen Van A",
+        name: "Bác Sĩ Nguyễn Văn A",
         image: doctor1,
-        department: "Cardiology",
-        description: "Dr. Nguyen Van A is the top cardiologist in our hospital, specializing in heart diseases and interventions.",
+        department: "Tim Mạch",
+        description: "Bác sĩ Nguyễn Văn A là chuyên gia tim mạch hàng đầu tại bệnh viện, chuyên về bệnh lý tim và can thiệp tim mạch.",
     },
     {
-        name: "Dr. Tran Van B",
+        name: "Bác Sĩ Lê Văn B",
         image: doctor2,
-        department: "Neurology",
-        description: "Dr. Tran Thi B is the leading neurologist, renowned for her expertise in treating complex neurological disorders.",
+        department: "Thần Kinh",
+        description: "Bác sĩ Lê Văn B là nhà thần kinh học hàng đầu, nổi tiếng với chuyên môn điều trị các rối loạn thần kinh phức tạp.",
     },
     {
-        name: "Dr. Le Thi C",
+        name: "Bác Sĩ Trần Thị C",
         image: doctor3,
-        department: "Pediatrics",
-        description: "Dr. Le Van C is the best pediatrician, dedicated to providing excellent care for children.",
+        department: "Nhi Khoa",
+        description: "Bác sĩ Trần Thị C là bác sĩ nhi khoa giỏi nhất, tận tâm cung cấp dịch vụ chăm sóc sức khỏe tuyệt vời cho trẻ em.",
     },
 ];
 
@@ -246,10 +245,11 @@ const DoctorSection = () => {
         <section id='doctors' className="bg-gray-100 py-20">
             <div className='container mx-auto px-4'>
                 <div className='flex flex-col items-center justify-center pb-10'>
-                    <h1 className='text-4xl font-bold uppercase mb-3'>Our Top Professionists</h1>
-                    <p className='text-base text-gray-400'>Doctor with top skills and techniques in Northside Vietnam</p>
+                    <h1 className='text-4xl font-bold uppercase mb-3'>Chuyên Gia Hàng Đầu Của Chúng Tôi</h1>
+                    <p className='text-base text-gray-400'>Bác sĩ với kỹ năng và kỹ thuật hàng đầu tại miền Bắc Việt Nam</p>
                     <div className='flex flex-row items-center justify-center gap-5 p-6'>
                         <Button
+                            onClick={() => window.location.href = '/patient/'}
                             type="primary"
                             size="large"
                             icon={<AiOutlineSchedule />}
@@ -257,7 +257,7 @@ const DoctorSection = () => {
                             className="!bg-gradient-to-r from-[#1DA1F2] to-[#0066CC] border-none text-white
                                 !font-bold uppercase hover:opacity-60"
                         >
-                            Book an appointment
+                            Đặt lịch hẹn
                         </Button>
                     </div>
                 </div>

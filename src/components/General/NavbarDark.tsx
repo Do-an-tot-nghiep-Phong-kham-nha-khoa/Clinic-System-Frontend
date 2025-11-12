@@ -49,7 +49,7 @@ const NavbarDark = () => {
                             }`}
                     >
                         <>
-                            <a href="/appointment" className='text-base font-semibold'>APPOINTMENT</a>
+                            <a href="/patient" className='text-base font-semibold'>APPOINTMENT</a>
                             <a href="/doctors" className='text-base font-semibold'>DOCTORS</a>
                             <a href="/about" className='text-base font-semibold'>ABOUT</a>
                             <a href="/contact" className='text-base font-semibold'>CONTACT</a>

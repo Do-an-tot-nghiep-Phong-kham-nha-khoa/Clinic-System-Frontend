@@ -34,3 +34,15 @@ export async function getReceptionistByAccountId(accountId: string): Promise<Rec
         return null;
     }
 }
+
+export async function updateReceptionist(receptionistId: string, dto: Partial<Receptionist>): Promise<Receptionist | null> {
+    const url = `${BASE_URL}/receptionists/${receptionistId}`;
+    try {
+        const res = await axios.put(url, dto);
+        return res?.data ?? null;
+    }
+    catch (error) {
+        console.error("Lỗi khi cập nhật lễ tân:", error);
+        return null;
+    }
+}
