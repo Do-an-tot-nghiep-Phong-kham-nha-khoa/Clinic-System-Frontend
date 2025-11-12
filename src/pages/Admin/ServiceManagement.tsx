@@ -111,7 +111,10 @@ const ServiceManagement = () => {
 
     const columns = [
         { title: 'Tên dịch vụ', dataIndex: 'name', key: 'name' },
-        { title: 'Giá', dataIndex: 'price', key: 'price', width: 100, sorter: true },
+        {
+            title: 'Giá (VNĐ)', dataIndex: 'price', key: 'price', width: 120, sorter: true,
+            render: (value: number) => value.toLocaleString('vi-VN')
+        },
         { title: 'Mô tả', dataIndex: 'description', key: 'description' },
         {
             title: 'Ngày thêm',
