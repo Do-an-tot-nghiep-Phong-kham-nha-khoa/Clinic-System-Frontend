@@ -5,6 +5,7 @@ import {
 } from "@ant-design/icons";
 import { CgProfile } from "react-icons/cg";
 import { ImProfile } from "react-icons/im";
+import { FaHome } from 'react-icons/fa';
 import { Button, Layout, Menu, Avatar } from "antd";
 import {
     MdLogout,
@@ -25,6 +26,7 @@ const PatientLayout = () => {
     const location = useLocation();
 
     const menuItems = [
+        
         {
             key: "profile",
             icon: <CgProfile size={20} />,
@@ -91,7 +93,7 @@ const PatientLayout = () => {
                 <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-slate-800 text-white">
                     <div className="px-4 py-6">
                         <div className="text-white text-xl font-bold text-center pb-4 align-middle justify-center flex items-center">
-                            <Link to="/" className="!text-white">{!collapsed ? "Patient Panel" : "Patient"}</Link>
+                            <Link to="/" className="!text-white">{!collapsed ? "Khung bệnh nhân" : "Bệnh nhân"}</Link>
                         </div>
 
                         <div className="!flex-1 !overflow-auto">
@@ -145,6 +147,15 @@ const PatientLayout = () => {
                         onClick={() => setCollapsed(!collapsed)}
                         className="!w-[48px] !h-[48px] !text-base !text-white"
                     />
+                    {/* Home button to return to patient home/dashboard */}
+                    <Button
+                        type="text"
+                        icon={<FaHome />}
+                        onClick={() => navigate('/')}
+                        className="!ml-2 !text-white"
+                    >
+                        {!collapsed && <span>Trang chủ</span>}
+                    </Button>
                 </Header>
 
                 <Content className="p-4 bg-[#f5f5f5] flex-grow overflow-y-auto">
