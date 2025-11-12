@@ -10,8 +10,8 @@ const ContactInfo = () => {
         <section id='contact-info' className="bg-white py-20 mt-10">
             <div className='container mx-auto px-4'>
                 <div className='flex flex-col items-center justify-center mb-10'>
-                    <h1 className='text-4xl font-bold uppercase'>Get In Touch</h1>
-                    <p className='text-base text-gray-400 mt-3'>Reach out to us for any inquiries or appointments</p>
+                    <h1 className='text-4xl font-bold uppercase'>Liên Hệ Với Chúng Tôi</h1>
+                    <p className='text-base text-gray-400 mt-3'>Liên hệ với chúng tôi nếu có bất kỳ thắc mắc hoặc đặt lịch hẹn</p>
                 </div>
                 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6'>
                     <div className='flex flex-row items-center justify-start gap-5 p-6 border rounded-lg shadow-sm'>
@@ -19,7 +19,7 @@ const ContactInfo = () => {
                             <FiPhone className="text-white w-[32px] h-[32px]" />
                         </div>
                         <div>
-                            <h2 className='text-base font-bold uppercase'>Hotline</h2>
+                            <h2 className='text-base font-bold uppercase'>Đường Dây Nóng</h2>
                             <p className='text-gray-600 text-xl'>1900-0091</p>
                         </div>
                     </div>
@@ -28,7 +28,7 @@ const ContactInfo = () => {
                             <LuAmbulance className="text-white w-[32px] h-[32px]" />
                         </div>
                         <div>
-                            <h2 className='text-base font-bold uppercase'>Ambulance</h2>
+                            <h2 className='text-base font-bold uppercase'>Xe Cấp Cứu</h2>
                             <p className='text-gray-600 text-xl'>876-256-876</p>
                         </div>
                     </div>
@@ -37,8 +37,8 @@ const ContactInfo = () => {
                             <IoLocationOutline className="text-white w-[32px] h-[32px]" />
                         </div>
                         <div className='flex flex-col'>
-                            <h2 className='text-base font-bold uppercase'>Location</h2>
-                            <p className='text-gray-600 text-xl'>123 Nguyen Trai, Hanoi</p>
+                            <h2 className='text-base font-bold uppercase'>Địa Chỉ</h2>
+                            <p className='text-gray-600 text-xl'>123 Nguyễn Trãi, Hà Nội</p>
                         </div>
                     </div>
                     <div className='flex flex-row items-center justify-start gap-5 p-6 border rounded-lg shadow-sm'>
@@ -52,11 +52,11 @@ const ContactInfo = () => {
                     </div>
                 </div>
                 <div className='mt-10 flex flex-col items-center'>
-                    <h2 className='text-2xl font-bold mb-4'>Business Hours</h2>
+                    <h2 className='text-2xl font-bold mb-4'>Giờ Làm Việc</h2>
                     <ul className='text-gray-600 text-center'>
-                        <li>Monday - Friday: 8:00 AM - 8:00 PM</li>
-                        <li>Saturday: 9:00 AM - 5:00 PM</li>
-                        <li>Sunday: Closed</li>
+                        <li>Thứ Hai - Thứ Sáu: 8:00 Sáng - 8:00 Tối</li>
+                        <li>Thứ Bảy: 9:00 Sáng - 5:00 Chiều</li>
+                        <li>Chủ Nhật: Đóng cửa</li>
                     </ul>
                 </div>
             </div>
@@ -69,8 +69,8 @@ const MapSection = () => {
         <section id='map' className="bg-white py-20">
             <div className='container mx-auto px-4'>
                 <div className='flex flex-col items-center justify-center mb-10'>
-                    <h1 className='text-4xl font-bold uppercase'>Find Us On Map</h1>
-                    <p className='text-base text-gray-400 mt-3'>Location: 123 Nguyen Trai, Thanh Xuan, Hanoi, Vietnam</p>
+                    <h1 className='text-4xl font-bold uppercase'>Tìm Chúng Tôi Trên Bản Đồ</h1>
+                    <p className='text-base text-gray-400 mt-3'>Địa chỉ: 123 Nguyễn Trãi, Thanh Xuân, Hà Nội, Việt Nam</p>
                 </div>
                 <div className='w-full h-[400px]'>
                     <iframe

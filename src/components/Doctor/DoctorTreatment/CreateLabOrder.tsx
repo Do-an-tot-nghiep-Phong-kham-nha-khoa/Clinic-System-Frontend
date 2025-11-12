@@ -5,6 +5,7 @@ import { ExperimentOutlined, RollbackOutlined, PlusOutlined, DeleteOutlined, Sav
 import dayjs, { Dayjs } from "dayjs";
 import { createLabOrder } from "../../../services/LabOrderService";
 import ButtonPrimary from "../../../utils/ButtonPrimary";
+import moment, { type Moment } from 'moment';
 
 const { Text, Title } = Typography;
 
@@ -69,7 +70,7 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
         }
 
         const payload = {
-            testTime: testTime.toISOString(), // Chuyển Dayjs sang ISOString
+            testTime: testTime ? moment.utc(testTime.format("YYYY-MM-DD")).toISOString() : undefined,
             healthProfile_id: healthProfileId,
             // Chỉ gửi serviceId, quantity và description
             items: items.map(item => ({
@@ -160,8 +161,7 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
                         <Space direction="vertical" style={{ width: '100%' }} size="middle">
                             <Text strong>Thời gian thực hiện chỉ định:</Text>
                             <DatePicker
-                                showTime
-                                format="YYYY-MM-DD HH:mm"
+                                format="YYYY-MM-DD"
                                 value={testTime}
                                 onChange={(date) => setTestTime(date)}
                                 style={{ width: '100%' }}

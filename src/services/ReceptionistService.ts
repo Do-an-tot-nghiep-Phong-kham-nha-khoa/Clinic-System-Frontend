@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
+import api from './Api';
 
 export type Receptionist = {
     _id: string;
@@ -9,15 +7,15 @@ export type Receptionist = {
 };
 
 export async function getReceptionists(): Promise<Receptionist[]> {
-    const url = `${BASE_URL}/receptionists`;
-    const res = await axios.get(url);
+    const url = `/receptionists`;
+    const res = await api.get(url);
     return res?.data ?? [];
 }
 
 export async function getReceptionistById(receptionistId: string): Promise<Receptionist | null> {
-    const url = `${BASE_URL}/receptionists/${receptionistId}`;
+    const url = `/receptionists/${receptionistId}`;
     try {
-        const res = await axios.get(url);
+        const res = await api.get(url);
         return res?.data ?? null;
     } catch (error) {
         console.error("Lỗi khi lấy lễ tân theo ID:", error);
@@ -27,9 +25,9 @@ export async function getReceptionistById(receptionistId: string): Promise<Recep
 
 // Lấy lễ tân bằng account ID
 export async function getReceptionistByAccountId(accountId: string): Promise<Receptionist | null> {
-    const url = `${BASE_URL}/receptionists/byAccount/${accountId}`;
+    const url = `/receptionists/byAccount/${accountId}`;
     try {
-        const res = await axios.get(url);
+        const res = await api.get(url);
         return res?.data ?? null;
     } catch (error) {
         console.error("Lỗi khi lấy lễ tân theo account ID:", error);
@@ -38,9 +36,9 @@ export async function getReceptionistByAccountId(accountId: string): Promise<Rec
 }
 
 export async function updateReceptionist(receptionistId: string, dto: Partial<Receptionist>): Promise<Receptionist | null> {
-    const url = `${BASE_URL}/receptionists/${receptionistId}`;
+    const url = `/receptionists/${receptionistId}`;
     try {
-        const res = await axios.put(url, dto);
+        const res = await api.put(url, dto);
         return res?.data ?? null;
     }
     catch (error) {

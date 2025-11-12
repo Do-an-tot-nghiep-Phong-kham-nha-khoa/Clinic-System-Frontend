@@ -8,7 +8,7 @@ const Footer = () => {
             <div className="container mx-auto px-4 py-10">
                 {/* Trusted by brands */}
                 <div className="flex flex-wrap items-center gap-3 justify-center mb-10">
-                    <span className="uppercase tracking-wider text-xs text-slate-400">Trusted by</span>
+                    <span className="uppercase tracking-wider text-xs text-slate-400">Được tin cậy bởi</span>
                     {["MediX", "HealthOne", "BioCore", "CarePlus", "NovaLab"].map((b) => (
                         <span key={b} className="px-3 py-1 rounded-full border border-slate-700 text-sm">
                             {b}
@@ -22,7 +22,7 @@ const Footer = () => {
                     <div>
                         <h3 className="text-white text-2xl font-bold">ProHealth</h3>
                         <p className="mt-3 text-sm">
-                            Leading healthcare provider with modern facilities and a passionate team.
+                            Nhà cung cấp dịch vụ y tế hàng đầu với cơ sở vật chất hiện đại và đội ngũ tận tâm.
                         </p>
                         <div className="flex items-center gap-3 mt-4">
                             <a aria-label="Facebook" className="p-2 rounded-full bg-slate-800 hover:bg-[#13c2c2] hover:text-white transition-colors">
@@ -42,35 +42,35 @@ const Footer = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="text-white font-semibold mb-3 uppercase text-sm">Quick Links</h4>
+                        <h4 className="text-white font-semibold mb-3 uppercase text-sm">Liên Kết Nhanh</h4>
                         <ul className="space-y-2 text-sm">
-                            <li><a href="#hero" className="hover:text-white transition-colors">Home</a></li>
-                            <li><a href="#about" className="hover:text-white transition-colors">About</a></li>
-                            <li><a href="#doctor" className="hover:text-white transition-colors">Departments</a></li>
-                            <li><a href="#doctors" className="hover:text-white transition-colors">Doctors</a></li>
-                            <li><a href="#appointment" className="hover:text-white transition-colors">Contact</a></li>
+                            <li><a href="#hero" className="hover:text-white transition-colors">Trang Chủ</a></li>
+                            <li><a href="#about" className="hover:text-white transition-colors">Về Chúng Tôi</a></li>
+                            <li><a href="#doctor" className="hover:text-white transition-colors">Chuyên Khoa</a></li>
+                            <li><a href="#doctors" className="hover:text-white transition-colors">Bác Sĩ</a></li>
+                            <li><a href="#appointment" className="hover:text-white transition-colors">Liên Hệ</a></li>
                         </ul>
                     </div>
 
                     {/* Departments */}
                     <div>
-                        <h4 className="text-white font-semibold mb-3 uppercase text-sm">Departments</h4>
+                        <h4 className="text-white font-semibold mb-3 uppercase text-sm">Các Chuyên Khoa</h4>
                         <ul className="space-y-2 text-sm">
-                            <li>Cardiology</li>
-                            <li>Neurology</li>
-                            <li>Pediatrics</li>
-                            <li>Genecology</li>
-                            <li>Psychiatry</li>
+                            <li>Tim Mạch</li>
+                            <li>Thần Kinh</li>
+                            <li>Nhi Khoa</li>
+                            <li>Phụ Khoa</li>
+                            <li>Tâm Thần</li>
                         </ul>
                     </div>
 
                     {/* Contact */}
                     <div>
-                        <h4 className="text-white font-semibold mb-3 uppercase text-sm">Contact</h4>
+                        <h4 className="text-white font-semibold mb-3 uppercase text-sm">Liên Hệ</h4>
                         <ul className="space-y-2 text-sm">
                             <li className="flex items-start gap-2">
                                 <FaLocationDot className="mt-1 text-[var(--color-primary)]" />
-                                123 Nguyen Trai, Thanh Xuan, Hanoi, Vietnam
+                                123 Nguyễn Trãi, Thanh Xuân, Hà Nội, Việt Nam
                             </li>
                             <li className="flex items-center gap-2">
                                 <FaPhone className="text-[var(--color-primary)]" /> 1900-0091
@@ -86,8 +86,8 @@ const Footer = () => {
             {/* Bottom bar */}
             <div className="border-t border-slate-800">
                 <div className="container mx-auto px-4 py-4 text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-between">
-                    <span>© {new Date().getFullYear()} ProHealth. All rights reserved.</span>
-                    <span className="text-slate-400">Made with care and love</span>
+                    <span>© {new Date().getFullYear()} ProHealth. Mọi quyền được bảo lưu.</span>
+                    <span className="text-slate-400">Lương y như từ mẫu</span>
                 </div>
             </div>
         </footer>

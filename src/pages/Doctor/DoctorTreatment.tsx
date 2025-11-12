@@ -7,6 +7,7 @@ import CreateLabOrder from "../../components/Doctor/DoctorTreatment/CreateLabOrd
 import CreatePrescription from "../../components/Doctor/DoctorTreatment/CreatePrescription";
 import { message } from "antd";
 import { createTreatment, type CreateTreatmentDto } from "../../services/TreatmentService";
+import moment, { type Moment } from 'moment';
 
 const DoctorTreatment = () => {
     const { user } = useAuth();
@@ -84,13 +85,14 @@ const DoctorTreatment = () => {
 
         const healthProfileId = selectedAppointment.healthProfile_id._id;
         const appointmentId = selectedAppointment._id;
+        const date = moment() as Moment;
 
         // Xây dựng Payload
         const payload: CreateTreatmentDto = {
             healthProfile: healthProfileId,
             doctor: doctorId,
             appointment: appointmentId,
-            treatmentDate: new Date().toISOString(), // Dùng thời gian hiện tại
+            treatmentDate: date ? moment.utc(date.format('YYYY-MM-DD')).toISOString() : undefined,
 
             // Dữ liệu từ Precheck
             diagnosis: precheckData.diagnosis,
