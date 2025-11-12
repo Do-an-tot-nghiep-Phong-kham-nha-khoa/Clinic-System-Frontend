@@ -36,9 +36,9 @@ export async function getReceptionistByAccountId(accountId: string): Promise<Rec
 }
 
 export async function updateReceptionist(receptionistId: string, dto: Partial<Receptionist>): Promise<Receptionist | null> {
-    const url = `${BASE_URL}/receptionists/${receptionistId}`;
+    const url = `/receptionists/${receptionistId}`;
     try {
-        const res = await axios.put(url, dto);
+        const res = await api.put(url, dto);
         return res?.data ?? null;
     }
     catch (error) {

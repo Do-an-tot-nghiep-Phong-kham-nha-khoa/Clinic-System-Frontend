@@ -50,7 +50,7 @@ interface DoctorResponse {
 }
 
 export async function getDoctorsWithPaging(params: { page?: number; limit?: number; q?: string; specialty?: string; specialtyId?: string; name?: string } = {}): Promise<{ items: Doctor[]; total: number; page: number; limit: number }> {
-  const url = `${BASE_URL}/doctors`;
+  const url = `/doctors`;
   // Map frontend params to backend query names: 'q' -> 'name', 'specialty'|'specialtyId' -> 'specialtyId'
   const sendParams: any = {};
   if (params.page) sendParams.page = params.page;
@@ -60,7 +60,7 @@ export async function getDoctorsWithPaging(params: { page?: number; limit?: numb
   if (params.specialtyId) sendParams.specialtyId = params.specialtyId;
   else if (params.specialty) sendParams.specialtyId = params.specialty;
 
-  const res = await axios.get(url, { params: sendParams, withCredentials: true });
+  const res = await api.get(url, { params: sendParams, withCredentials: true });
   const body = res?.data ?? {};
 
   // Expected backend shape (based on your example): { message, data: [...], pagination: { page, pageSize, totalItems, totalPages } }
@@ -95,9 +95,9 @@ export async function getDoctorsWithPaging(params: { page?: number; limit?: numb
 }
 export async function getDoctorsByIds(ids: string[]): Promise<Doctor[]> {
   if (!ids || !ids.length) return [];
-  const url = `${BASE_URL}/doctors/batch`;
+  const url = `/doctors/batch`;
   try {
-    const res = await axios.post(url, { ids }, { withCredentials: true });
+    const res = await api.post(url, { ids }, { withCredentials: true });
     return res?.data?.data ?? res?.data ?? [];
   } catch (e) {
     console.error('Error fetching doctors by ids', e);
@@ -105,9 +105,9 @@ export async function getDoctorsByIds(ids: string[]): Promise<Doctor[]> {
   }
 }
 export async function getDoctorById(id: string): Promise<Doctor | null> {
-  const url = `${BASE_URL}/doctors/${id}`;
+  const url = `/doctors/${id}`;
   try {
-    const res = await axios.get(url, { withCredentials: true });
+    const res = await api.get(url, { withCredentials: true });
     if (res?.data?.data) {
       // Some APIs return { data: { doctor: { ... }, schedules: [...] } }
       if (res.data.data.doctor) return res.data.data.doctor;
@@ -121,9 +121,9 @@ export async function getDoctorById(id: string): Promise<Doctor | null> {
 }
 
 export async function createDoctor(dto: Partial<Doctor>): Promise<Doctor | null> {
-  const url = `${BASE_URL}/doctors`;
+  const url = `/doctors`;
   try {
-    const res = await axios.post(url, dto);
+    const res = await api.post(url, dto);
     return res?.data?.data ?? res?.data ?? null;
   } catch (e) {
     console.error('Error creating doctor', e);
@@ -132,9 +132,9 @@ export async function createDoctor(dto: Partial<Doctor>): Promise<Doctor | null>
 }
 
 export async function updateDoctor(id: string, dto: Partial<Doctor>): Promise<Doctor | null> {
-  const url = `${BASE_URL}/doctors/${id}`;
+  const url = `/doctors/${id}`;
   try {
-    const res = await axios.put(url, dto);
+    const res = await api.put(url, dto);
     return res?.data?.data ?? res?.data ?? null;
   } catch (e) {
     console.error('Error updating doctor', e);
@@ -143,20 +143,20 @@ export async function updateDoctor(id: string, dto: Partial<Doctor>): Promise<Do
 }
 
 export async function deleteDoctor(id: string): Promise<void> {
-  const url = `${BASE_URL}/doctors/${id}`;
-  await axios.delete(url);
+  const url = `/doctors/${id}`;
+  await api.delete(url);
 }
 
 // search doctors by query params (e.g., ?q=smith&page=1&limit=10)
 export async function searchDoctors(params: { q?: string; page?: number; limit?: number } = {}): Promise<Doctor[]> {
-  const url = `${BASE_URL}/doctors/search`;
-  const res = await axios.get(url, { params, withCredentials: true });
+  const url = `/doctors/search`;
+  const res = await api.get(url, { params, withCredentials: true });
   return res?.data?.data ?? res?.data ?? [];
 }
 
 export async function getDoctorsBySpecialty(specialtyId: string, params: { page?: number; limit?: number } = {}): Promise<Doctor[]> {
-  const url = `${BASE_URL}/doctors/specialty/${specialtyId}`;
-  const res = await axios.get(url, { params });
+  const url = `/doctors/specialty/${specialtyId}`;
+  const res = await api.get(url, { params });
   return res?.data?.data ?? res?.data ?? [];
 }
 
@@ -206,17 +206,12 @@ export async function getDoctors(specialtyId?: string): Promise<Doctor[]> {
 }
 
 export async function getDoctorByAccountId(accountId: string): Promise<DoctorProfile> {
-  const url = `${BASE_URL}/doctors/account/${accountId}`;
+  const url = `/doctors/account/${accountId}`;
 
   try {
-    const res = await axios.get<DoctorResponse>(url);
+    const res = await api.get<DoctorResponse>(url);
     return res.data.data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const errorMessage = error.response?.data?.message || `Lỗi khi gọi API: ${error.message}`;
-      console.error(`Error fetching doctor profile for accountId ${accountId}:`, errorMessage);
-      throw new Error(errorMessage);
-    }
     throw new Error('Lỗi không xác định khi tải hồ sơ bác sĩ.');
   }
 }
@@ -225,16 +220,12 @@ export async function updateDoctorById(
   doctorId: string,
   payload: UpdateDoctorPayload
 ): Promise<DoctorProfile> {
-  const url = `${BASE_URL}/doctors/${doctorId}`;
+  const url = `/doctors/${doctorId}`;
 
   try {
-    const res = await axios.put<DoctorResponse>(url, payload);
+    const res = await api.put<DoctorResponse>(url, payload);
     return res.data.data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const errorMessage = error.response?.data?.message || `Lỗi khi gọi API: ${error.message}`;
-      throw new Error(errorMessage);
-    }
     throw new Error('Lỗi không xác định khi cập nhật hồ sơ bác sĩ.');
   }
 }
