@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Button, message, Checkbox, Space, Input } from 'antd';
+import { Modal, Form, Button, message, Checkbox, Space, Input, Typography, Divider, Alert, Card, Tooltip } from 'antd';
 import type { Role, PermissionItem } from '../../services/RoleService';
+import { SaveOutlined, CloseOutlined, WarningOutlined, SettingOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
+const { TextArea } = Input;
 
 type PermissionSchema = {
     module: string;
@@ -68,40 +72,95 @@ export default function RolePermissionsModal({ visible, onClose, role, schema = 
     }
 
     return (
-        <Modal open={visible} onCancel={onClose} title={`Phân quyền: ${role?.name || ''}`} footer={null}>
-            <Form layout="vertical">
-                <Form.Item label="Chọn quyền theo module">
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                        {schema.length === 0 && (
-                            <div>
-                                <div>Không có schema permissions từ backend. Bạn có thể dán JSON permissions hoặc thêm schema ở backend.</div>
-                                <Input.TextArea rows={8} value={manualJson} onChange={(e) => setManualJson(e.target.value)} placeholder='Ví dụ: [{"module":"appointments","actions":["read","create"]}]' />
-                            </div>
-                        )}
-                        {schema.map((s) => (
-                            <div key={s.module} style={{ borderBottom: '1px solid #f0f0f0', paddingBottom: 8 }}>
-                                <div style={{ fontWeight: 600 }}>{s.module}</div>
-                                <Checkbox.Group value={Array.from(selected[s.module] || [])} onChange={(vals) => {
-                                    // vals is array of checked action strings
-                                    updateSelectedSet(s.module, vals as string[]);
-                                }}>
-                                    <Space>
-                                        {s.actions.map((a) => (
-                                            <Checkbox key={a} value={a}>{a}</Checkbox>
-                                        ))}
-                                    </Space>
-                                </Checkbox.Group>
-                            </div>
-                        ))}
-                    </Space>
-                </Form.Item>
+        <Modal
+            open={visible}
+            onCancel={onClose}
+            // Cải thiện tiêu đề modal
+            title={<Title level={4} className="!mb-0"><SettingOutlined /> Phân Quyền: <Text type="success">{role?.name || 'Vai trò'}</Text></Title>}
+            footer={
+                // Chuyển footer logic vào đây để đồng bộ
+                <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+                    <Button onClick={onClose} icon={<CloseOutlined />}>Hủy</Button>
+                    <Button
+                        type="primary"
+                        onClick={handleSave}
+                        icon={<SaveOutlined />}
+                        disabled={!role}
+                    >
+                        Lưu Quyền
+                    </Button>
+                </Space>
+            }
+            width={700} // Mở rộng modal cho dễ thao tác
+        >
 
-                <Form.Item>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                        <Button onClick={onClose}>Hủy</Button>
-                        <Button type="primary" onClick={handleSave}>Lưu</Button>
-                    </div>
-                </Form.Item>
+            <Divider className="!my-4" />
+
+            <Form layout="vertical">
+                {schema.length === 0 ? (
+                    // --- Fallback: Nhập JSON thủ công (Cải thiện UI) ---
+                    <Form.Item
+                        label={<Text strong><WarningOutlined style={{ color: '#faad14' }} /> Chỉnh sửa thủ công (Fallback)</Text>}
+                        help="Không tìm thấy cấu trúc quyền (schema). Vui lòng nhập mảng JSON quyền trực tiếp."
+                    >
+                        <TextArea
+                            rows={8}
+                            value={manualJson}
+                            onChange={(e) => setManualJson(e.target.value)}
+                            placeholder='Ví dụ: [{"module":"appointments","actions":["read","create"]}]'
+                        />
+                        <Alert
+                            message="Cảnh báo: Chế độ này yêu cầu nhập JSON chính xác. Lỗi cú pháp có thể ngăn việc lưu."
+                            type="warning"
+                            showIcon
+                            className="mt-2"
+                        />
+                    </Form.Item>
+                ) : (
+                    // --- Chọn quyền theo Module (Cải thiện UI) ---
+                    <Form.Item label={<Text strong>Chọn Quyền theo Module</Text>}>
+                        <Space direction="vertical" style={{ width: '100%', maxHeight: '400px', overflowY: 'auto' }}>
+                            {schema.map((s) => (
+                                <Card
+                                    variant='borderless'
+                                    key={s.module}
+                                    size="small"
+                                    title={<Text strong>{s.module.toUpperCase()}</Text>}
+                                    className="w-full transition duration-150"
+                                    extra={
+                                        <Tooltip title="Chọn/Bỏ chọn tất cả">
+                                            <Checkbox
+                                                checked={Array.from(selected[s.module] || []).length === s.actions.length && s.actions.length > 0}
+                                                indeterminate={
+                                                    (Array.from(selected[s.module] || []).length > 0) &&
+                                                    (Array.from(selected[s.module] || []).length < s.actions.length)
+                                                }
+                                                onChange={(e) => {
+                                                    updateSelectedSet(s.module, e.target.checked ? s.actions : []);
+                                                }}
+                                            />
+                                        </Tooltip>
+                                    }
+                                >
+                                    <Checkbox.Group
+                                        value={Array.from(selected[s.module] || [])}
+                                        onChange={(vals) => {
+                                            updateSelectedSet(s.module, vals as string[]);
+                                        }}
+                                    >
+                                        <Space wrap size={[16, 8]}>
+                                            {s.actions.map((a) => (
+                                                <Checkbox key={a} value={a}>
+                                                    {a.charAt(0).toUpperCase() + a.slice(1)} {/* Viết hoa chữ cái đầu */}
+                                                </Checkbox>
+                                            ))}
+                                        </Space>
+                                    </Checkbox.Group>
+                                </Card>
+                            ))}
+                        </Space>
+                    </Form.Item>
+                )}
             </Form>
         </Modal>
     );
