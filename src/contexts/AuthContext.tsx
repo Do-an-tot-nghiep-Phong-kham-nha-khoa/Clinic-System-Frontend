@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 export interface User {
     id: string;
     email: string;
+    role: string;
 }
 
 export interface AuthContextType {
@@ -110,6 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const userObject: User = {
                     id: userDataFromApi.id,
                     email: userDataFromApi.email,
+                    role: userDataFromApi.role
                 };
 
                 // THÊM LẠI: Tự set cookie userData để duy trì đăng nhập khi tải lại trang
