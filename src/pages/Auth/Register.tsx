@@ -40,7 +40,7 @@ const Register: React.FC = () => {
       setLoading(true);
       const response = await registerUser(formData);
       if (response.message === "Đăng ký thành công!") {
-        navigate("/");
+        navigate("/login");
       } else {
         setErrorMsg(response.message || "Đăng ký thất bại!");
       }
@@ -140,12 +140,11 @@ const Register: React.FC = () => {
               placeholder="••••••••"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition pr-10 ${
-                formData.confirmPassword &&
-                formData.confirmPassword !== formData.password
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition pr-10 ${formData.confirmPassword &&
+                  formData.confirmPassword !== formData.password
                   ? "border-red-400 focus:ring-red-400"
                   : "focus:ring-indigo-400"
-              }`}
+                }`}
               required
             />
             <button
@@ -236,11 +235,10 @@ const Register: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-lg font-semibold text-white transition duration-200 ${
-              loading
+            className={`w-full py-3 rounded-lg font-semibold text-white transition duration-200 ${loading
                 ? "bg-indigo-300 cursor-not-allowed"
                 : "bg-indigo-600 hover:bg-indigo-700 shadow-md"
-            }`}
+              }`}
           >
             {loading ? "Đang đăng ký..." : "Đăng ký"}
           </button>

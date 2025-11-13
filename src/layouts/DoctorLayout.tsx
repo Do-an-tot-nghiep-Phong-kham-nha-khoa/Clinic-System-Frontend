@@ -37,12 +37,6 @@ const DoctorLayout = () => {
             onClick: () => navigate("/doctor/appointments"),
         },
         {
-            key: "medical-records",
-            icon: <FaFileMedical size={20} />,
-            label: "Xem hồ sơ bệnh án",
-            onClick: () => navigate("/doctor/medical-records"),
-        },
-        {
             key: "treatments",
             icon: <FaHandHoldingMedical size={20} />,
             label: "Khám bệnh",

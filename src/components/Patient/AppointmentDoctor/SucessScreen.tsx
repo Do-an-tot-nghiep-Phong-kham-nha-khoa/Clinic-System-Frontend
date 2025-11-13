@@ -1,7 +1,8 @@
 import { Button, Card, Divider, Typography } from 'antd';
-import React from 'react';
+import React, { use } from 'react';
 import { FaCalendarCheck, FaClock, FaMedkit, FaUserTie } from 'react-icons/fa';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -18,12 +19,12 @@ interface AppointmentSuccessScreenProps {
 }
 
 const SuccessScreen: React.FC<AppointmentSuccessScreenProps> = ({ appointmentInfo }) => {
+    const navigate = useNavigate();
 
     const formattedDate = dayjs(appointmentInfo.date).format('dddd, [ngày] DD/MM/YYYY');
 
     const handleViewHistory = () => {
-        // TODO: route to history page
-        alert("Chức năng xem lịch sử đang được phát triển!");
+        navigate('/patient/appointments');
     };
 
     return (

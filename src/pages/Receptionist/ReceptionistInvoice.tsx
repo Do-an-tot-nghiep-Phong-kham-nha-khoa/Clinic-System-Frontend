@@ -351,8 +351,8 @@ const ReceptionistInvoice = () => {
                                         rowKey="_id"
                                         size="small"
                                     />
-                                    <p className="text-right mt-2">
-                                        **Tổng tiền Dịch vụ:** **{selectedInvoice.labOrder.totalPrice.toLocaleString('vi-VN')} VNĐ**
+                                    <p className="text-right mt-2 font-bold">
+                                        Tổng tiền Dịch vụ: {selectedInvoice.labOrder.totalPrice.toLocaleString('vi-VN')} VNĐ
                                     </p>
                                 </>
                             )}
@@ -371,8 +371,8 @@ const ReceptionistInvoice = () => {
                                         rowKey="_id"
                                         size="small"
                                     />
-                                    <p className="text-right mt-2">
-                                        **Tổng tiền Thuốc:** **{selectedInvoice.prescription.totalPrice.toLocaleString('vi-VN')} VNĐ**
+                                    <p className="text-right mt-2 font-bold">
+                                        Tổng tiền Thuốc: {selectedInvoice.prescription.totalPrice.toLocaleString('vi-VN')} VNĐ
                                     </p>
                                 </>
                             )}
