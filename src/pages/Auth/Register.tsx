@@ -40,7 +40,7 @@ const Register: React.FC = () => {
       setLoading(true);
       const response = await registerUser(formData);
       if (response.message === "Đăng ký thành công!") {
-        navigate("/");
+        navigate("/login");
       } else {
         setErrorMsg(response.message || "Đăng ký thất bại!");
       }
