@@ -10,7 +10,6 @@ import ModalCreateAccount from "../../components/Admin/ModalCreateAccount";
 import ModalEditAccount from "../../components/Admin/ModalEditAccount";
 import { formatDateDDMMYYYY } from "../../utils/date";
 
-const { TabPane } = Tabs;
 
 const AccountManagement = () => {
     const [accounts, setAccounts] = useState<Account[]>([]);

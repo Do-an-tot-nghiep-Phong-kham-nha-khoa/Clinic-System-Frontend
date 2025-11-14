@@ -27,7 +27,8 @@ export type PatientQuery = {
 };
 
 export type CreatePatientDto = {
-    accountId: string;
+    email: string;
+    password: string;
     name: string;
     dob?: string;
     phone: string;
