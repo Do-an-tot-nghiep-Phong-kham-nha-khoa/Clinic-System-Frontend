@@ -1,9 +1,8 @@
 import { Button, Input, message, Table, Tag, Modal, Select } from "antd";
 import { useEffect, useState } from "react";
-import { FaSearch, FaRegEdit } from "react-icons/fa";
+import { FaSearch, FaRegEdit, FaInfoCircle } from "react-icons/fa";
 import { formatDateDDMMYYYY } from "../../utils/date";
 import {
-    getInvoiceById,
     getInvoices,
     type Invoice,
     type InvoiceMeta,
@@ -11,14 +10,7 @@ import {
     updateInvoiceStatus,
 } from "../../services/InvoiceService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
-
-const formatGender = (gender: 'male' | 'female' | 'other'): string => {
-    switch (gender) {
-        case 'male': return 'Nam';
-        case 'female': return 'Nữ';
-        default: return 'Khác';
-    }
-}
+import InvoiceDetailModal from "../../components/Receptionist/InvoiceDetailModal";
 
 const ReceptionistInvoice = () => {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -40,8 +32,7 @@ const ReceptionistInvoice = () => {
     const [selectedStatus, setSelectedStatus] = useState<InvoiceStatus | undefined>(undefined);
 
     const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
-    const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-    const [detailLoading, setDetailLoading] = useState(false);
+    const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchInvoices();
@@ -147,16 +138,8 @@ const ReceptionistInvoice = () => {
     };
 
     const handlePrintInvoice = async (invoiceId: string) => {
-        try {
-            setDetailLoading(true);
-            const invoice = await getInvoiceById(invoiceId);
-            setSelectedInvoice(invoice);
-            setInvoiceDetailOpen(true);
-        } catch (error) {
-            message.error("Không thể lấy chi tiết hóa đơn.");
-        } finally {
-            setDetailLoading(false);
-        }
+        setSelectedInvoiceId(invoiceId);
+        setInvoiceDetailOpen(true);
     };
 
     const columns = [
@@ -217,10 +200,11 @@ const ReceptionistInvoice = () => {
                     </ButtonPrimary>
 
                     <Button
-                        type="default" // Có thể dùng type="ghost" hoặc type="default"
-                        onClick={() => handlePrintInvoice(record._id)} // Tạo hàm xử lý mới
+                        type="default"
+                        onClick={() => handlePrintInvoice(record._id)}
+                        icon={<FaInfoCircle />}
                     >
-                        In HĐ
+                        Xem chi tiết
                     </Button>
                 </div>
             )
@@ -275,7 +259,7 @@ const ReceptionistInvoice = () => {
                 confirmLoading={statusSaving}
                 okText="Lưu"
                 cancelText="Hủy"
-                destroyOnClose
+                destroyOnHidden={true}
             >
                 <div className="flex flex-col gap-3">
                     <div>
@@ -294,96 +278,14 @@ const ReceptionistInvoice = () => {
                 </div>
             </Modal>
 
-            <Modal
-                title={`Chi tiết Hóa đơn: ${selectedInvoice?._id.slice(0, 8)}`}
+            <InvoiceDetailModal
                 open={invoiceDetailOpen}
-                onCancel={() => {
+                invoiceId={selectedInvoiceId}
+                onClose={() => {
                     setInvoiceDetailOpen(false);
-                    setSelectedInvoice(null);
+                    setSelectedInvoiceId(null);
                 }}
-                footer={[
-                    <Button key="back" onClick={() => setInvoiceDetailOpen(false)}>
-                        Đóng
-                    </Button>,
-                    <Button key="print" type="primary" onClick={() => window.print()} disabled={!selectedInvoice}>
-                        In Hóa đơn
-                    </Button>,
-                ]}
-                width={800}
-                // Dùng kỹ thuật in cho Modal Antd
-                // Tạo một ID cho nội dung cần in
-                getContainer={() => document.getElementById('invoice-print-container') || document.body}
-                destroyOnClose
-            >
-                {detailLoading ? (
-                    <div>Đang tải...</div>
-                ) : (
-                    selectedInvoice && (
-                        <div id="invoice-print-content" className="p-4">
-                            {/* 1. Thông tin Chung & Chủ HSSK */}
-                            <h2 className="text-xl font-bold mb-3 border-b pb-1">THÔNG TIN HÓA ĐƠN</h2>
-                            <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                                <div>
-                                    <p><strong>Mã HĐ:</strong> {selectedInvoice._id.slice(0, 8)}</p>
-                                    <p><strong>Ngày tạo:</strong> {formatDateDDMMYYYY(selectedInvoice.created_at)}</p>
-                                    <p><strong>Tổng tiền:</strong> {selectedInvoice.totalPrice.toLocaleString('vi-VN')} VNĐ</p>
-                                    <p><strong>Trạng thái:</strong> {getStatusTag(selectedInvoice.status)}</p>
-                                </div>
-                                <div>
-                                    <p><strong>Chủ HSSK:</strong> {selectedInvoice.owner_detail.name}</p>
-                                    <p><strong>SĐT:</strong> {selectedInvoice.owner_detail.phone}</p>
-                                    <p><strong>Ngày sinh:</strong> {formatDateDDMMYYYY(selectedInvoice.owner_detail.dob)}</p>
-                                    <p><strong>Giới tính:</strong> {formatGender(selectedInvoice.owner_detail.gender)}</p>
-                                </div>
-                            </div>
-
-                            {/* 2. Chi tiết Dịch vụ (Lab Order) */}
-                            {selectedInvoice.labOrder && selectedInvoice.labOrder.items.length > 0 && (
-                                <>
-                                    <h3 className="text-lg font-semibold mt-4 mb-2 border-b pb-1">DỊCH VỤ SỬ DỤNG (XÉT NGHIỆM)</h3>
-                                    <Table
-                                        columns={[
-                                            { title: 'Tên Dịch vụ', dataIndex: ['service', 'name'], key: 'serviceName' },
-                                            { title: 'Giá', dataIndex: ['service', 'price'], key: 'servicePrice', align: 'right' as const, render: (v: number) => v.toLocaleString('vi-VN') + ' VNĐ' },
-                                        ]}
-                                        dataSource={selectedInvoice.labOrder.items}
-                                        pagination={false}
-                                        rowKey="_id"
-                                        size="small"
-                                    />
-                                    <p className="text-right mt-2 font-bold">
-                                        Tổng tiền Dịch vụ: {selectedInvoice.labOrder.totalPrice.toLocaleString('vi-VN')} VNĐ
-                                    </p>
-                                </>
-                            )}
-
-                            {/* 3. Chi tiết Thuốc (Prescription) */}
-                            {selectedInvoice.prescription && selectedInvoice.prescription.items.length > 0 && (
-                                <>
-                                    <h3 className="text-lg font-semibold mt-4 mb-2 border-b pb-1">ĐƠN THUỐC</h3>
-                                    <Table
-                                        columns={[
-                                            { title: 'Tên Thuốc', dataIndex: ['medicine', 'name'], key: 'medicineName' },
-                                            { title: 'Giá', dataIndex: ['medicine', 'price'], key: 'medicinePrice', align: 'right' as const, render: (v: number) => v.toLocaleString('vi-VN') + ' VNĐ' },
-                                        ]}
-                                        dataSource={selectedInvoice.prescription.items}
-                                        pagination={false}
-                                        rowKey="_id"
-                                        size="small"
-                                    />
-                                    <p className="text-right mt-2 font-bold">
-                                        Tổng tiền Thuốc: {selectedInvoice.prescription.totalPrice.toLocaleString('vi-VN')} VNĐ
-                                    </p>
-                                </>
-                            )}
-
-                            <h3 className="text-xl font-bold mt-4 pt-2 border-t text-right">
-                                TỔNG THANH TOÁN: {selectedInvoice.totalPrice.toLocaleString('vi-VN')} VNĐ
-                            </h3>
-                        </div>
-                    )
-                )}
-            </Modal>
+            />
         </div>
     )
 }

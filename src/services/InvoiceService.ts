@@ -22,6 +22,7 @@ export type MedicineItem = {
 export type PrescriptionInfo = {
     _id: string;
     totalPrice: number;
+    quantity: number;
     items: MedicineItem[];
 };
 
