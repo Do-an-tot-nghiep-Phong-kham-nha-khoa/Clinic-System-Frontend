@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 
 const { Option } = Select;
 
-// ✨ Card hiển thị hồ sơ với design mới và nút xóa
+// ✨ Card hiển thị hồ sơ với nút xóa
 const CardHoverProfile: React.FC<{
     profile: HealthProfile;
     onEdit: () => void;
@@ -55,29 +55,19 @@ const CardHoverProfile: React.FC<{
             }
         >
             <Descriptions column={1} size="small" bordered style={{ borderRadius: 8, overflow: 'hidden' }}>
-                <Descriptions.Item
-                    label={<Space><CalendarOutlined /> Chiều cao</Space>}
-                >
+                <Descriptions.Item label={<Space><CalendarOutlined /> Chiều cao</Space>}>
                     {profile.height ?? '-'} cm
                 </Descriptions.Item>
-                <Descriptions.Item
-                    label={<Space><CalendarOutlined /> Cân nặng</Space>}
-                >
+                <Descriptions.Item label={<Space><CalendarOutlined /> Cân nặng</Space>}>
                     {profile.weight ?? '-'} kg
                 </Descriptions.Item>
-                <Descriptions.Item
-                    label={<Space><HeartOutlined /> Nhóm máu</Space>}
-                >
+                <Descriptions.Item label={<Space><HeartOutlined /> Nhóm máu</Space>}>
                     {profile.bloodType ?? '---'}
                 </Descriptions.Item>
-                <Descriptions.Item
-                    label={<Space><MedicineBoxOutlined /> Dị ứng</Space>}
-                >
+                <Descriptions.Item label={<Space><MedicineBoxOutlined /> Dị ứng</Space>}>
                     {(profile.allergies || []).slice(0, 3).join(', ') || '---'}
                 </Descriptions.Item>
-                <Descriptions.Item
-                    label={<Space><MedicineBoxOutlined /> Thuốc đang dùng</Space>}
-                >
+                <Descriptions.Item label={<Space><MedicineBoxOutlined /> Thuốc đang dùng</Space>}>
                     {(profile.medications || []).slice(0, 3).join(', ') || '---'}
                 </Descriptions.Item>
             </Descriptions>
@@ -96,6 +86,7 @@ const HealthProfilePage: React.FC = () => {
 
     const [form] = Form.useForm();
 
+    // Load patient + health profiles
     const load = async () => {
         if (!user) return;
         try {
@@ -103,11 +94,15 @@ const HealthProfilePage: React.FC = () => {
             const patient = await getPatientByAccountId(user.id);
             if (!patient) {
                 message.error("Không tìm thấy thông tin bệnh nhân");
+                setProfiles([]);
+                setPatientId(null);
                 return;
             }
             setPatientId(patient._id);
+
             const data = await HealthProfileService.getAllHealthProfiles(patient._id);
-            setProfiles(Array.isArray(data) ? data : []);
+            const profilesArray = Array.isArray(data) ? data : (data?.data || []);
+            setProfiles(profilesArray);
         } catch (err) {
             console.error(err);
             message.error("Không thể tải hồ sơ");
@@ -118,10 +113,10 @@ const HealthProfilePage: React.FC = () => {
 
     useEffect(() => { load(); }, [user]);
 
-    const openNew = () => {
+    const openNew = (type: 'Patient' | 'FamilyMember' = 'Patient') => {
         setSelected(null);
         form.resetFields();
-        setFormType("FamilyMember");
+        setFormType(type);
         setDrawerOpen(true);
     };
 
@@ -164,12 +159,12 @@ const HealthProfilePage: React.FC = () => {
 
     const onSave = async () => {
         if (!patientId) return;
-
         try {
             const values = await form.validateFields();
             setLoading(true);
 
             let ownerId = patientId;
+
             if (formType === 'FamilyMember' && !selected) {
                 const fm = await FamilyMemberService.createFamilyMember({
                     bookerId: patientId,
@@ -182,19 +177,23 @@ const HealthProfilePage: React.FC = () => {
             }
 
             const healthPayload: any = {
-                height: values.height,
-                weight: values.weight,
-                bloodType: values.bloodType,
-                allergies: values.allergies ? values.allergies.split(',').map((s: string) => s.trim()) : [],
-                chronicConditions: values.chronicConditions ? values.chronicConditions.split(',').map((s: string) => s.trim()) : [],
-                medications: values.medications ? values.medications.split(',').map((s: string) => s.trim()) : [],
-                emergencyContact: {
-                    name: values.emergencyContactName,
-                    phone: values.emergencyContactPhone
-                }
+                height: values.height ? Number(values.height) : undefined,
+                weight: values.weight ? Number(values.weight) : undefined,
+                bloodType: values.bloodType || undefined,
+                allergies: values.allergies ? values.allergies.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
+                chronicConditions: values.chronicConditions ? values.chronicConditions.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
+                medications: values.medications ? values.medications.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
+                emergencyContact: (values.emergencyContactName || values.emergencyContactPhone) ? {
+                    name: values.emergencyContactName || undefined,
+                    phone: values.emergencyContactPhone || undefined
+                } : undefined
             };
+            Object.keys(healthPayload).forEach(key => {
+                if (healthPayload[key] === undefined) delete healthPayload[key];
+            });
 
             if (selected) {
+                // Update existing
                 if (formType === "FamilyMember") {
                     await FamilyMemberService.updateFamilyMember(selected.ownerId, {
                         relationship: values.relationship,
@@ -206,16 +205,34 @@ const HealthProfilePage: React.FC = () => {
                 await HealthProfileService.updateHealthProfileById(selected._id, healthPayload);
                 message.success("Cập nhật hồ sơ thành công");
             } else {
-                await HealthProfileService.createHealthProfileNew("FamilyMember", ownerId, healthPayload);
-                message.success("Tạo hồ sơ thành công");
+                // Create new
+                try {
+                    await HealthProfileService.createHealthProfileNew(formType, ownerId, healthPayload);
+                    message.success("Tạo hồ sơ thành công");
+                } catch (createError: any) {
+                    if (createError?.response?.data?.message?.includes('already exists') && formType === 'Patient') {
+                        // Patient HP exists → update
+                        const existingProfiles = await HealthProfileService.getAllHealthProfiles(patientId);
+                        const existingProfile = existingProfiles.find((p: any) => p.type === 'Patient');
+                        if (existingProfile) {
+                            await HealthProfileService.updateHealthProfileById(existingProfile._id, healthPayload);
+                            message.success("Cập nhật hồ sơ chủ sở hữu thành công");
+                        } else {
+                            throw createError;
+                        }
+                    } else {
+                        throw createError;
+                    }
+                }
             }
 
             setDrawerOpen(false);
             load();
 
         } catch (err: any) {
-            console.error(err);
-            message.error(err?.message || "Lỗi khi lưu hồ sơ");
+            console.error("Error saving profile:", err);
+            const errorMsg = err?.response?.data?.message || err?.message || "Lỗi khi lưu hồ sơ";
+            message.error(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -228,17 +245,20 @@ const HealthProfilePage: React.FC = () => {
         <div style={{ padding: 24 }}>
             <Space direction="vertical" style={{ width: '100%' }} size={24}>
                 <Space style={{ justifyContent: "space-between", width: '100%' }}>
-                    <h2>Hồ sơ sức khỏe</h2>
-                    <Button type="primary" onClick={openNew}>Thêm hồ sơ sức khỏe</Button>
+                    <h2 className="text-2xl font-bold">Hồ sơ sức khỏe</h2>
+                    <Space>
+                        {!owner && <Button type="primary" onClick={() => openNew('Patient')}>Thêm hồ sơ chủ sở hữu</Button>}
+                        <Button type="primary" onClick={() => openNew('FamilyMember')}>Thêm hồ sơ thành viên</Button>
+                    </Space>
                 </Space>
 
                 <div>
-                    <h3>Chủ sở hữu</h3>
+                    <h3 className="text-xl font-semibold mb-4">Chủ sở hữu</h3>
                     {owner ? (
                         <List grid={{ gutter: 16, column: 1 }}>
                             <List.Item>
-                                <CardHoverProfile 
-                                    profile={owner} 
+                                <CardHoverProfile
+                                    profile={owner}
                                     onEdit={() => openEdit(owner)}
                                     onDelete={() => onDelete(owner)}
                                 />
@@ -248,15 +268,15 @@ const HealthProfilePage: React.FC = () => {
                 </div>
 
                 <div>
-                    <h3>Thành viên gia đình</h3>
+                    <h3 className="text-xl font-semibold mt-8 mb-4">Thành viên gia đình</h3>
                     {family.length ? (
                         <List
                             grid={{ gutter: 16, column: 3, xs: 1, sm: 2, md: 3, lg: 3 }}
                             dataSource={family}
                             renderItem={item => (
                                 <List.Item>
-                                    <CardHoverProfile 
-                                        profile={item} 
+                                    <CardHoverProfile
+                                        profile={item}
                                         onEdit={() => openEdit(item)}
                                         onDelete={() => onDelete(item)}
                                     />
