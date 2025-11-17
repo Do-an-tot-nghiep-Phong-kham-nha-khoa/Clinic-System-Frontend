@@ -49,10 +49,10 @@ const Navbar = () => {
                             }`}
                     >
                         <>
-                            <a href="/patient/" className='text-base font-semibold'>APPOINTMENT</a>
-                            <a href="/doctors" className='text-base font-semibold'>DOCTORS</a>
-                            <a href="/about" className='text-base font-semibold'>ABOUT</a>
-                            <a href="/contact" className='text-base font-semibold'>CONTACT</a>
+                            <a href="/patient/" className='text-base font-semibold'>ĐẶT LỊCH</a>
+                            <a href="/doctors" className='text-base font-semibold'>BÁC SĨ</a>
+                            <a href="/about" className='text-base font-semibold'>GIỚI THIỆU</a>
+                            <a href="/contact" className='text-base font-semibold'>LIÊN HỆ</a>
                         </>
 
                         <div className='flex items-center gap-3'>
@@ -64,7 +64,7 @@ const Navbar = () => {
                                         variant="solid" color="blue"
                                         className='!text-base !font-bold'
                                     >
-                                        Logout
+                                        Đăng xuất
                                     </Button>
                                 </>
                             ) : (
@@ -72,7 +72,7 @@ const Navbar = () => {
                                     <Button onClick={() => navigate('/login')}
                                         variant="solid" color="blue"
                                         className='!text-base !font-bold'>
-                                        Login
+                                        Đăng nhập
                                     </Button>
                                     <Button
                                         color="blue"
@@ -81,7 +81,7 @@ const Navbar = () => {
                                         className='!text-base !font-bold'
                                         onClick={() => navigate('/register')}
                                     >
-                                        Register
+                                        Đăng ký
                                     </Button>
                                 </>
                             )}

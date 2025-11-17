@@ -3,7 +3,7 @@ import { Input, Checkbox, Button, Form, Alert, message } from 'antd';
 import backgroundImage from '../../assets/login_photo.jpg';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom'; // Thêm hook để điều hướng
-
+import Cookies from 'js-cookie';
 // Loại bỏ các props của Modal: visible và onClose
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -22,6 +22,23 @@ const LoginPage: React.FC = () => {
             message.success('Đăng nhập thành công! Chào mừng trở lại.', 2);
             // Điều hướng người dùng đến trang chủ hoặc trang dashboard sau khi đăng nhập thành công
             navigate('/');
+            const userData = JSON.parse(Cookies.get('userData') || '{}');
+            switch (userData.role) {
+                case 'doctor':
+                    navigate('/doctor');
+                    break;
+                case 'admin':
+                    navigate('/admin');
+                    break;
+                case 'patient':
+                    navigate('/');
+                    break;
+                case 'receptionist':
+                    navigate('/receptionist');
+                    break;
+                default:
+                    navigate('/');
+            }
         } catch (err) {
             setError('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.');
         } finally {
