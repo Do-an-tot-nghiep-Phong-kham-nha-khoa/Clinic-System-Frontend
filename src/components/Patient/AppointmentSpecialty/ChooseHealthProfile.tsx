@@ -4,6 +4,7 @@ import { FaArrowLeft, FaHeartbeat, FaPhone, FaUser } from 'react-icons/fa';
 import dayjs from 'dayjs';
 import { useAuth } from '../../../contexts/AuthContext';
 import { getAllHealthProfiles, type HealthProfile } from '../../../services/HealthProfileService';
+import { FaPerson } from 'react-icons/fa6';
 
 const { Title, Text } = Typography;
 
@@ -88,7 +89,11 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({
                             Nhóm máu: {profile.bloodType ?? "Không rõ"}
                         </p>
                         <p className="flex items-center">
-                            Chiều cao: {profile.height ?? "-"} cm &nbsp;|&nbsp; Cân nặng: {profile.weight ?? "-"} kg
+                            <FaPerson className="mr-2 text-cyan-500" />
+                            <div>
+                                <p>Chiều cao: {profile.height ?? "-"} cm</p>
+                                <p>Cân nặng: {profile.weight ?? "-"} kg </p>
+                            </div>
                         </p>
                         {profile.emergencyContact && (
                             <p className="flex items-center">

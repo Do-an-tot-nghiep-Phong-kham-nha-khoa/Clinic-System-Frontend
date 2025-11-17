@@ -44,3 +44,15 @@ body {
 
 /* Xóa border thừa bên trái của cột đầu tiên (Chủ Nhật) */
 .custom-calendar-grid .ant-picker-cell:nth-child(7n + 1) {}
+
+@media print {
+
+    .ant-modal-footer,
+    .no-print {
+        display: none !important;
+    }
+
+    .ant-modal-content {
+        box-shadow: none !important;
+    }
+}

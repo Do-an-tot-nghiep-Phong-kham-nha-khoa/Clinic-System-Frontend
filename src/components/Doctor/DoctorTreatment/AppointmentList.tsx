@@ -124,6 +124,19 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
         }
     ];
 
+    if (!data) return (
+        <div>
+            <Card variant="outlined" className="shadow-lg">
+                <div>
+                    <Title level={3} className="!mb-0"><CalendarOutlined />
+                        Danh Sách Cuộc Hẹn
+                    </Title>
+                    <Text>Không có cuộc hẹn nào.</Text>
+                </div>
+            </Card>
+        </div>
+    )
+
     return (
         <div>
             <Card variant="outlined" className="shadow-lg">

@@ -27,7 +27,9 @@ import DoctorTreatment from './pages/Doctor/DoctorTreatment'
 // Patient Pages & Layouts
 import PatientLayout from './layouts/PatientLayout'
 import PatientProfile from './pages/Patient/PatientProfile'
-import PatientMedicalRecord from './pages/Patient/PatientMedicalRecord'
+import PatientAppointmentDoctor from './pages/Patient/PatientAppointmentDoctor'
+import PatientAppointment from './pages/Patient/PatientAppointment'
+import PatientTreatmentHistory from './pages/Patient/PatientTreatmentHistory'
 import PatientAppointmentSpecialty from './pages/Patient/PatientAppointmentSpecialty'
 import Chat from './components/chat'
 // Receptionist Pages & Layouts
@@ -39,9 +41,8 @@ import ReceptionistInvoice from './pages/Receptionist/ReceptionistInvoice'
 import DoctorProfile from './pages/Doctor/DoctorProfile'
 import HealthProfile from './pages/Patient/HealthProfile'
 import LoginPage from './pages/Auth/LoginPage'
-import PatientAppointmentDoctor from './pages/Patient/PatientAppointmentDoctor'
-import PatientAppointment from './pages/Patient/PatientAppointment'
 import ProtectedRoute from './components/ProtectedRoutes'
+
 
 function App() {
 
@@ -92,7 +93,7 @@ function App() {
           <Route path='appointments' element={<PatientAppointment />} />
           <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
           <Route path='appointments-doctor' element={<PatientAppointmentDoctor />} />
-          <Route path='medical-records' element={<PatientMedicalRecord />} />
+          <Route path='medical-records' element={<PatientTreatmentHistory />} />
           <Route path='chatbot' element={<Chat />} />
           <Route path='health-profile' element={<HealthProfile />} />
         </Route>

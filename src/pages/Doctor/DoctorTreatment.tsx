@@ -141,6 +141,9 @@ const DoctorTreatment = () => {
                     isSaving={isSaving}
                     onSaveTreatment={handleSaveTreatment}
                     onBack={goBackToList}
+
+                    currentLabOrderId={currentLabOrderId}
+                    currentPrescriptionId={currentPrescriptionId}
                 />
             )}
 

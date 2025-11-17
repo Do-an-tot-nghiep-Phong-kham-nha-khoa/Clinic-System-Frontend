@@ -1,6 +1,4 @@
-import axios from "axios";
-
-const BASE_URL = import.meta.env.BACKEND_URL || "http://localhost:3000";
+import api from "./Api";
 
 export type LabOrderItemInput = {
     serviceId: string;
@@ -15,7 +13,13 @@ export type CreateLabOrderInput = {
 };
 
 export async function createLabOrder(data: CreateLabOrderInput) {
-    const url = `${BASE_URL}/laborders`;
-    const res = await axios.post(url, data);
+    const url = `/laborders`;
+    const res = await api.post(url, data);
+    return res?.data;
+}
+
+export async function getLabOrderById(labOrderId: string) {
+    const url = `/laborders/${labOrderId}`;
+    const res = await api.get(url);
     return res?.data;
 }

@@ -6,6 +6,8 @@ import type { Role, RoleCreateDTO } from '../../services/RoleService';
 import * as RoleService from '../../services/RoleService';
 import api from '../../services/Api';
 import RolePermissionsModal from '../../components/Admin/RolePermissionsModal';
+import ButtonPrimary from '../../utils/ButtonPrimary';
+import { MdAdd } from 'react-icons/md';
 
 const RoleManagement: React.FC = () => {
     const [roles, setRoles] = useState<Role[]>([]);
@@ -129,18 +131,15 @@ const RoleManagement: React.FC = () => {
     }
 
     return (
-        <div>
-            <h1 style={{ padding: 16, margin: 0 }}>Quản lý vai trò</h1>
-            <div style={{ padding: 16 }}>
-                <Space style={{ marginBottom: 12 }}>
-                    <Button type="primary" onClick={() => setModalVisible(true)}>
-                        Tạo vai trò
-                    </Button>
-                </Space>
+        <div className='container mx-auto p-4'>
+            <h1 className="text-3xl font-bold mb-4">Quản lý vai trò</h1>
+            <div className='space-y-4'>
+                <ButtonPrimary icon={<MdAdd />} size="large" onClick={() => setModalVisible(true)}>
+                    Tạo vai trò mới
+                </ButtonPrimary>
 
                 <RoleList roles={roles} loading={loading} onEdit={(r) => { setEditing(r); setModalVisible(true); }} onDelete={handleDelete} onPermissions={handleOpenPermissions} />
 
-                
                 <RolePermissionsModal visible={permModalVisible} onClose={() => { setPermModalVisible(false); setPermRole(undefined); }} role={permRole} schema={permissionSchema} onSave={handleSavePermissions} />
 
                 {/* Optional: preview permissions list */}

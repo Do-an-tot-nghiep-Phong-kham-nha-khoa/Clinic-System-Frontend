@@ -37,12 +37,6 @@ const ReceptionistLayout = () => {
             onClick: () => navigate("/receptionist/appointments"),
         },
         {
-            key: "treatments",
-            icon: <FaFileMedical size={20} />,
-            label: "Quản lý ca khám",
-            onClick: () => navigate("/receptionist/treatments"),
-        },
-        {
             key: "invoices",
             icon: <FaMoneyBill size={20} />,
             label: "Quản lý hoá đơn",

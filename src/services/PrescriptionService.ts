@@ -1,6 +1,4 @@
-import axios from "axios";
-
-const BASE_URL = import.meta.env.BACKEND_URL || "http://localhost:3000";
+import api from "./Api";
 
 export type PrescriptionItemDto = {
     medicineId: string;
@@ -17,7 +15,13 @@ export type CreatePrescriptionDto = {
 }
 
 export async function createPrescription(data: CreatePrescriptionDto) {
-    const url = `${BASE_URL}/prescriptions`;
-    const res = await axios.post(url, data);
+    const url = `/prescriptions`;
+    const res = await api.post(url, data);
+    return res.data;
+}
+
+export async function getPrescriptionById(prescriptionId: string) {
+    const url = `/prescriptions/${prescriptionId}`;
+    const res = await api.get(url);
     return res.data;
 }

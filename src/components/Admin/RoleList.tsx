@@ -1,5 +1,6 @@
 import { Table, Button, Popconfirm } from 'antd';
 import type { Role } from '../../services/RoleService';
+import { EditOutlined, SafetyOutlined, DeleteOutlined } from '@ant-design/icons';
 
 type Props = {
     roles: Role[];
@@ -30,16 +31,20 @@ export default function RoleList({ roles, loading, onEdit, onDelete, onPermissio
         {
             title: 'Hành động',
             key: 'actions',
+            align: 'right' as const,
             render: (_: unknown, record: Role) => (
-                <div style={{ display: 'flex', gap: 8 }}>
-                    <Button size="small" onClick={() => onEdit(record)}>
+                <div className='space-x-2 flex justify-end'>
+                    <Button icon={<EditOutlined />} onClick={() => onEdit(record)}
+                        color='primary' variant='solid'>
                         Sửa
                     </Button>
-                    <Button size="small" onClick={() => onPermissions?.(record)}>
+                    <Button icon={<SafetyOutlined />} onClick={() => onPermissions?.(record)}
+                        color='cyan' variant='solid'>
                         Phân quyền
                     </Button>
                     <Popconfirm title="Bạn có muốn xóa?" onConfirm={() => onDelete(record._id)}>
-                        <Button size="small" danger>
+                        <Button icon={<DeleteOutlined />}
+                            color='danger' variant='solid'>
                             Xóa
                         </Button>
                     </Popconfirm>
