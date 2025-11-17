@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Modal, Button, Table, message, Divider, Tag } from 'antd';
 import { getInvoiceById, type Invoice, type InvoiceStatus } from '../../services/InvoiceService';
 import { formatDateDDMMYYYY } from '../../utils/date';
-import { useReactToPrint } from 'react-to-print';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { FaPrint } from 'react-icons/fa';

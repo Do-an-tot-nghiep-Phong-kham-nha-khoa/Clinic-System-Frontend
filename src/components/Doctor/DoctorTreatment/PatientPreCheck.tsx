@@ -1,6 +1,11 @@
-import { Button, Input, Space, Card, Divider } from "antd";
+import { Button, Input, Space, Card, Divider, message, Spin, Table, Empty, Typography } from "antd";
 import { UserOutlined, HeartOutlined, FileTextOutlined, SaveOutlined, ArrowLeftOutlined, ExperimentOutlined, MedicineBoxOutlined } from "@ant-design/icons";
 import ButtonPrimary from "../../../utils/ButtonPrimary";
+import { useEffect, useState } from "react";
+import { getPrescriptionById } from "../../../services/PrescriptionService";
+import { getLabOrderById } from "../../../services/LabOrderService";
+
+const { Text } = Typography;
 
 interface PrecheckData {
     bloodPressure: string;
@@ -19,6 +24,8 @@ interface Props {
     onCreateLabOrder: () => void;
     onGotoPrescription: () => void;
     onSaveTreatment: () => void;
+    currentLabOrderId?: string | null;
+    currentPrescriptionId?: string | null;
 }
 
 const PatientPreCheck = ({
@@ -29,10 +36,42 @@ const PatientPreCheck = ({
     onBack,
     onCreateLabOrder,
     onGotoPrescription,
-    onSaveTreatment
+    onSaveTreatment,
+    currentLabOrderId,
+    currentPrescriptionId,
 }: Props) => {
     const hp = appointment.healthProfile_id;
     const owner = hp?.owner_detail;
+    const [labOrder, setLabOrder] = useState<any>(null);
+    const [prescription, setPrescription] = useState<any>(null);
+    const [loadingLab, setLoadingLab] = useState(false);
+    const [loadingPres, setLoadingPres] = useState(false);
+
+    // Fetch Lab Order
+    useEffect(() => {
+        if (currentLabOrderId) {
+            setLoadingLab(true);
+            getLabOrderById(currentLabOrderId)
+                .then(setLabOrder)
+                .catch(() => message.error("Không tải được chỉ định CLS"))
+                .finally(() => setLoadingLab(false));
+        } else {
+            setLabOrder(null);
+        }
+    }, [currentLabOrderId]);
+
+    // Fetch Prescription
+    useEffect(() => {
+        if (currentPrescriptionId) {
+            setLoadingPres(true);
+            getPrescriptionById(currentPrescriptionId)
+                .then(setPrescription)
+                .catch(() => message.error("Không tải được đơn thuốc"))
+                .finally(() => setLoadingPres(false));
+        } else {
+            setPrescription(null);
+        }
+    }, [currentPrescriptionId]);
 
     const handleDataChange = (field: keyof PrecheckData, value: string) => {
         onPrecheckDataChange({
@@ -119,17 +158,23 @@ const PatientPreCheck = ({
                                 onChange={(e) => handleDataChange("diagnosis", e.target.value)}
                             />
                         </Space>
-                    </Card>
-
-                    <div className="mb-4 "></div>
+                    </Card>                    <div className="mb-4 "></div>
                     <Card variant="outlined" className="shadow-md">
                         <div className="text-base font-semibold mb-3"><FileTextOutlined /> Hành động</div>
                         <Space size="middle" className="w-full justify-end">
-                            <ButtonPrimary icon={<ExperimentOutlined />} onClick={onCreateLabOrder}>
-                                Chỉ định CLS
+                            <ButtonPrimary
+                                icon={<ExperimentOutlined />}
+                                onClick={onCreateLabOrder}
+                                disabled={!!currentLabOrderId}
+                            >
+                                {currentLabOrderId ? "Đã chỉ định CLS" : "Chỉ định CLS"}
                             </ButtonPrimary>
-                            <ButtonPrimary icon={<MedicineBoxOutlined />} onClick={onGotoPrescription}>
-                                Kê đơn thuốc
+                            <ButtonPrimary
+                                icon={<MedicineBoxOutlined />}
+                                onClick={onGotoPrescription}
+                                disabled={!!currentPrescriptionId}
+                            >
+                                {currentPrescriptionId ? "Đã kê đơn thuốc" : "Kê đơn thuốc"}
                             </ButtonPrimary>
                             <Divider type="vertical" />
                             <Button
@@ -145,6 +190,98 @@ const PatientPreCheck = ({
                     </Card>
                 </div>
             </div>
+
+            {/* Hiển thị 2 bảng lab order và prescription nếu có */}
+            <Card
+                title={<><ExperimentOutlined /> Chỉ định Cận Lâm Sàng</>}
+                variant="outlined"
+                className="shadow-md !mt-4"
+            >
+                {loadingLab ? <Spin /> : labOrder ? (
+                    <Table
+                        size="small"
+                        pagination={false}
+                        dataSource={labOrder.items}
+                        scroll={{ x: 1200 }}
+                        rowKey={(record) => record.serviceId || Math.random().toString()}
+                        columns={[
+                            {
+                                title: "Dịch vụ",
+                                key: "name",
+                                render: (_: any, record: any) => record.service?.name || "Dịch vụ không xác định"
+                            },
+                            { title: "Số lượng", dataIndex: "quantity", key: "quantity", width: 80, align: "center" as const },
+                            { title: "Ghi chú", dataIndex: "description", key: "description" },
+                            {
+                                title: "Thời gian",
+                                key: "testTime",
+                                render: () => new Date(labOrder.testTime).toLocaleDateString("vi-VN")
+                            },
+                        ]}
+                    />
+                ) : (
+                    <Empty description="Chưa có chỉ định cận lâm sàng" />
+                )}
+            </Card>
+            {/* Đơn thuốc đã tạo */}
+            <Card
+                title={<><MedicineBoxOutlined /> Đơn Thuốc</>}
+                variant="outlined"
+                className="shadow-md !mt-4"
+
+            >
+                {loadingPres ? (
+                    <div className="text-center py-8"><Spin /></div>
+                ) : prescription ? (
+                    <Table
+                        size="small"
+                        pagination={false}
+                        bordered
+                        scroll={{ x: 1200 }}
+                        dataSource={prescription.items || []}
+                        rowKey={(record) => record._id || record.medicineId || Math.random().toString()}
+                        columns={[
+                            {
+                                title: "Thuốc",
+                                key: "name",
+                                render: (_: any, record: any) => record.medicine?.name || "Thuốc không xác định",
+                                width: 200,
+                            },
+                            {
+                                title: "Số lượng",
+                                dataIndex: "quantity",
+                                key: "quantity",
+                                width: 90,
+                                align: "center" as const,
+                            },
+                            {
+                                title: "Liều dùng - Tần suất - Thời gian",
+                                key: "dosage-info",
+                                render: (_: any, record: any) => {
+                                    const dosage = record.dosage || "";
+                                    const frequency = record.frequency || "";
+                                    const duration = record.duration || "";
+                                    const parts = [dosage, frequency, duration].filter(Boolean);
+                                    return parts.length > 0 ? (
+                                        <Text strong>{parts.join(" • ")}</Text>
+                                    ) : (
+                                        <Text type="secondary">Chưa có hướng dẫn</Text>
+                                    );
+                                },
+                            },
+                            {
+                                title: "Hướng dẫn sử dụng",
+                                dataIndex: "instruction",
+                                key: "instruction",
+                                ellipsis: { showTitle: true },
+                                render: (text: any) => text || <Text type="secondary">Không có ghi chú</Text>,
+                            },
+                        ]}
+                    />
+                ) : (
+                    <Empty description="Chưa kê đơn thuốc" />
+                )}
+            </Card>
         </div>
     );
 };
