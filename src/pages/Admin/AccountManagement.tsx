@@ -64,7 +64,11 @@ const AccountManagement = () => {
     // Table columns
     const columns = [
         { title: "Email", dataIndex: "email", key: "email" },
-        { title: "Role", dataIndex: ["roleId", "name"], key: "role", render: (name: string) => name || "Người dùng" },
+        {
+            title: "Role",
+            key: "role",
+            render: (_: any, record: Account) => record.roleId?.name || "Người dùng",
+        },
         { title: "Status", dataIndex: "status", key: "status" },
         {
             title: "Ngày tạo",
@@ -174,7 +178,7 @@ const AccountManagement = () => {
 
             <ModalEditAccount
                 open={editOpen}
-                id={editingId}
+                account={accounts.find(acc => acc._id === editingId)}
                 onClose={() => { setEditOpen(false); setEditingId(undefined); }}
                 onUpdated={() => fetchAccounts()}
             />

@@ -1,83 +1,192 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, message } from 'antd';
-import { getAccountById,updateAccount, type Account } from '../../services/AccountService';
+import { useEffect, useState } from 'react';
+import { Modal, Form, Input, Select, Button, message, DatePicker } from 'antd';
+import moment from 'moment';
 
-interface ModalEditAccountProps {
-    open: boolean;
-    id?: string;
-    onClose: () => void;
-    onUpdated?: (updated: Account) => void;
-}
+import { updateDoctor } from '../../services/DoctorService';
+import { updatePatient } from '../../services/PatientService';
+import { updateAdmin } from '../../services/AdminService';
+import { updateReceptionist } from '../../services/ReceptionistService';
 
-const ModalEditAccount: React.FC<ModalEditAccountProps> = ({ open, id, onClose, onUpdated }) => {
-    const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [form] = Form.useForm();
+const { Option } = Select;
 
-    useEffect(() => {
-        const fetchDetail = async () => {
-            if (!open || !id) return;
-            try {
-                setLoading(true);
-                const data = await getAccountById(id);
-                form.setFieldsValue({
-                    email: data ? data.email : '',
-                });
-            } catch (e) {
-                message.error('Không thể tải dữ liệu tài khoản');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchDetail();
-        if (!open) form.resetFields();
-    }, [open, id, form]);
+type Props = {
+  open: boolean;
+  onClose: () => void;
+  onUpdated?: () => void;
+  account: any; 
+};
 
-    const handleOk = async () => {
-        if (!id) return;
-        try {
-            const values = await form.validateFields();
-            setSaving(true);
-            const payload = {
-                username: values.username,
-                email: values.email,
-            };
-            const updated = await updateAccount(id, payload);
-            message.success('Cập nhật tài khoản thành công');
-            onUpdated?.(updated);
-            onClose();
-        } catch (err: any) {
-            if (err?.errorFields) return; // validation error
-            message.error('Cập nhật tài khoản thất bại');
-        } finally {
-            setSaving(false);
-        }
-    };
+const ModalEditAccount = ({ open, onClose, onUpdated, account }: Props) => {
+  const [form] = Form.useForm();
+  const [role, setRole] = useState<string>('');
 
-    return (
-        <Modal
-            title="Chỉnh sửa tài khoản"
-            open={open}
-            onCancel={onClose}
-            onOk={handleOk}
-            confirmLoading={saving}
-            okText="Lưu"
-            cancelText="Hủy"
-            destroyOnHidden={true}
-            maskClosable={!loading}
+  useEffect(() => {
+    if (account) {
+      const detectedRole = account.roleId?.name || '';
+      setRole(detectedRole);
+
+      form.setFieldsValue({
+        name: account.name,
+        phone: account.phone,
+        email: account.email,
+        specialtyId: account.specialtyId,
+        experience: account.experience,
+        address: account.address,
+        gender: account.gender,
+        avatar: account.avatar,
+        note: account.note,
+        dob: account.dob ? moment(account.dob) : undefined
+      });
+    }
+  }, [account]);
+
+  const handleSubmit = async (values: any) => {
+    if (!account?._id) {
+      message.error("Missing account id");
+      return;
+    }
+
+    try {
+      switch (role) {
+        case 'doctor':
+          await updateDoctor(account._id, {
+            name: values.name,
+            phone: values.phone,
+            specialtyId: values.specialtyId,
+            experience: values.experience
+          });
+          break;
+
+        case 'patient':
+          await updatePatient(account._id, {
+            name: values.name,
+            phone: values.phone,
+            dob: values.dob?.format('YYYY-MM-DD'),
+            address: values.address,
+            gender: values.gender
+          });
+          break;
+
+        case 'admin':
+          await updateAdmin(account._id, {
+            name: values.name,
+            phone: values.phone,
+            avatar: values.avatar,
+            note: values.note
+          });
+          break;
+
+        case 'receptionist':
+          await updateReceptionist(account._id, {
+            name: values.name,
+            phone: values.phone
+          });
+          break;
+
+        default:
+          message.error("Role không hợp lệ");
+          return;
+      }
+
+      message.success("Cập nhật thành công");
+      onUpdated?.();
+      onClose();
+    } catch (err: any) {
+      message.error(err.response?.data?.message || "Lỗi cập nhật");
+    }
+  };
+
+  return (
+    <Modal
+      title="Chỉnh sửa tài khoản"
+      open={open}
+      onCancel={onClose}
+      footer={null}
+    >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+
+        <Form.Item label="Vai trò">
+          <Input value={role} disabled />
+        </Form.Item>
+
+        <Form.Item
+          label="Tên"
+          name="name"
+          rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
         >
-            <Form form={form} layout="vertical" preserve={false} disabled={loading}>
-                <Form.Item name="username" label="Tên đăng nhập"
-                    rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập' }]}>
-                    <Input placeholder="Tên đăng nhập" />
-                </Form.Item>
-                <Form.Item name="email" label="Email"
-                    rules={[{ required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ' }]}>
-                    <Input placeholder="Email" />
-                </Form.Item>
-            </Form>
-        </Modal>
-    );
+          <Input />
+        </Form.Item>
+
+        <Form.Item label="Email">
+          <Input value={account?.email} disabled />
+        </Form.Item>
+
+        <Form.Item
+          label="Số điện thoại"
+          name="phone"
+          rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
+        >
+          <Input />
+        </Form.Item>
+
+        {role === 'doctor' && (
+          <>
+            <Form.Item
+              label="Chuyên khoa ID"
+              name="specialtyId"
+              rules={[{ required: true, message: 'Vui lòng nhập specialtyId' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item label="Kinh nghiệm (năm)" name="experience">
+              <Input />
+            </Form.Item>
+          </>
+        )}
+
+        {role === 'patient' && (
+          <>
+            <Form.Item label="Ngày sinh" name="dob">
+              <DatePicker style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item label="Địa chỉ" name="address">
+              <Input />
+            </Form.Item>
+
+            <Form.Item label="Giới tính" name="gender">
+              <Select>
+                <Option value="male">Nam</Option>
+                <Option value="female">Nữ</Option>
+                <Option value="other">Khác</Option>
+              </Select>
+            </Form.Item>
+          </>
+        )}
+
+        {role === 'admin' && (
+          <>
+            <Form.Item label="Avatar URL" name="avatar">
+              <Input />
+            </Form.Item>
+
+            <Form.Item label="Ghi chú" name="note">
+              <Input />
+            </Form.Item>
+          </>
+        )}
+
+        {role === 'receptionist' && null}
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block>
+            Cập nhật
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
 };
 
 export default ModalEditAccount;
