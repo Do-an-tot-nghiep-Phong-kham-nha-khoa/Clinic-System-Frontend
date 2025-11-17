@@ -43,6 +43,7 @@ import HealthProfile from './pages/Patient/HealthProfile'
 import LoginPage from './pages/Auth/LoginPage'
 import ProtectedRoute from './components/ProtectedRoutes'
 
+
 function App() {
 
   return (
