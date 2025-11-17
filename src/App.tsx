@@ -41,7 +41,7 @@ import ReceptionistInvoice from './pages/Receptionist/ReceptionistInvoice'
 import DoctorProfile from './pages/Doctor/DoctorProfile'
 import HealthProfile from './pages/Patient/HealthProfile'
 import LoginPage from './pages/Auth/LoginPage'
-
+import ProtectedRoute from './components/ProtectedRoutes'
 
 
 function App() {
@@ -59,7 +59,11 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
         </ Route>
 
-        <Route path='admin' element={<AdminLayout />}>
+        <Route path='admin' element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
           <Route index element={<AdminDashboard />} />
           <Route path='medicines' element={<MedicineManagement />} />
           <Route path='services' element={<ServiceManagement />} />
@@ -69,14 +73,22 @@ function App() {
           <Route path='appointments' element={<AppointmentManagement />} />
         </Route>
 
-        <Route path='doctor' element={<DoctorLayout />}>
+        <Route path='doctor' element={
+            <ProtectedRoute allowedRoles={['doctor']}>
+              <DoctorLayout />
+            </ProtectedRoute>
+          }>
           <Route index element={<DoctorProfile />} />
           <Route path='medical-records' element={<DoctorMedicalRecord />} />
           <Route path='treatments' element={<DoctorTreatment />} />
           <Route path='appointments' element={<DoctorAppointment />} />
         </Route>
 
-        <Route path='patient' element={<PatientLayout />}>
+        <Route path='patient' element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <PatientLayout />
+            </ProtectedRoute>
+          }>
           <Route index element={<PatientProfile />} />
           <Route path='appointments' element={<PatientAppointment />} />
           <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
@@ -86,7 +98,11 @@ function App() {
           <Route path='health-profile' element={<HealthProfile />} />
         </Route>
 
-        <Route path='receptionist' element={<ReceptionistLayout />}>
+        <Route path='receptionist' element={
+            <ProtectedRoute allowedRoles={['receptionist']}>
+              <ReceptionistLayout />
+            </ProtectedRoute>
+          }>
           <Route index element={<ReceptionistProfile />} />
           <Route path='appointments' element={<ReceptionistAppointment />} />
           <Route path='treatments' element={<ReceptionistTreatment />} />
