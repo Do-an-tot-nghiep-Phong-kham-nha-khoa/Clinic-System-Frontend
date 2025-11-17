@@ -1,4 +1,3 @@
-import React from 'react';
 import picAbout1 from '../../assets/pic-about-1.png'
 import picAbout2 from '../../assets/pic-about-2.png';
 import { Card, Carousel } from 'antd';

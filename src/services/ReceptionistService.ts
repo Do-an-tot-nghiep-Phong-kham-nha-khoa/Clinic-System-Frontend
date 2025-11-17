@@ -4,6 +4,8 @@ export type Receptionist = {
     _id: string;
     name: string;
     phone: string;
+    email: string;
+    password?: string;
 };
 
 export async function getReceptionists(): Promise<Receptionist[]> {
@@ -34,7 +36,11 @@ export async function getReceptionistByAccountId(accountId: string): Promise<Rec
         return null;
     }
 }
-
+export async function createReceptionist(dto: { name: string; phone: string; email: string; password: string }): Promise<Receptionist> {
+    const url = `/receptionists`;
+    const res = await api.post(url, dto);
+    return res?.data;
+}
 export async function updateReceptionist(receptionistId: string, dto: Partial<Receptionist>): Promise<Receptionist | null> {
     const url = `/receptionists/${receptionistId}`;
     try {

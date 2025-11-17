@@ -27,7 +27,8 @@ export type PatientQuery = {
 };
 
 export type CreatePatientDto = {
-    accountId: string;
+    email: string;
+    password: string;
     name: string;
     dob?: string;
     phone: string;
@@ -35,7 +36,6 @@ export type CreatePatientDto = {
     gender?: 'male' | 'female' | 'other' | string;
 };
 export type UpdatePatientDTO = {
-    accountId?: string;
     name?: string;
     dob?: string;
     phone?: string;
