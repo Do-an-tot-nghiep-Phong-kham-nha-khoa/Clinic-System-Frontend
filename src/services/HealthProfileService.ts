@@ -34,3 +34,40 @@ export async function getAllHealthProfiles(patientId: string): Promise<HealthPro
         throw error;
     }
 }
+
+// Create a new health profile for ownerModel ('Patient' or 'FamilyMember') and ownerId
+export async function createHealthProfileNew(ownerModel: 'Patient' | 'FamilyMember', ownerId: string, payload: Partial<HealthProfile>) {
+    const modelParam = ownerModel === 'Patient' ? 'patient' : 'familyMember';
+    const url = `/health-profiles/${modelParam}/${ownerId}`;
+    try {
+        const res = await api.post(url, payload);
+        return res.data;
+    } catch (error) {
+        console.error('Error creating health profile:', error);
+        throw error;
+    }
+}
+
+
+// Note: backend may not expose this route; this helper attempts PATCH /health-profiles/:id
+export async function updateHealthProfileById(profileId: string, updates: Partial<HealthProfile>) {
+    const url = `/health-profiles/profile/${profileId}`;
+    try {
+        const res = await api.patch(url, updates);
+        return res.data;
+    } catch (error) {
+        console.error('Error updating health profile by id:', error);
+        throw error;
+    }
+}
+
+export async function deleteHealthProfileById(profileId: string) {
+    const url = `/health-profiles/profile/${profileId}`;
+    try {
+        const res = await api.delete(url);
+        return res.data;
+    } catch (error) {
+        console.error('Error deleting health profile by id:', error);
+        throw error;
+    }
+}

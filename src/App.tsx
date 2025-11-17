@@ -9,6 +9,7 @@ import Home from './pages/General/Home'
 import DoctorsPage from './pages/General/Doctors'
 import About from './pages/General/About'
 import Contact from './pages/General/Contact'
+import DoctorProfileView from './components/Doctor/DoctorProfileView'
 // Admin Pages & Layouts
 import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/Admin/AdminDashboard'
@@ -36,7 +37,7 @@ import Chat from './components/chat'
 import ReceptionistLayout from './layouts/ReceptionistLayout'
 import ReceptionistProfile from './pages/Receptionist/ReceptionistProfile'
 import ReceptionistAppointment from './pages/Receptionist/ReceptionistAppointment'
-import ReceptionistTreatment from './pages/Receptionist/ReceptionistTreatment'
+import ReceptionistManageAppointment from './pages/Receptionist/ReceptionistManageAppoinment'
 import ReceptionistInvoice from './pages/Receptionist/ReceptionistInvoice'
 import DoctorProfile from './pages/Doctor/DoctorProfile'
 import HealthProfile from './pages/Patient/HealthProfile'
@@ -52,6 +53,7 @@ function App() {
         <Route path='/' element={<UserLayout />}>
           <Route index element={<Home />} />
           <Route path='doctors' element={<DoctorsPage />} />
+          <Route path='doctors/:doctorId' element={<DoctorProfileView />} />
           <Route path='about' element={<About />} />
           <Route path='contact' element={<Contact />} />
           <Route path='chat' element={<Chat />} />
@@ -104,8 +106,9 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<ReceptionistProfile />} />
-          <Route path='appointments' element={<ReceptionistAppointment />} />
-          <Route path='treatments' element={<ReceptionistTreatment />} />
+          <Route path='assignments' element={<ReceptionistAppointment />} />
+          <Route path='appointments' element={<ReceptionistManageAppointment />} />
+          {/* <Route path='treatments' element={<ReceptionistTreatment />} /> */}
           <Route path='invoices' element={<ReceptionistInvoice />} />
         </Route>
       </Routes>

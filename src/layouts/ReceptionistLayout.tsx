@@ -31,6 +31,12 @@ const ReceptionistLayout = () => {
             onClick: () => navigate("/receptionist"),
         },
         {
+            key: "assignments",
+            icon: <FaListCheck size={20} />,
+            label: "Gán bác sĩ",
+            onClick: () => navigate("/receptionist/assignments"),
+        },
+        {
             key: "appointments",
             icon: <FaListCheck size={20} />,
             label: "Quản lý lịch hẹn",
@@ -49,7 +55,9 @@ const ReceptionistLayout = () => {
     if (pathname.startsWith("/receptionist/treatments")) selectedKey = "treatments";
     else if (pathname.startsWith("/receptionist/invoices")) selectedKey = "invoices";
     else if (pathname.startsWith("/receptionist/appointments")) selectedKey = "appointments";
+    else if (pathname.startsWith("/receptionist/assignments")) selectedKey = "assignments";
     else if (pathname === "/receptionist" || pathname === "/receptionist/") selectedKey = "profile";
+    
 
     return (
         <Layout className="h-screen">
