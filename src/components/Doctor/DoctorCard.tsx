@@ -11,7 +11,7 @@ type Props = {
 
 const DoctorCard: React.FC<Props> = ({ doctor, onClick, selected, className, height }) => {
     const specialtyName = typeof doctor.specialtyId === 'object' && doctor.specialtyId ? (doctor.specialtyId as any).name : undefined;
-    const imgSrc = (doctor as any).photo ?? (doctor as any).image ?? '/placeholder-doctor.png';
+    const imgSrc = (doctor as any).photo ?? (doctor as any).image ?? (doctor as any).avatar ?? (doctor as any).accountId?.avatar ?? '/placeholder-doctor.png';
     const description = (doctor as any).description ?? (doctor as any).bio ?? undefined;
 
     return (
@@ -25,7 +25,8 @@ const DoctorCard: React.FC<Props> = ({ doctor, onClick, selected, className, hei
                 <img
                     src={imgSrc}
                     alt={doctor.name}
-                    className="object-contain h-full w-full bg-blue-100"
+                    className="object-cover h-full w-full bg-blue-100"
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-doctor.png'; }}
                 />
             </div>
 

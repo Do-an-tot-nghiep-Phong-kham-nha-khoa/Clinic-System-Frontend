@@ -3,6 +3,7 @@ import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar } from 'a
 import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import { getDoctorById, type Doctor } from "../../services/DoctorService";
+import { getAccountById } from '../../services/AccountService';
 
 const DoctorProfileView: React.FC = () => {
     const [doctor, setDoctor] = useState<Doctor | null>(null);
@@ -21,6 +22,11 @@ const DoctorProfileView: React.FC = () => {
         try {
             setLoading(true);
             const data = await getDoctorById(doctorId);
+            // If backend returned doctor with accountId as an ID (not populated), try to fetch account to get avatar
+            if (data && data.accountId && typeof data.accountId === 'string') {
+                const acc = await getAccountById(data.accountId);
+                (data as any).accountId = acc || data.accountId;
+            }
             setDoctor(data);
             console.log(data)
             setError(null);
@@ -96,10 +102,11 @@ const DoctorProfileView: React.FC = () => {
                     <div className="flex flex-col md:flex-row items-start md:items-center mb-6 border-b pb-4">
                         <Avatar
                             size={96}
+                            src={(doctor as any).avatar || (doctor.accountId as any)?.avatar}
                             icon={<UserOutlined />}
                             className="bg-cyan-100 text-cyan-600 text-5xl font-bold shadow-lg mr-6 flex-shrink-0"
                         >
-                            {doctor.name.charAt(0)}
+                            {(!((doctor as any).avatar) && !(doctor.accountId as any)?.avatar) && doctor.name.charAt(0)}
                         </Avatar>
 
                         <div className="mt-4 md:mt-0 mx-4">

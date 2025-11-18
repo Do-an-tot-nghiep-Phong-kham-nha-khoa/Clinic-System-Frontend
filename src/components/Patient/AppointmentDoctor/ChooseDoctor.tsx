@@ -86,7 +86,7 @@ const ChooseDoctor: React.FC<ChooseDoctorProps> = ({ onNext, selectedDoctorId, d
               ]}
             >
               <List.Item.Meta
-                avatar={<Avatar src={item.avatar || '/default-avatar.png'} />}
+                avatar={<Avatar src={(item as any).avatar || (item as any).accountId?.avatar || '/default-avatar.png'} />}
                 title={<span>{item.name}</span>}
                 description={
                   <>
