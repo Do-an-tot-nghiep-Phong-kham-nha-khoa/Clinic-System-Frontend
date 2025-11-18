@@ -57,7 +57,7 @@ const ReceptionistLayout = () => {
     else if (pathname.startsWith("/receptionist/appointments")) selectedKey = "appointments";
     else if (pathname.startsWith("/receptionist/assignments")) selectedKey = "assignments";
     else if (pathname === "/receptionist" || pathname === "/receptionist/") selectedKey = "profile";
-    
+
 
     return (
         <Layout className="h-screen">
@@ -88,7 +88,6 @@ const ReceptionistLayout = () => {
                                 {!collapsed && (
                                     <div className="flex flex-col text-white text-sm gap-1">
                                         <span className="font-semibold">{user?.email}</span>
-                                        <span className="text-gray-400 text-xs">{user?.email}</span>
                                     </div>
                                 )}
                             </div>
