@@ -20,6 +20,8 @@ import AccountManagement from './pages/Admin/AccountManagement'
 import InvoiceManagement from './pages/Admin/InvoiceManagement'
 import RoleManagement from './pages/Admin/RoleManagement'
 import AppointmentManagement from './pages/Admin/AppointmentManagement'
+import DoctorSchedule from './pages/Admin/DoctorSchedule'
+import ScheduleManagement from './pages/Admin/ScheduleManagement'
 // Doctor Pages & Layouts
 import DoctorLayout from './layouts/DoctorLayout'
 import DoctorAppointment from './pages/Doctor/DoctorAppointment'
@@ -72,6 +74,8 @@ function App() {
           <Route path='roles' element={<RoleManagement />} />
           <Route path='invoices' element={<InvoiceManagement />} />
           <Route path='users' element={<AccountManagement />} />
+          <Route path='doctor-schedule' element={<DoctorSchedule />} />
+          <Route path='doctor-schedule/:doctorId' element={<ScheduleManagement />} />
           <Route path='appointments' element={<AppointmentManagement />} />
         </Route>
 

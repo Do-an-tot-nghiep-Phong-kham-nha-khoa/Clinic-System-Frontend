@@ -9,6 +9,7 @@ import {
     MdDashboard,
     MdPeople,
     MdLogout,
+    MdPunchClock,
 } from "react-icons/md";
 import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
@@ -52,6 +53,12 @@ const AdminLayout = () => {
             onClick: () => navigate("/admin/appointments"),
         },
         {
+            key: "doctor-schedule",
+            icon: <MdPunchClock size={20} />,
+            label: "Quản lý lịch trình",
+            onClick: () => navigate("/admin/doctor-schedule"),
+        },
+        {
             key: "medicines",
             icon: <GiMedicines size={20} />,
             label: "Quản lý kho thuốc",
@@ -76,6 +83,7 @@ const AdminLayout = () => {
     if (pathname.startsWith("/admin/medicines")) selectedKey = "medicines";
     else if (pathname.startsWith("/admin/users")) selectedKey = "users";
     else if (pathname.startsWith("/admin/appointments")) selectedKey = "appointments";
+    else if (pathname.startsWith("/admin/doctor-schedule")) selectedKey = "doctor-schedule";
     else if (pathname.startsWith("/admin/services")) selectedKey = "services";
     else if (pathname.startsWith("/admin/invoices")) selectedKey = "invoices";
     else if (pathname.startsWith("/admin/roles")) selectedKey = "roles";
@@ -110,7 +118,6 @@ const AdminLayout = () => {
                                 {!collapsed && (
                                     <div className="flex flex-col text-white text-sm gap-1">
                                         <span className="font-semibold">{user?.email}</span>
-                                        <span className="text-gray-400 text-xs">{user?.email}</span>
                                     </div>
                                 )}
                             </div>
