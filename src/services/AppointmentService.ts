@@ -215,3 +215,18 @@ export async function cancelAppointment(appointmentId: string): Promise<Appointm
         throw new Error("Lỗi kết nối server");
     }
 }
+
+export async function getAppointmentsByDoctorToday(doctorId: string): Promise<ListAppointmentByDoctorResponse> {
+    const url = `/appointments/doctor/${doctorId}/today`;
+    try {
+        const res = await api.get(url);
+        return res.data;
+    }
+    catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            console.error("Lỗi GET lịch hẹn hôm nay theo doctor:", error.response.data);
+            throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn bác sĩ hôm nay.");
+        }
+        throw new Error("Lỗi kết nối server");
+    }
+}

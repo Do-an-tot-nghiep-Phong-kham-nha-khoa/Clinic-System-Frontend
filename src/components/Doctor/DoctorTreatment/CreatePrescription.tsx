@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getMedicines, type Medicine } from "../../../services/MedicineService";
 import { createPrescription } from "../../../services/PrescriptionService";
 import { Button, Input, Card, Space, Typography, List, Modal, InputNumber, Divider, message, Popconfirm } from "antd";
-import { MedicineBoxOutlined, RollbackOutlined, SaveOutlined, DeleteOutlined, PlusOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { MedicineBoxOutlined, RollbackOutlined, SaveOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import ButtonPrimary from "../../../utils/ButtonPrimary";
 
@@ -38,21 +38,27 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
     const [openModal, setOpenModal] = useState(false);
     const [form, setForm] = useState<DosageForm>(defaultForm);
     const [loading, setLoading] = useState(false);
+    const [searchValue, setSearchValue] = useState<string>("");
 
     useEffect(() => {
         loadMed();
     }, []);
 
-    const loadMed = async () => {
+    const loadMed = async (query?: string) => {
         setLoading(true);
         try {
-            const res = await getMedicines({ page: 1, limit: 100 });
+            const res = await getMedicines({ page: 1, limit: 100, q: query || undefined });
             setMedicines(res.items);
         } catch (error) {
             message.error("Lỗi khi tải danh sách thuốc.");
         } finally {
             setLoading(false);
         }
+    };
+
+    // Hàm xử lý khi người dùng bấm nút tìm kiếm hoặc nhấn Enter
+    const handleSearch = (value: string) => {
+        loadMed(value);
     };
 
     const selectMed = (med: Medicine) => {
@@ -160,15 +166,27 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
                 </ButtonPrimary>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                {/* Cột 1 & 2: Danh sách Thuốc */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">                {/* Cột 1 & 2: Danh sách Thuốc */}
                 <Card
                     title="Danh Sách Thuốc Có Sẵn"
                     variant="outlined"
                     className="lg:col-span-2 shadow-md"
                     loading={loading}
                 >
+                    {/* Search Bar */}
+                    <div className="mb-4">
+                        <Input.Search
+                            placeholder="Tìm kiếm thuốc theo tên..."
+                            allowClear
+                            enterButton={<SearchOutlined />}
+                            size="large"
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onSearch={handleSearch}
+                            loading={loading}
+                        />
+                    </div>
+
                     <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
                         {medicines.map(m => {
                             const isSelected = selectedMedicineIds.includes(m._id);
