@@ -21,11 +21,11 @@ const DoctorCard: React.FC<Props> = ({ doctor, onClick, selected, className, hei
             className={`bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-transform duration-300 cursor-pointer mx-auto w-full max-w-[360px] ${selected ? 'ring-4 ring-blue-500' : ''} ${className ?? ''}`}
             style={{ height: height ?? 420 }}
         >
-            <div className="h-2/3 w-full flex items-center justify-center bg-gray-100">
+            <div className="h-2/3 w-full flex items-center justify-center">
                 <img
                     src={imgSrc}
                     alt={doctor.name}
-                    className="object-cover h-full w-full bg-blue-100"
+                    className="object-contain h-full w-full"
                     onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-doctor.png'; }}
                 />
             </div>

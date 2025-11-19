@@ -169,11 +169,6 @@ const DoctorProfileComponent: React.FC = () => {
                             <Tag color="magenta">{doctor._id}</Tag>
                         </Descriptions.Item>
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><EnvironmentOutlined className="mr-2" /> Mã Chuyên Khoa</span>}
-                        >
-                            {specialtyId}
-                        </Descriptions.Item>
-                        <Descriptions.Item
                             label={<span className="font-medium flex items-center"><ExperimentOutlined className="mr-2" /> Tên Chuyên Khoa</span>}
                         >
                             {specialtyName}

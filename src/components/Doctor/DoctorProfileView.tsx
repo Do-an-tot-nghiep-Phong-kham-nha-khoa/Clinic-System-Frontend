@@ -105,13 +105,13 @@ const DoctorProfileView: React.FC = () => {
                     >
                         <div className="flex flex-col md:flex-row items-start md:items-center mb-6 border-b pb-4">
                             <Avatar
-                            size={96}
-                            src={(doctor as any).avatar || (doctor.accountId as any)?.avatar}
-                            icon={<UserOutlined />}
-                            className="bg-cyan-100 text-cyan-600 text-5xl font-bold shadow-lg mr-6 flex-shrink-0"
-                        >
-                            {(!((doctor as any).avatar) && !(doctor.accountId as any)?.avatar) && doctor.name.charAt(0)}
-                        </Avatar>
+                                size={96}
+                                src={(doctor as any).avatar || (doctor.accountId as any)?.avatar}
+                                icon={<UserOutlined />}
+                                className="bg-cyan-100 text-cyan-600 text-5xl font-bold shadow-lg mr-6 flex-shrink-0 !object-contain"
+                            >
+                                {(!((doctor as any).avatar) && !(doctor.accountId as any)?.avatar) && doctor.name.charAt(0)}
+                            </Avatar>
 
                             <div className="mt-4 md:mt-0 mx-4">
                                 <h3 className="text-3xl font-extrabold text-gray-900 leading-tight">{doctor.name}</h3>
@@ -148,11 +148,6 @@ const DoctorProfileView: React.FC = () => {
                                 label={<span className="font-medium flex items-center"><IdcardOutlined className="mr-2" /> Mã Bác Sĩ</span>}
                             >
                                 <Tag color="magenta">{doctor._id}</Tag>
-                            </Descriptions.Item>
-                            <Descriptions.Item
-                                label={<span className="font-medium flex items-center"><EnvironmentOutlined className="mr-2" /> Mã Chuyên Khoa</span>}
-                            >
-                                {specialtyId}
                             </Descriptions.Item>
                             <Descriptions.Item
                                 label={<span className="font-medium flex items-center"><ExperimentOutlined className="mr-2" /> Tên Chuyên Khoa</span>}
