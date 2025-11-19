@@ -20,6 +20,8 @@ import AccountManagement from './pages/Admin/AccountManagement'
 import InvoiceManagement from './pages/Admin/InvoiceManagement'
 import RoleManagement from './pages/Admin/RoleManagement'
 import AppointmentManagement from './pages/Admin/AppointmentManagement'
+import DoctorSchedule from './pages/Admin/DoctorSchedule'
+import ScheduleManagement from './pages/Admin/ScheduleManagement'
 // Doctor Pages & Layouts
 import DoctorLayout from './layouts/DoctorLayout'
 import DoctorAppointment from './pages/Doctor/DoctorAppointment'
@@ -62,24 +64,26 @@ function App() {
         </ Route>
 
         <Route path='admin' element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminLayout />
-            </ProtectedRoute>
-          }>
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<AdminDashboard />} />
           <Route path='medicines' element={<MedicineManagement />} />
           <Route path='services' element={<ServiceManagement />} />
           <Route path='roles' element={<RoleManagement />} />
           <Route path='invoices' element={<InvoiceManagement />} />
           <Route path='users' element={<AccountManagement />} />
+          <Route path='doctor-schedule' element={<DoctorSchedule />} />
+          <Route path='doctor-schedule/:doctorId' element={<ScheduleManagement />} />
           <Route path='appointments' element={<AppointmentManagement />} />
         </Route>
 
         <Route path='doctor' element={
-            <ProtectedRoute allowedRoles={['doctor']}>
-              <DoctorLayout />
-            </ProtectedRoute>
-          }>
+          <ProtectedRoute allowedRoles={['doctor']}>
+            <DoctorLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<DoctorProfile />} />
           <Route path='medical-records' element={<DoctorMedicalRecord />} />
           <Route path='treatments' element={<DoctorTreatment />} />
@@ -87,10 +91,10 @@ function App() {
         </Route>
 
         <Route path='patient' element={
-            <ProtectedRoute allowedRoles={['patient']}>
-              <PatientLayout />
-            </ProtectedRoute>
-          }>
+          <ProtectedRoute allowedRoles={['patient']}>
+            <PatientLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<PatientProfile />} />
           <Route path='appointments' element={<PatientAppointment />} />
           <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
@@ -101,10 +105,10 @@ function App() {
         </Route>
 
         <Route path='receptionist' element={
-            <ProtectedRoute allowedRoles={['receptionist']}>
-              <ReceptionistLayout />
-            </ProtectedRoute>
-          }>
+          <ProtectedRoute allowedRoles={['receptionist']}>
+            <ReceptionistLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<ReceptionistProfile />} />
           <Route path='assignments' element={<ReceptionistAppointment />} />
           <Route path='appointments' element={<ReceptionistManageAppointment />} />

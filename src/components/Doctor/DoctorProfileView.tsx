@@ -4,6 +4,8 @@ import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, Experiment
 import { useParams } from 'react-router-dom';
 import { getDoctorById, type Doctor } from "../../services/DoctorService";
 import { getAccountById } from '../../services/AccountService';
+import NavbarDark from '../General/NavbarDark';
+import Footer from '../General/Footer';
 
 const DoctorProfileView: React.FC = () => {
     const [doctor, setDoctor] = useState<Doctor | null>(null);
@@ -88,19 +90,21 @@ const DoctorProfileView: React.FC = () => {
     const phone = doctor.phone || 'N/A';
 
     return (
-        <div className="p-4 sm:p-8">
-            <div className="container mx-auto">
-                <Card
-                    className="shadow-2xl rounded-2xl border-t-4 border-cyan-600"
-                    title={
-                        <div className="flex items-center space-x-3 text-2xl font-bold text-gray-800">
-                            <ExperimentOutlined className="text-cyan-600" />
-                            <span>Hồ Sơ Bác Sĩ</span>
-                        </div>
-                    }
-                >
-                    <div className="flex flex-col md:flex-row items-start md:items-center mb-6 border-b pb-4">
-                        <Avatar
+        <div className=''>
+            <NavbarDark />
+            <div className="p-4 mt-10 sm:p-8">
+                <div className="container mx-auto">
+                    <Card
+                        className="shadow-2xl rounded-2xl border-t-4 border-cyan-600"
+                        title={
+                            <div className="flex items-center space-x-3 text-2xl font-bold text-gray-800">
+                                <ExperimentOutlined className="text-cyan-600" />
+                                <span>Hồ Sơ Bác Sĩ</span>
+                            </div>
+                        }
+                    >
+                        <div className="flex flex-col md:flex-row items-start md:items-center mb-6 border-b pb-4">
+                            <Avatar
                             size={96}
                             src={(doctor as any).avatar || (doctor.accountId as any)?.avatar}
                             icon={<UserOutlined />}
@@ -109,55 +113,57 @@ const DoctorProfileView: React.FC = () => {
                             {(!((doctor as any).avatar) && !(doctor.accountId as any)?.avatar) && doctor.name.charAt(0)}
                         </Avatar>
 
-                        <div className="mt-4 md:mt-0 mx-4">
-                            <h3 className="text-3xl font-extrabold text-gray-900 leading-tight">{doctor.name}</h3>
-                            <div className="mt-1 space-x-2">
-                                <Tag color="processing" icon={<ExperimentOutlined />} className="text-base px-3 py-1 font-semibold">
-                                    {specialtyName}
-                                </Tag>
+                            <div className="mt-4 md:mt-0 mx-4">
+                                <h3 className="text-3xl font-extrabold text-gray-900 leading-tight">{doctor.name}</h3>
+                                <div className="mt-1 space-x-2">
+                                    <Tag color="processing" icon={<ExperimentOutlined />} className="text-base px-3 py-1 font-semibold">
+                                        {specialtyName}
+                                    </Tag>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <h4 className="text-xl font-semibold text-gray-700 mb-3 border-l-4 border-indigo-500 pl-2">Thông Tin Chuyên Môn & Liên Hệ</h4>
+                        <h4 className="text-xl font-semibold text-gray-700 mb-3 border-l-4 border-indigo-500 pl-2">Thông Tin Chuyên Môn & Liên Hệ</h4>
 
-                    <Descriptions
-                        column={1}
-                        bordered
-                        layout="horizontal"
-                        className="rounded-lg overflow-hidden"
-                        size="middle"
-                    >
-                        <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><RocketOutlined className="mr-2" /> Kinh Nghiệm</span>}
+                        <Descriptions
+                            column={1}
+                            bordered
+                            layout="horizontal"
+                            className="rounded-lg overflow-hidden"
+                            size="middle"
                         >
-                            <span className="font-bold text-indigo-600">{experience} năm</span>
-                        </Descriptions.Item>
+                            <Descriptions.Item
+                                label={<span className="font-medium flex items-center"><RocketOutlined className="mr-2" /> Kinh Nghiệm</span>}
+                            >
+                                <span className="font-bold text-indigo-600">{experience} năm</span>
+                            </Descriptions.Item>
 
-                        <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><PhoneOutlined className="mr-2" /> Số Điện Thoại</span>}
-                        >
-                            <span className="font-semibold text-green-600">{phone}</span>
-                        </Descriptions.Item>
+                            <Descriptions.Item
+                                label={<span className="font-medium flex items-center"><PhoneOutlined className="mr-2" /> Số Điện Thoại</span>}
+                            >
+                                <span className="font-semibold text-green-600">{phone}</span>
+                            </Descriptions.Item>
 
-                        <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><IdcardOutlined className="mr-2" /> Mã Bác Sĩ</span>}
-                        >
-                            <Tag color="magenta">{doctor._id}</Tag>
-                        </Descriptions.Item>
-                        <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><EnvironmentOutlined className="mr-2" /> Mã Chuyên Khoa</span>}
-                        >
-                            {specialtyId}
-                        </Descriptions.Item>
-                        <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><ExperimentOutlined className="mr-2" /> Tên Chuyên Khoa</span>}
-                        >
-                            {specialtyName}
-                        </Descriptions.Item>
-                    </Descriptions>
-                </Card>
+                            <Descriptions.Item
+                                label={<span className="font-medium flex items-center"><IdcardOutlined className="mr-2" /> Mã Bác Sĩ</span>}
+                            >
+                                <Tag color="magenta">{doctor._id}</Tag>
+                            </Descriptions.Item>
+                            <Descriptions.Item
+                                label={<span className="font-medium flex items-center"><EnvironmentOutlined className="mr-2" /> Mã Chuyên Khoa</span>}
+                            >
+                                {specialtyId}
+                            </Descriptions.Item>
+                            <Descriptions.Item
+                                label={<span className="font-medium flex items-center"><ExperimentOutlined className="mr-2" /> Tên Chuyên Khoa</span>}
+                            >
+                                {specialtyName}
+                            </Descriptions.Item>
+                        </Descriptions>
+                    </Card>
+                </div>
             </div>
+            <Footer />
         </div>
     );
 };

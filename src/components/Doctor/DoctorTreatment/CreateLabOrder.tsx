@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getServices, type Service } from "../../../services/ServiceService";
 import { DatePicker, Input, InputNumber, Button, Card, Space, Typography, List, message } from "antd";
-import { ExperimentOutlined, RollbackOutlined, PlusOutlined, DeleteOutlined, SaveOutlined } from "@ant-design/icons";
+import { ExperimentOutlined, RollbackOutlined, PlusOutlined, DeleteOutlined, SaveOutlined, SearchOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import { createLabOrder } from "../../../services/LabOrderService";
 import ButtonPrimary from "../../../utils/ButtonPrimary";
@@ -20,22 +20,28 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
     const [items, setItems] = useState<any[]>([]);
     const [testTime, setTestTime] = useState<Dayjs | null>(dayjs());
     const [loading, setLoading] = useState(false);
+    const [searchValue, setSearchValue] = useState<string>("");
 
     useEffect(() => {
         fetchServices();
     }, []);
 
     // Lấy danh sách dịch vụ từ API
-    const fetchServices = async () => {
+    const fetchServices = async (query?: string) => {
         setLoading(true);
         try {
-            const { items: fetchedServices } = await getServices();
+            const { items: fetchedServices } = await getServices({ q: query || undefined });
             setServices(fetchedServices);
         } catch (error) {
             message.error("Lỗi khi tải danh sách dịch vụ.");
         } finally {
             setLoading(false);
         }
+    }
+
+    // Hàm xử lý khi người dùng bấm nút tìm kiếm hoặc nhấn Enter
+    const handleSearch = (value: string) => {
+        fetchServices(value);
     }
 
     const toggleSelect = (service: Service) => {
@@ -114,7 +120,6 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
                     Tạo Chỉ Định ({items.length})
                 </ButtonPrimary>
             </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Cột 1 & 2: Danh sách Dịch vụ */}
                 <Card
@@ -122,7 +127,20 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
                     variant="outlined"
                     className="lg:col-span-2 shadow-md"
                     loading={loading}
-                >
+                >                    {/* Search Bar */}
+                    <div className="mb-4">
+                        <Input.Search
+                            placeholder="Tìm kiếm dịch vụ theo tên..."
+                            allowClear
+                            enterButton={<SearchOutlined />}
+                            size="large"
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onSearch={handleSearch}
+                            loading={loading}
+                        />
+                    </div>
+
                     <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
                         {services.map(s => {
                             const isSelected = selectedServiceIds.includes(s._id);

@@ -115,38 +115,36 @@ export interface ListAppointmentByBookerResponse {
     appointments: BookerAppointmentModel[];
 }
 
-const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
-const API = `${BASE_URL}/appointments`;
 export async function getAppointments(params: any = {}): Promise<{ items: AppointmentPayload[]; meta: AppointmentMeta | null }> {
-    const url = `${API}`;
-    const res = await axios.get(url, { params, withCredentials: true });
+    const url = `/appointments`;
+    const res = await api.get(url, { params, withCredentials: true });
     const items: AppointmentPayload[] = res?.data?.data ?? res?.data?.appointments ?? res?.data?.items ?? res?.data ?? [];
     const meta: AppointmentMeta | null = res?.data?.meta ?? null;
     return { items, meta };
 }
 export async function getAppointment(id: string): Promise<AppointmentPayload> {
-    const url = `${API}/${id}`;
-    const res = await axios.get(url, { withCredentials: true });
+    const url = `appointments/${id}`;
+    const res = await api.get(url, { withCredentials: true });
     return res?.data ?? null;
 }
 export async function updateAppointment(id: string, status: string): Promise<AppointmentPayload> {
-    const url = `${API}/${id}`;
-    const res = await axios.put(url, { status }, { withCredentials: true });
+    const url = `appointments/${id}`;
+    const res = await api.put(url, { status }, { withCredentials: true });
     return res?.data ?? null;
 }
 export async function assignDoctor(appointment_id: string, doctor_id: string) {
-    const url = `${API}/${appointment_id}/assign-doctor`;
+    const url = `appointments/${appointment_id}/assign-doctor`;
     // Backend expects a PUT to /appointments/:id/assign-doctor with { doctor_id }
-    const res = await axios.put(url, { doctor_id }, { withCredentials: true });
+    const res = await api.put(url, { doctor_id }, { withCredentials: true });
     return res?.data ?? null;
 }
 export async function createAppointment(payload: any): Promise<AppointmentPayload> {
-    const url = `${API}`;
-    const res = await axios.post(url, payload, { withCredentials: true });
+    const url = `appointments`;
+    const res = await api.post(url, payload, { withCredentials: true });
     return res?.data ?? null;
 }
 export async function createAppointmentBySpecialty(payload: AppointmentBySpecialtyPayload): Promise<AppointmentResponse> {
-    const url = `${BASE_URL}/appointments/by-specialty`;
+    const url = `/appointments/by-specialty`;
 
     try {
         const res = await api.post(url, payload);
@@ -199,6 +197,35 @@ export async function getAppointmentsByBooker(bookerId: string): Promise<ListApp
         if (axios.isAxiosError(error) && error.response) {
             console.error("Lỗi GET lịch hẹn theo booker:", error.response.data);
             throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn người đặt.");
+        }
+        throw new Error("Lỗi kết nối server");
+    }
+}
+
+export async function cancelAppointment(appointmentId: string): Promise<AppointmentPayload> {
+    const url = `/appointments/${appointmentId}/cancel`;
+    try {
+        const res = await api.put(url);
+        return res.data;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            console.error("Lỗi hủy lịch hẹn:", error.response.data);
+            throw new Error(error.response.data.message || "Lỗi hủy lịch hẹn.");
+        }
+        throw new Error("Lỗi kết nối server");
+    }
+}
+
+export async function getAppointmentsByDoctorToday(doctorId: string): Promise<ListAppointmentByDoctorResponse> {
+    const url = `/appointments/doctor/${doctorId}/today`;
+    try {
+        const res = await api.get(url);
+        return res.data;
+    }
+    catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            console.error("Lỗi GET lịch hẹn hôm nay theo doctor:", error.response.data);
+            throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn bác sĩ hôm nay.");
         }
         throw new Error("Lỗi kết nối server");
     }
