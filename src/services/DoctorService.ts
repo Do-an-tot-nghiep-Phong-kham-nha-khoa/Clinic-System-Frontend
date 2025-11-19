@@ -1,5 +1,5 @@
 import api from './Api';
-
+import axios from 'axios';
 export type DoctorScheduleItem = {
   _id?: string;
   day: string;
@@ -125,13 +125,30 @@ export async function getDoctorById(id: string): Promise<Doctor | null> {
   }
 }
 
-export async function createDoctor(dto: Partial<Doctor>): Promise<Doctor | null> {
+export async function createDoctor(dto: Partial<Doctor> | FormData, isFormData = false): Promise<Doctor | null> {
   const url = `/doctors`;
   try {
-    const res = await api.post(url, dto);
+    const isFD = isFormData || (typeof FormData !== 'undefined' && dto instanceof FormData);
+
+    if (isFD) {
+      console.log('📤 Sending FormData to:', url);
+      console.log('📤 Is FormData?', dto instanceof FormData);
+      
+      // ✅ CRITICAL: Không set Content-Type, để browser tự động set với boundary
+      const res = await api.post(url, dto as FormData, { 
+        withCredentials: true,
+        // ❌ KHÔNG làm thế này: headers: { 'Content-Type': 'multipart/form-data' }
+        // ✅ Để browser tự set: 'multipart/form-data; boundary=----WebKitFormBoundary...'
+      });
+      
+      console.log('✅ Response:', res.data);
+      return res?.data?.data ?? res?.data ?? null;
+    }
+
+    const res = await api.post(url, dto as Partial<Doctor>);
     return res?.data?.data ?? res?.data ?? null;
-  } catch (e) {
-    console.error('Error creating doctor', e);
+  } catch (e: any) {
+    console.error('❌ Error creating doctor:', e.response?.data || e);
     throw e;
   }
 }

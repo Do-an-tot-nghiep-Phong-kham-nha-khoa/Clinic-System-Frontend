@@ -4,6 +4,7 @@ import { createDoctor } from '../../services/DoctorService';
 import { createPatient } from '../../services/PatientService';
 import { createAdmin } from '../../services/AdminService';
 import { createReceptionist } from '../../services/ReceptionistService';
+
 const { Option } = Select;
 
 type Props = {
@@ -19,8 +20,8 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
 
   const handleRoleChange = (value: string) => {
     setRole(value);
-    form.resetFields(); // reset các field để tránh dữ liệu cũ
-    form.setFieldsValue({ role: value }); // giữ role
+    form.resetFields();
+    form.setFieldsValue({ role: value });
   };
 
   const handleSubmit = async (values: any) => {
@@ -28,15 +29,48 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
     try {
       switch (values.role) {
         case 'doctor':
-          await createDoctor({
-            email: values.email,
-            password: values.password,
-            name: values.name,
-            specialtyId: values.specialtyId,
-            phone: values.phone,
-            experience: values.experience,
-          });
+          try {
+            const formData = new FormData();
+            formData.append('email', values.email);
+            formData.append('password', values.password);
+            formData.append('name', values.name);
+            formData.append('specialtyId', values.specialtyId);
+            formData.append('phone', values.phone);
+            formData.append('experience', values.experience || '');
+
+            // ✅ FIX: Lấy file từ input có name="avatar"
+            const avatarInput = document.querySelector('input[name="avatar"]') as HTMLInputElement;
+            if (avatarInput?.files?.[0]) {
+              const file = avatarInput.files[0];
+              console.log('📎 File to upload:', {
+                name: file.name,
+                type: file.type,
+                size: file.size
+              });
+              formData.append('avatar', file);
+            } else {
+              console.log('⚠️ No avatar file selected');
+            }
+
+            // Debug FormData
+            console.log('📤 FormData entries:');
+            for (let [key, value] of formData.entries()) {
+              console.log(key, value);
+            }
+
+            await createDoctor(formData, true);
+            message.success('Tạo bác sĩ thành công');
+            form.resetFields();
+            onCreated?.();
+            onClose();
+          } catch (err: any) {
+            console.error('❌ Create doctor error:', err);
+            message.error(err.response?.data?.message || 'Tạo bác sĩ thất bại');
+          } finally {
+            setLoading(false);
+          }
           break;
+
         case 'patient':
           await createPatient({
             email: values.email,
@@ -47,7 +81,12 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             address: values.address,
             gender: values.gender,
           });
+          message.success('Tạo bệnh nhân thành công');
+          form.resetFields();
+          onCreated?.();
+          onClose();
           break;
+
         case 'admin':
           await createAdmin({
             email: values.email,
@@ -57,7 +96,12 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             note: values.note,
             avatar: values.avatar,
           });
+          message.success('Tạo admin thành công');
+          form.resetFields();
+          onCreated?.();
+          onClose();
           break;
+
         case 'receptionist':
           await createReceptionist({
             name: values.name,
@@ -65,15 +109,17 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             email: values.email,
             password: values.password,
           });
+          message.success('Tạo lễ tân thành công');
+          form.resetFields();
+          onCreated?.();
+          onClose();
           break;
+
         default:
           throw new Error('Role không hợp lệ');
       }
-      message.success('Tạo tài khoản thành công');
-      form.resetFields();
-      onCreated?.();
-      onClose();
     } catch (error: any) {
+      console.error('❌ Error:', error);
       message.error(error.response?.data?.message || 'Tạo tài khoản thất bại');
     } finally {
       setLoading(false);
@@ -106,7 +152,7 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
           <Input placeholder="Nhập tên" />
         </Form.Item>
 
-        {(role === 'doctor' || role === 'patient' || role === 'admin'|| role === 'receptionist') && (
+        {(role === 'doctor' || role === 'patient' || role === 'admin' || role === 'receptionist') && (
           <Form.Item
             label="Email"
             name="email"
@@ -150,6 +196,21 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             </Form.Item>
             <Form.Item label="Kinh nghiệm" name="experience">
               <Input placeholder="Số năm kinh nghiệm" />
+            </Form.Item>
+
+            {/* ✅ FIX: Thêm name="avatar" vào input */}
+            <Form.Item label="Avatar">
+              <input 
+                type="file" 
+                name="avatar" 
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    console.log('✅ File selected:', file.name);
+                  }
+                }}
+              />
             </Form.Item>
           </>
         )}
