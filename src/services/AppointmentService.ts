@@ -127,7 +127,7 @@ export async function getAppointment(id: string): Promise<AppointmentPayload> {
     const res = await api.get(url, { withCredentials: true });
     return res?.data ?? null;
 }
-export async function updateAppointment(id: string, status: string): Promise<AppointmentPayload> {
+export async function updateAppointment(id: string, payload: Partial<AppointmentPayload>): Promise<AppointmentPayload> {
     const url = `appointments/${id}`;
     const res = await api.put(url, { status }, { withCredentials: true });
     return res?.data ?? null;
@@ -202,6 +202,11 @@ export async function getAppointmentsByBooker(bookerId: string): Promise<ListApp
     }
 }
 
+export async function deleteAppointment(appointmentId: string): Promise<{ success: boolean; message: string }> {
+    const url = `/${appointmentId}`;
+    const res = await api.delete(url, { withCredentials: true });
+    return res?.data ?? { success: false, message: 'Xoá thất bại' };
+}
 export async function cancelAppointment(appointmentId: string): Promise<AppointmentPayload> {
     const url = `/appointments/${appointmentId}/cancel`;
     try {
