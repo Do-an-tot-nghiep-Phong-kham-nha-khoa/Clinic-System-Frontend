@@ -129,7 +129,7 @@ export async function getAppointment(id: string): Promise<AppointmentPayload> {
 }
 export async function updateAppointment(id: string, payload: Partial<AppointmentPayload>): Promise<AppointmentPayload> {
     const url = `appointments/${id}`;
-    const res = await api.put(url, { status }, { withCredentials: true });
+    const res = await api.put(url, payload, { withCredentials: true });
     return res?.data ?? null;
 }
 export async function assignDoctor(appointment_id: string, doctor_id: string) {

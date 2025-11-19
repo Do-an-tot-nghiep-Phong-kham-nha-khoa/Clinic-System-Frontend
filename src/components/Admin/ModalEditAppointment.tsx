@@ -333,7 +333,8 @@ const ModalEditAppointment: React.FC<ModalEditAppointmentProps> = ({ open, id, o
             <Select
               options={[
                 { value: "waiting_assigned", label: "Chờ phân công" },
-                { value: "assigned", label: "Đã phân công" },
+                { value: "pending", label: "Đang chờ" },
+                { value: "confirmed", label: "Đã phân công" },
                 { value: "completed", label: "Hoàn thành" },
                 { value: "cancelled", label: "Đã hủy" },
               ]}
