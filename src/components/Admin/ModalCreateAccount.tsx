@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Modal, Form, Input, Select, Button, message, DatePicker } from 'antd';
+import { Modal, Form, Input, Select, Button, message, DatePicker, Avatar, Space } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import { createDoctor } from '../../services/DoctorService';
 import { createPatient } from '../../services/PatientService';
 import { createAdmin } from '../../services/AdminService';
@@ -17,107 +18,129 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<string>('');
+  const [previewAvatar, setPreviewAvatar] = useState<string>('');
 
   const handleRoleChange = (value: string) => {
     setRole(value);
+    setPreviewAvatar(''); // Reset preview khi đổi role
     form.resetFields();
     form.setFieldsValue({ role: value });
+  };
+
+  // Preview avatar khi chọn file
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      console.log('✅ File selected:', file.name);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewAvatar('');
+    }
   };
 
   const handleSubmit = async (values: any) => {
     setLoading(true);
     try {
+      const avatarInput = document.querySelector('input[name="avatar"]') as HTMLInputElement;
+      const avatarFile = avatarInput?.files?.[0];
+
       switch (values.role) {
-        case 'doctor':
-          try {
-            const formData = new FormData();
-            formData.append('email', values.email);
-            formData.append('password', values.password);
-            formData.append('name', values.name);
-            formData.append('specialtyId', values.specialtyId);
-            formData.append('phone', values.phone);
-            formData.append('experience', values.experience || '');
+        case 'doctor': {
+          const formData = new FormData();
+          formData.append('email', values.email);
+          formData.append('password', values.password);
+          formData.append('name', values.name);
+          formData.append('specialtyId', values.specialtyId);
+          formData.append('phone', values.phone);
+          formData.append('experience', values.experience || '');
 
-            // ✅ FIX: Lấy file từ input có name="avatar"
-            const avatarInput = document.querySelector('input[name="avatar"]') as HTMLInputElement;
-            if (avatarInput?.files?.[0]) {
-              const file = avatarInput.files[0];
-              console.log('📎 File to upload:', {
-                name: file.name,
-                type: file.type,
-                size: file.size
-              });
-              formData.append('avatar', file);
-            } else {
-              console.log('⚠️ No avatar file selected');
-            }
-
-            // Debug FormData
-            console.log('📤 FormData entries:');
-            for (let [key, value] of formData.entries()) {
-              console.log(key, value);
-            }
-
-            await createDoctor(formData, true);
-            message.success('Tạo bác sĩ thành công');
-            form.resetFields();
-            onCreated?.();
-            onClose();
-          } catch (err: any) {
-            console.error('❌ Create doctor error:', err);
-            message.error(err.response?.data?.message || 'Tạo bác sĩ thất bại');
-          } finally {
-            setLoading(false);
+          if (avatarFile) {
+            formData.append('avatar', avatarFile);
+            console.log('📎 Avatar file attached');
           }
-          break;
 
-        case 'patient':
-          await createPatient({
-            email: values.email,
-            password: values.password,
-            name: values.name,
-            phone: values.phone,
-            dob: values.dob ? values.dob.format('YYYY-MM-DD') : undefined,
-            address: values.address,
-            gender: values.gender,
-          });
+          await createDoctor(formData, true);
+          message.success('Tạo bác sĩ thành công');
+          break;
+        }
+
+        case 'patient': {
+          const formData = new FormData();
+          formData.append('email', values.email);
+          formData.append('password', values.password);
+          formData.append('name', values.name);
+          formData.append('phone', values.phone);
+          
+          if (values.dob) {
+            formData.append('dob', values.dob.format('YYYY-MM-DD'));
+          }
+          if (values.address) {
+            formData.append('address', values.address);
+          }
+          if (values.gender) {
+            formData.append('gender', values.gender);
+          }
+          if (avatarFile) {
+            formData.append('avatar', avatarFile);
+            console.log('📎 Avatar file attached');
+          }
+
+          await createPatient(formData, true);
           message.success('Tạo bệnh nhân thành công');
-          form.resetFields();
-          onCreated?.();
-          onClose();
           break;
+        }
 
-        case 'admin':
-          await createAdmin({
-            email: values.email,
-            password: values.password,
-            name: values.name,
-            phone: values.phone,
-            note: values.note,
-            avatar: values.avatar,
-          });
+        case 'admin': {
+          const formData = new FormData();
+          formData.append('email', values.email);
+          formData.append('password', values.password);
+          formData.append('name', values.name);
+          
+          if (values.phone) {
+            formData.append('phone', values.phone);
+          }
+          if (values.note) {
+            formData.append('note', values.note);
+          }
+          if (avatarFile) {
+            formData.append('avatar', avatarFile);
+            console.log('📎 Avatar file attached');
+          }
+
+          await createAdmin(formData, true);
           message.success('Tạo admin thành công');
-          form.resetFields();
-          onCreated?.();
-          onClose();
           break;
+        }
 
-        case 'receptionist':
-          await createReceptionist({
-            name: values.name,
-            phone: values.phone,
-            email: values.email,
-            password: values.password,
-          });
+        case 'receptionist': {
+          const formData = new FormData();
+          formData.append('email', values.email);
+          formData.append('password', values.password);
+          formData.append('name', values.name);
+          formData.append('phone', values.phone);
+          
+          if (avatarFile) {
+            formData.append('avatar', avatarFile);
+            console.log('📎 Avatar file attached');
+          }
+
+          await createReceptionist(formData, true);
           message.success('Tạo lễ tân thành công');
-          form.resetFields();
-          onCreated?.();
-          onClose();
           break;
+        }
 
         default:
           throw new Error('Role không hợp lệ');
       }
+
+      form.resetFields();
+      setPreviewAvatar('');
+      onCreated?.();
+      onClose();
     } catch (error: any) {
       console.error('❌ Error:', error);
       message.error(error.response?.data?.message || 'Tạo tài khoản thất bại');
@@ -127,7 +150,13 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
   };
 
   return (
-    <Modal title="Tạo tài khoản mới" open={open} onCancel={onClose} footer={null}>
+    <Modal 
+      title="Tạo tài khoản mới" 
+      open={open} 
+      onCancel={onClose} 
+      footer={null}
+      width={600}
+    >
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
           label="Vai trò"
@@ -153,28 +182,60 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
         </Form.Item>
 
         {(role === 'doctor' || role === 'patient' || role === 'admin' || role === 'receptionist') && (
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[
-              { required: true, message: 'Vui lòng nhập email' },
-              { type: 'email', message: 'Email không hợp lệ' },
-            ]}
-          >
-            <Input placeholder="Nhập email" />
-          </Form.Item>
+          <>
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                { required: true, message: 'Vui lòng nhập email' },
+                { type: 'email', message: 'Email không hợp lệ' },
+              ]}
+            >
+              <Input placeholder="Nhập email" />
+            </Form.Item>
+
+            <Form.Item
+              label="Mật khẩu"
+              name="password"
+              rules={[
+                { required: true, message: 'Vui lòng nhập mật khẩu' },
+                { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự' },
+              ]}
+            >
+              <Input.Password placeholder="Nhập mật khẩu" />
+            </Form.Item>
+          </>
         )}
 
-        {(role === 'doctor' || role === 'patient' || role === 'admin' || role === 'receptionist') && (
-          <Form.Item
-            label="Mật khẩu"
-            name="password"
-            rules={[
-              { required: true, message: 'Vui lòng nhập mật khẩu' },
-              { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự' },
-            ]}
-          >
-            <Input.Password placeholder="Nhập mật khẩu" />
+        {/* Avatar Upload - Chung cho tất cả roles */}
+        {role && (
+          <Form.Item label="Avatar">
+            <Space direction="vertical" style={{ width: '100%' }}>
+              {/* Preview */}
+              {previewAvatar && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+                  <Avatar 
+                    size={64} 
+                    src={previewAvatar} 
+                    icon={<UserOutlined />}
+                  />
+                  <span style={{ fontSize: 12, color: '#52c41a' }}>
+                    ✓ Ảnh đã chọn
+                  </span>
+                </div>
+              )}
+
+              {/* File Input */}
+              <input 
+                type="file" 
+                name="avatar" 
+                accept="image/*"
+                onChange={handleAvatarChange}
+              />
+              <span style={{ fontSize: 12, color: '#888' }}>
+                Chọn ảnh đại diện (không bắt buộc)
+              </span>
+            </Space>
           </Form.Item>
         )}
 
@@ -197,21 +258,6 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             <Form.Item label="Kinh nghiệm" name="experience">
               <Input placeholder="Số năm kinh nghiệm" />
             </Form.Item>
-
-            {/* ✅ FIX: Thêm name="avatar" vào input */}
-            <Form.Item label="Avatar">
-              <input 
-                type="file" 
-                name="avatar" 
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    console.log('✅ File selected:', file.name);
-                  }
-                }}
-              />
-            </Form.Item>
           </>
         )}
 
@@ -225,7 +271,7 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
               <Input placeholder="Nhập số điện thoại" />
             </Form.Item>
             <Form.Item label="Ngày sinh" name="dob">
-              <DatePicker style={{ width: '100%' }} />
+              <DatePicker style={{ width: '100%' }} placeholder="Chọn ngày sinh" />
             </Form.Item>
             <Form.Item label="Địa chỉ" name="address">
               <Input placeholder="Nhập địa chỉ" />
@@ -247,9 +293,6 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             </Form.Item>
             <Form.Item label="Ghi chú" name="note">
               <Input placeholder="Nhập ghi chú" />
-            </Form.Item>
-            <Form.Item label="Avatar URL" name="avatar">
-              <Input placeholder="Nhập URL avatar" />
             </Form.Item>
           </>
         )}
