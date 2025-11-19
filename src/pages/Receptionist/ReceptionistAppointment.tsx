@@ -20,7 +20,6 @@ const ReceptionistAppointment = () => {
 
     useEffect(() => {
         fetchSpecialties();
-        fetchAppointments();
     }, []);
 
     useEffect(() => {
@@ -49,7 +48,8 @@ const ReceptionistAppointment = () => {
                 : result?.items ?? result?.data ?? [];
 
             // filter appointment chưa có doctor
-            const doctorless = items.filter(a => a.doctor_id == null || a.doctor_id === "" || a.doctor_id === undefined);
+            const doctorless = items.filter(a => !a.doctor_id);
+
 
             setAppointments(doctorless);
         } catch (err) {
@@ -64,7 +64,7 @@ const ReceptionistAppointment = () => {
             if (appointment.status !== "waiting_assigned") {
                 const updated = await AppointmentService.updateAppointment(
                     String(appointment._id),
-                    "waiting_assigned"
+                    { status: "waiting_assigned" }
                 );
                 setSelectedAppointment(updated ?? appointment);
             } else {

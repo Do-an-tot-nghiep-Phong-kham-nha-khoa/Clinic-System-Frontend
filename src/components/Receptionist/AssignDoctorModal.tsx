@@ -3,6 +3,7 @@ import { Modal, Select, Spin, Empty, message } from "antd";
 import * as ScheduleService from "../../services/ScheduleService";
 import * as AppointmentService from "../../services/AppointmentService";
 import * as DoctorService from "../../services/DoctorService";
+import type { AvailableSlots } from "../../services/ScheduleService";
 
 const { Option } = Select;
 
@@ -56,12 +57,13 @@ export default function AssignDoctorModal({ open, appointment, onClose, onAssign
         const timeSlot = appointment.time_slot ?? appointment.timeSlot;
         if (!specialty_id || !date || !timeSlot) {
           message.error("Thiếu dữ liệu cuộc hẹn");
+          console.log("Missing data", { specialty_id, date, timeSlot });
           return;
         }
         const [startTime, endTime] = timeSlot.split("-").map(s => s.trim());
 
         // 4. Gọi API lấy tất cả slot trống theo specialty
-        const slots = await ScheduleService.getAvailableTimeSlotsBySpecialty(specialty_id, date);
+        const slots: AvailableSlots[] = await ScheduleService.getAvailableTimeSlotsBySpecialty(specialty_id, date);
 
         // 5. Lọc slot đúng giờ
         const matched = slots.filter(s => s.startTime === startTime && s.endTime === endTime);
@@ -73,7 +75,7 @@ export default function AssignDoctorModal({ open, appointment, onClose, onAssign
         }
 
         // 6. Lấy danh sách doctor_id
-        const doctorIds = matched.map(s => s.doctor_id);
+        const doctorIds = matched.flatMap(s => s.doctor_ids ?? []);
         console.log("doctorIds", doctorIds);
 
         // 7. Fetch thông tin doctor
