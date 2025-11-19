@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Button, Card, Space, Table, Tag, Typography } from "antd";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { getAppointmentsByDoctor } from "../../../services/AppointmentService";
-import { ClockCircleOutlined, UserOutlined, CalendarOutlined, SolutionOutlined, SyncOutlined, CheckCircleOutlined, ExclamationCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { getAppointmentsByDoctorToday } from "../../../services/AppointmentService";
+import { ClockCircleOutlined, CalendarOutlined, SolutionOutlined, SyncOutlined, CheckCircleOutlined, ExclamationCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 dayjs.extend(utc);
 
 const { Title, Text } = Typography;
@@ -51,7 +51,7 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
 
     const loadData = async () => {
         setLoading(true);
-        const res = await getAppointmentsByDoctor(doctorId);
+        const res = await getAppointmentsByDoctorToday(doctorId);
         setData(res.appointments);
         setLoading(false);
     };
