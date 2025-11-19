@@ -109,7 +109,7 @@ const DoctorsPage: React.FC = () => {
       <NavbarDark />
       <div className="container mx-auto px-4 py-8 pt-32">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-          <Title level={2} className="m-0">Doctors</Title>
+          <Title level={2} className="m-0">Danh sách bác sĩ</Title>
 
           <div className="flex items-center gap-3">
             <Input.Search placeholder="Search doctors" onSearch={handleSearch} allowClear style={{ width: 280 }} />

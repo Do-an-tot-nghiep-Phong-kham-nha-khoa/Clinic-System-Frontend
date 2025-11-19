@@ -34,6 +34,11 @@ export type Doctor = {
   __v?: number;
   avatar?: string;
   title?: string;
+  accountId?: {
+    _id: string;
+    email: string;
+    status?: string;
+  };
 };
 export interface DoctorProfile {
   _id: string;

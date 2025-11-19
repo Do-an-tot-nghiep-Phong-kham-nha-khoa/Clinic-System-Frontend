@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getAppointmentsByBooker, type BookerAppointmentModel } from "../../services/AppointmentService";
-import { Badge, Calendar, Modal, type CalendarProps } from "antd";
+import { getAppointmentsByBooker, type BookerAppointmentModel, cancelAppointment } from "../../services/AppointmentService";
+import { Badge, Calendar, Modal, type CalendarProps, Button, message } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { getPatientByAccountId } from "../../services/PatientService";
+import { MdCancel } from "react-icons/md";
 dayjs.extend(utc);
 
 const PatientAppointment = () => {
@@ -89,11 +90,29 @@ const PatientAppointment = () => {
     const onSelect = (value: Dayjs) => {
         setSelectedDate(value.clone());
         setIsModalVisible(true);
-    };
-
-    const handleClose = () => {
+    }; const handleClose = () => {
         setIsModalVisible(false);
         setSelectedDate(null);
+    };
+
+    const handleCancelAppointment = async (appointmentId: string) => {
+        Modal.confirm({
+            title: "Xác nhận hủy lịch hẹn",
+            content: "Bạn có chắc chắn muốn hủy lịch hẹn này?",
+            okText: "Hủy lịch hẹn",
+            cancelText: "Đóng",
+            okType: "danger",
+            onOk: async () => {
+                try {
+                    await cancelAppointment(appointmentId);
+                    message.success("Hủy lịch hẹn thành công!");
+                    loadAppointments(); // Reload appointments
+                } catch (error: any) {
+                    message.error(error.message || "Không thể hủy lịch hẹn. Vui lòng thử lại.");
+                    console.error("Error cancelling appointment:", error);
+                }
+            }
+        });
     };
 
     const cellRender: CalendarProps<Dayjs>["cellRender"] = (current, info) => {
@@ -127,15 +146,29 @@ const PatientAppointment = () => {
                                 return startA.localeCompare(startB);
                             })
                             .map((a) => (
-                                <li key={a._id} className="mb-3 p-3 shadow rounded-md bg-blue-50">
-                                    <div className="font-semibold">{a.timeSlot}</div>
-                                    <div className="text-sm">Lý do: {a.reason}</div>
-                                    <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
-                                    <div className="text-sm">
-                                        Bác sĩ: {a.doctor_id?.name || "Chưa phân công"}
-                                    </div>
-                                    <div className="text-sm">
-                                        Chuyên khoa: {a.specialty_id?.name || "Không rõ"}
+                                <li key={a._id} className="mb-3 p-3 shadow rounded-md bg-blue-50 relative">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex-1">
+                                            <div className="font-semibold">{a.timeSlot}</div>
+                                            <div className="text-sm">Lý do: {a.reason}</div>
+                                            <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
+                                            <div className="text-sm">
+                                                Bác sĩ: {a.doctor_id?.name || "Chưa phân công"}
+                                            </div>
+                                            <div className="text-sm">
+                                                Chuyên khoa: {a.specialty_id?.name || "Không rõ"}
+                                            </div>
+                                        </div>
+                                        {(a.status === "pending" || a.status === "waiting_assigned" || a.status === "confirmed") && (
+                                            <Button
+                                                type="text"
+                                                danger
+                                                icon={<MdCancel size={20} />}
+                                                onClick={() => handleCancelAppointment(a._id)}
+                                                title="Hủy lịch hẹn"
+                                                className="flex items-center justify-center"
+                                            />
+                                        )}
                                     </div>
                                 </li>
                             ))}
