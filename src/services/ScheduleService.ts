@@ -1,4 +1,3 @@
-import axios from 'axios';
 import api from './Api';
 const URL = `/schedules`;
 
@@ -19,27 +18,25 @@ export type DoctorAvailability = {
     doctorId: string;
     name?: string;
 };
-export type AvailableSlot = {
-    doctor_id: string;
+export type AvailableSlots = {
+    doctor_ids: string[];
     startTime: string;
     endTime: string;
-    doctor_name?: string;
+    doctor_names?: string[];
 };
-
+// [GET] /schedules/specialty/:specialtyId/:date
 export async function getAvailableTimeSlotsBySpecialty(
     specialtyId: string,
     date: string
-): Promise<AvailableSlot[]> {
+): Promise<AvailableSlots[]> {
     const url = `${URL}/specialty/${encodeURIComponent(specialtyId)}/${encodeURIComponent(date)}`;
     const res = await api.get(url);
     const body = res?.data ?? [];
-    if (Array.isArray(body)) return body as AvailableSlot[];
-    if (Array.isArray(body?.data)) return body.data as AvailableSlot[];
+    if (Array.isArray(body)) return body as AvailableSlots[];
+    if (Array.isArray(body?.data)) return body.data as AvailableSlots[];
     return [];
 }
-/* ---------------------------------------------------
-   GET: /schedules/:doctorId
----------------------------------------------------- */
+// [GET] /schedules/:doctorId
 export async function getDoctorSchedule(doctorId: string): Promise<ScheduleEntry[]> {
     try {
         const url = `${URL}/${doctorId}`;
@@ -69,9 +66,7 @@ export async function getAvailableBySpecialty(
     const res = await api.get(url);
     return res.data; // [{startTime, endTime, doctor_ids:[...] }]
 }
-/* ---------------------------------------------------
-   GET: /schedules/:doctorId/:date
----------------------------------------------------- */
+// [GET] /schedules/:doctorId/:date
 export async function getDoctorScheduleByDate(doctorId: string, date: string, shift?: 'morning' | 'afternoon') {
     let url = `${URL}/${doctorId}/${encodeURIComponent(date)}`;
     if (shift) url += `?shift=${shift}`;
@@ -81,33 +76,8 @@ export async function getDoctorScheduleByDate(doctorId: string, date: string, sh
 export async function getAvailableSlotsByDoctor(doctorId: string, date: string, shift?: 'morning' | 'afternoon') {
     return getDoctorScheduleByDate(doctorId, date, shift);
 }
-/* ---------------------------------------------------
-   GET: /schedules/available-doctors?specialtyId=...&date=...&timeSlot=...
----------------------------------------------------- */
-export async function getAvailableDoctors(
-    specialtyId: string,
-    date: string,
-    timeSlot: string
-) {
-    try {
-        const res = await api.get(`${URL}/available-doctors`, {
-            params: {
-                specialty_id: specialtyId,
-                date: date,           // phải là yyyy-mm-dd
-                time_slot: timeSlot   // phải là "HH:MM-HH:MM"
-            },
-            withCredentials: true
-        });
 
-        return res.data;
-    } catch (error) {
-        console.error("getAvailableDoctors error:", error);
-        return { doctors: [] };
-    }
-}
-/* ---------------------------------------------------
-   POST: /schedules
----------------------------------------------------- */
+// [POST] /schedules
 export async function createSchedule(payload: {
     doctorId: string;
     date: string;

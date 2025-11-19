@@ -129,9 +129,9 @@ export async function getAppointment(id: string): Promise<AppointmentPayload> {
     const res = await axios.get(url, { withCredentials: true });
     return res?.data ?? null;
 }
-export async function updateAppointment(id: string, status: string): Promise<AppointmentPayload> {
+export async function updateAppointment(id: string, payload: Partial<AppointmentPayload>): Promise<AppointmentPayload> {
     const url = `${API}/${id}`;
-    const res = await axios.put(url, { status }, { withCredentials: true });
+    const res = await axios.put(url, payload, { withCredentials: true });
     return res?.data ?? null;
 }
 export async function assignDoctor(appointment_id: string, doctor_id: string) {
@@ -202,4 +202,10 @@ export async function getAppointmentsByBooker(bookerId: string): Promise<ListApp
         }
         throw new Error("Lỗi kết nối server");
     }
+}
+
+export async function deleteAppointment(appointmentId: string): Promise<{ success: boolean; message: string }> {
+    const url = `${API}/${appointmentId}`;
+    const res = await axios.delete(url, { withCredentials: true });
+    return res?.data ?? { success: false, message: 'Xoá thất bại' };
 }
