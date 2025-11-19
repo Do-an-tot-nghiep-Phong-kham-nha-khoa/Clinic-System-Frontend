@@ -19,7 +19,6 @@ import RegisterPage from './pages/Auth/Register'
 import AccountManagement from './pages/Admin/AccountManagement'
 import InvoiceManagement from './pages/Admin/InvoiceManagement'
 import RoleManagement from './pages/Admin/RoleManagement'
-import AppointmentManagement from './pages/Admin/AppointmentManagement'
 import DoctorSchedule from './pages/Admin/DoctorSchedule'
 import ScheduleManagement from './pages/Admin/ScheduleManagement'
 // Doctor Pages & Layouts
@@ -76,7 +75,6 @@ function App() {
           <Route path='users' element={<AccountManagement />} />
           <Route path='doctor-schedule' element={<DoctorSchedule />} />
           <Route path='doctor-schedule/:doctorId' element={<ScheduleManagement />} />
-          <Route path='appointments' element={<AppointmentManagement />} />
         </Route>
 
         <Route path='doctor' element={

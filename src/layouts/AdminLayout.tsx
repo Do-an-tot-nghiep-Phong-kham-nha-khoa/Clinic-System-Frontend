@@ -47,12 +47,6 @@ const AdminLayout = () => {
             onClick: () => navigate("/admin/roles"),
         },
         {
-            key: "appointments",
-            icon: <FaListCheck size={20} />,
-            label: "Quản lý lịch hẹn",
-            onClick: () => navigate("/admin/appointments"),
-        },
-        {
             key: "doctor-schedule",
             icon: <MdPunchClock size={20} />,
             label: "Quản lý lịch trình",
@@ -82,7 +76,6 @@ const AdminLayout = () => {
     let selectedKey = "dashboard";
     if (pathname.startsWith("/admin/medicines")) selectedKey = "medicines";
     else if (pathname.startsWith("/admin/users")) selectedKey = "users";
-    else if (pathname.startsWith("/admin/appointments")) selectedKey = "appointments";
     else if (pathname.startsWith("/admin/doctor-schedule")) selectedKey = "doctor-schedule";
     else if (pathname.startsWith("/admin/services")) selectedKey = "services";
     else if (pathname.startsWith("/admin/invoices")) selectedKey = "invoices";
