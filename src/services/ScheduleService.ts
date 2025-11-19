@@ -4,7 +4,8 @@ const URL = `/schedules`;
 export type TimeSlot = {
     startTime: string;
     endTime: string;
-    isBooked?: boolean;
+    isBooked: boolean;
+    _id: string;
 }
 
 export type ScheduleEntry = {
@@ -24,7 +25,13 @@ export type AvailableSlots = {
     endTime: string;
     doctor_names?: string[];
 };
-// [GET] /schedules/specialty/:specialtyId/:date
+
+export type CreateTimeSlotDto = {
+    startTime: string;
+    endTime: string;
+    isBooked?: boolean;
+};
+
 export async function getAvailableTimeSlotsBySpecialty(
     specialtyId: string,
     date: string
@@ -79,12 +86,51 @@ export async function getAvailableSlotsByDoctor(doctorId: string, date: string, 
 
 // [POST] /schedules
 export async function createSchedule(payload: {
-    doctorId: string;
+    doctor_id: string;
     date: string;
-    timeSlots: TimeSlot[];
+    timeSlots: CreateTimeSlotDto[];
 }) {
     const res = await api.post(URL, payload);
     return res?.data ?? null;
 }
 
 export default {} as const;
+
+
+export async function updateDoctorScheduleSlot(slotId: string, data: { isBooked: boolean }) {
+    try {
+        const url = `${URL}/slot/${slotId}`;
+        const res = await api.put(url, data);
+        return res?.data ?? null;
+    } catch (error) {
+        console.error("updateDoctorScheduleSlot error:", error);
+        return null;
+    }
+}
+
+export async function updateDoctorSchedule(slotId: string, payload: {
+    doctor_id: string;
+    date: string;
+    timeSlots: CreateTimeSlotDto[];
+}) {
+    try {
+        const url = `${URL}/${slotId}`;
+        const res = await api.put(url, payload);
+        return res?.data ?? null;
+    }
+    catch (error) {
+        console.error("updateDoctorSchedule error:", error);
+        return null;
+    }
+}
+
+export async function deleteDoctorSchedule(scheduleId: string) {
+    try {
+        const url = `${URL}/${scheduleId}`;
+        await api.delete(url);
+        return true;
+    } catch (error) {
+        console.error("deleteDoctorSchedule error:", error);
+        return false;
+    }
+}

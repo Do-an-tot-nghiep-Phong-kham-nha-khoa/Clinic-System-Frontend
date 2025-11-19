@@ -1,11 +1,13 @@
 type Doctor = {
-    photo: string;
+    photo?: string;
+    avatar?: string;
+    accountId?: any;
     name: string;
     specialty: string;
-    tagline: string;
-    phone: string;
-    yearsExperience: number;
-    rating: number;
+    tagline?: string;
+    phone?: string;
+    yearsExperience?: number;
+    rating?: number;
 };
 
 type DoctorHeroProps = {
@@ -19,7 +21,7 @@ function DoctorHero({ doctor, onBook }: DoctorHeroProps) {
         <header className="bg-white p-6 rounded-lg shadow mb-6">
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-6">
                 <img
-                    src={doctor.photo}
+                    src={doctor.photo || doctor.avatar || doctor.accountId?.avatar || '/default-avatar.png'}
                     alt={`${doctor.name} photo`}
                     className="w-32 h-32 rounded-full object-cover border-2 border-sky-200"
                 />
