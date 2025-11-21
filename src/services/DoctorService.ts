@@ -1,13 +1,8 @@
 import api from './Api';
-import axios from 'axios';
 export type DoctorScheduleItem = {
   _id?: string;
   day: string;
   timeSlots: string[];
-};
-export type Specialty = {
-  _id: string;
-  name: string;
 };
 export interface Account {
   _id: string;
@@ -17,7 +12,6 @@ export type SpecialtyRef = {
   _id: string;
   name: string;
 };
-
 export type Doctor = {
   _id: string;
   name: string;
@@ -28,8 +22,6 @@ export type Doctor = {
   experience?: number;
   schedule?: DoctorScheduleItem[];
   photo?: string;
-  clinic?: string;
-  degrees?: string[];
   bio?: string;
   __v?: number;
   avatar?: string;
@@ -44,7 +36,7 @@ export interface DoctorProfile {
   _id: string;
   accountId: Account;
   name: string;
-  specialtyId: Specialty;
+  specialtyName: string;
   phone: string;
   experience: number; // Số năm kinh nghiệm
 }
@@ -52,6 +44,19 @@ export interface DoctorProfile {
 interface DoctorResponse {
   message: string;
   data: DoctorProfile;
+}
+
+
+interface DoctorResponse {
+  message: string;
+  data: DoctorProfile;
+}
+
+export interface UpdateDoctorPayload {
+  specialtyId?: string;
+  name?: string;
+  phone?: string;
+  experience?: number;
 }
 
 export async function getDoctorsWithPaging(params: { page?: number; limit?: number; q?: string; specialty?: string; specialtyId?: string; name?: string } = {}): Promise<{ items: Doctor[]; total: number; page: number; limit: number }> {
@@ -125,7 +130,7 @@ export async function getDoctorById(id: string): Promise<Doctor | null> {
   }
 }
 
-export async function createDoctor(dto: Partial<Doctor> | FormData, isFormData = false): Promise<Doctor | null> {
+export async function createDoctor(dto: Partial<DoctorProfile> | FormData, isFormData = false): Promise<DoctorProfile | null> {
   const url = `/doctors`;
   try {
     const isFD = isFormData || (typeof FormData !== 'undefined' && dto instanceof FormData);
@@ -133,27 +138,26 @@ export async function createDoctor(dto: Partial<Doctor> | FormData, isFormData =
     if (isFD) {
       console.log('📤 Sending FormData to:', url);
       console.log('📤 Is FormData?', dto instanceof FormData);
-      
+
       // ✅ CRITICAL: Không set Content-Type, để browser tự động set với boundary
-      const res = await api.post(url, dto as FormData, { 
+      const res = await api.post(url, dto as FormData, {
         withCredentials: true,
         // ❌ KHÔNG làm thế này: headers: { 'Content-Type': 'multipart/form-data' }
         // ✅ Để browser tự set: 'multipart/form-data; boundary=----WebKitFormBoundary...'
       });
-      
+
       console.log('✅ Response:', res.data);
       return res?.data?.data ?? res?.data ?? null;
     }
 
-    const res = await api.post(url, dto as Partial<Doctor>);
+    const res = await api.post(url, dto as Partial<DoctorProfile>, { withCredentials: true });
     return res?.data?.data ?? res?.data ?? null;
   } catch (e: any) {
     console.error('❌ Error creating doctor:', e.response?.data || e);
     throw e;
   }
 }
-
-export async function updateDoctor(id: string, dto: Partial<Doctor>): Promise<Doctor | null> {
+export async function updateDoctor(id: string, dto: Partial<DoctorProfile>): Promise<DoctorProfile | null> {
   const url = `/doctors/${id}`;
   try {
     const res = await api.put(url, dto);
@@ -182,31 +186,6 @@ export async function getDoctorsBySpecialty(specialtyId: string, params: { page?
   return res?.data?.data ?? res?.data ?? [];
 }
 
-export interface Account {
-  _id: string;
-  email: string;
-}
-
-export interface DoctorProfile {
-  _id: string;
-  accountId: Account;
-  name: string;
-  specialtyId: Specialty;
-  phone: string;
-  experience: number; // Số năm kinh nghiệm
-}
-
-interface DoctorResponse {
-  message: string;
-  data: DoctorProfile;
-}
-
-export interface UpdateDoctorPayload {
-  specialtyId?: string;
-  name?: string;
-  phone?: string;
-  experience?: number;
-}
 
 export async function getDoctors(specialtyId?: string): Promise<Doctor[]> {
   try {

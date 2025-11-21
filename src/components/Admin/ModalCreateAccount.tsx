@@ -16,7 +16,7 @@ type Props = {
 const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState<string>('');
+  const [role, setRole] = useState<string>('patient');
 
   const handleRoleChange = (value: string) => {
     setRole(value);
@@ -34,7 +34,7 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             formData.append('email', values.email);
             formData.append('password', values.password);
             formData.append('name', values.name);
-            formData.append('specialtyId', values.specialtyId);
+            formData.append('specialtyName', values.specialtyName);
             formData.append('phone', values.phone);
             formData.append('experience', values.experience || '');
 
@@ -188,11 +188,18 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
               <Input placeholder="Nhập số điện thoại" />
             </Form.Item>
             <Form.Item
-              label="Chuyên khoa ID"
-              name="specialtyId"
-              rules={[{ required: true, message: 'Vui lòng nhập specialtyId' }]}
+              label="Tên chuyên khoa"
+              name="specialtyName"
+              rules={[{ required: true, message: 'Vui lòng chọn chuyên khoa' }]}
             >
-              <Input placeholder="Nhập specialtyId" />
+              <Select placeholder="Chọn chuyên khoa">
+                <Option value="Tim mạch">Tim mạch</Option>
+                <Option value="Nhi">Nhi</Option>
+                <Option value="Da liễu">Da liễu</Option>
+                <Option value="Tai Mũi Họng">Tai Mũi Họng</Option>
+                <Option value="Nội tổng quát">Nội tổng quát</Option>
+                <Option value="Sản phụ khoa">Sản phụ khoa</Option>
+              </Select>
             </Form.Item>
             <Form.Item label="Kinh nghiệm" name="experience">
               <Input placeholder="Số năm kinh nghiệm" />
