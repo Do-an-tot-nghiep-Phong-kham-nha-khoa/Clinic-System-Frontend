@@ -98,8 +98,6 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             password: values.password,
             name: values.name,
             phone: values.phone,
-            note: values.note,
-            avatar: values.avatar,
           });
           message.success('Tạo admin thành công');
           form.resetFields();
@@ -256,12 +254,6 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
           <>
             <Form.Item label="Số điện thoại" name="phone">
               <Input placeholder="Nhập số điện thoại" />
-            </Form.Item>
-            <Form.Item label="Ghi chú" name="note">
-              <Input placeholder="Nhập ghi chú" />
-            </Form.Item>
-            <Form.Item label="Avatar URL" name="avatar">
-              <Input placeholder="Nhập URL avatar" />
             </Form.Item>
           </>
         )}
