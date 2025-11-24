@@ -9,8 +9,9 @@ dayjs.extend(utc);
 const { Title, Text } = Typography;
 
 interface Props {
-    doctorId: string;
+    accountId: string;
     onSelect: (app: any) => void;
+    onDoctorIdChange: (doctorId: string) => void;
 }
 
 const getGenderLabel = (gender?: string): string => {
@@ -36,12 +37,14 @@ const getStatusTag = (status: string) => {
             return <Tag icon={<SolutionOutlined />} color="green">Đã hoàn thành</Tag>;
         case "cancelled":
             return <Tag icon={<CloseCircleOutlined />} color="red">Đã hủy</Tag>;
+        case "waiting_assigned":
+            return <Tag icon={<ClockCircleOutlined />} color="purple">Chờ phân công</Tag>;
         default:
             return <Tag>{status}</Tag>;
     }
 };
 
-const AppointmentList = ({ onSelect, doctorId }: Props) => {
+const AppointmentList = ({ onSelect, accountId, onDoctorIdChange }: Props) => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<any[]>([]);
 
@@ -51,8 +54,15 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
 
     const loadData = async () => {
         setLoading(true);
-        const res = await getAppointmentsByDoctorToday(doctorId);
+        const res = await getAppointmentsByDoctorToday(accountId);
         setData(res.appointments);
+
+        // Lấy doctorId từ appointment đầu tiên và truyền lên component cha
+        if (res.appointments && res.appointments.length > 0) {
+            const doctorId = res.appointments[0].doctor_id;
+            onDoctorIdChange(doctorId);
+        }
+
         setLoading(false);
     };
 
@@ -116,7 +126,11 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
                     type="primary"
                     icon={<SolutionOutlined />}
                     onClick={() => onSelect(record)}
-                    disabled={record.status.toLowerCase() === 'completed' || record.status.toLowerCase() === 'cancelled'}
+                    disabled={record.status.toLowerCase() === 'completed' ||
+                        record.status.toLowerCase() === 'cancelled' ||
+                        record.status.toLowerCase() === 'pending' ||
+                        record.status.toLowerCase() === 'waiting_assigned'
+                    }
                 >
                     Khám
                 </Button>

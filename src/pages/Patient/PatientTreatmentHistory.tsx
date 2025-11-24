@@ -15,7 +15,6 @@ import ButtonPrimary from "../../utils/ButtonPrimary";
 
 const PatientTreatmentHistory = () => {
     const { user } = useAuth();
-    const [bookerId, setBookerId] = useState<string>("");
     const [treatments, setTreatments] = useState<Treatment[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -30,20 +29,15 @@ const PatientTreatmentHistory = () => {
     const [selectedTreatmentId, setSelectedTreatmentId] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadBooker = async () => {
-            if (!user?.id) return;
-            const data = await getPatientByAccountId(user.id);
-            if (data?._id) setBookerId(data._id);
-        };
-        loadBooker();
-    }, [user?.id]);
-
-    useEffect(() => {
         const loadTreatments = async () => {
-            if (!bookerId) return;
+            if (!user?.id) {
+                setTreatments([]);
+                setTotal(0);
+                return;
+            }
             setLoading(true);
             try {
-                const res = await getTreatmentsByBooker(bookerId, {
+                const res = await getTreatmentsByBooker(user.id, {
                     page,
                     limit,
                     sortBy: sortField,
@@ -58,7 +52,7 @@ const PatientTreatmentHistory = () => {
             }
         };
         loadTreatments();
-    }, [bookerId, page, limit, sortField, sortOrder]);
+    }, [user?.id, page, limit, sortField, sortOrder]);
 
     const handleTableChange = (
         pagination: TablePaginationConfig,

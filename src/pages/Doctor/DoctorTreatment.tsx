@@ -1,6 +1,5 @@
 import { useAuth } from "../../contexts/AuthContext";
-import { useEffect, useState } from "react";
-import { getDoctorByAccountId } from "../../services/DoctorService";
+import { useState } from "react";
 import AppointmentList from "../../components/Doctor/DoctorTreatment/AppointmentList";
 import PatientPreCheck from "../../components/Doctor/DoctorTreatment/PatientPreCheck";
 import CreateLabOrder from "../../components/Doctor/DoctorTreatment/CreateLabOrder";
@@ -25,14 +24,9 @@ const DoctorTreatment = () => {
     const [currentPrescriptionId, setCurrentPrescriptionId] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
 
-    useEffect(() => {
-        const load = async () => {
-            if (!user?.id) return;
-            const data = await getDoctorByAccountId(user.id);
-            setDoctorId(data?._id || "");
-        };
-        load();
-    }, [user?.id]);
+    const handleDoctorIdChange = (id: string) => {
+        setDoctorId(id);
+    };
 
     const goPreCheck = (appointment: any) => {
         setSelectedAppointment(appointment);
@@ -122,12 +116,16 @@ const DoctorTreatment = () => {
         }
     }
 
-    if (!doctorId) return <div className="p-4">Loading doctor info...</div>;
+    if (!user?.id) return <div className="p-4">Loading user info...</div>;
 
     return (
         <div className="p-4">
             {screen === "list" && (
-                <AppointmentList doctorId={doctorId} onSelect={goPreCheck} />
+                <AppointmentList
+                    accountId={user.id}
+                    onSelect={goPreCheck}
+                    onDoctorIdChange={handleDoctorIdChange}
+                />
             )}
 
             {screen === "precheck" && selectedAppointment && (
@@ -145,9 +143,7 @@ const DoctorTreatment = () => {
                     currentLabOrderId={currentLabOrderId}
                     currentPrescriptionId={currentPrescriptionId}
                 />
-            )}
-
-            {screen === "createLabOrder" && selectedAppointment && (
+            )}            {screen === "createLabOrder" && selectedAppointment && doctorId && (
                 <CreateLabOrder
                     healthProfileId={selectedAppointment.healthProfile_id._id}
                     onCreated={handleLabOrderCreated}
@@ -155,7 +151,7 @@ const DoctorTreatment = () => {
                 />
             )}
 
-            {screen === "prescription" && selectedAppointment && (
+            {screen === "prescription" && selectedAppointment && doctorId && (
                 <CreatePrescription
                     healthProfileId={selectedAppointment.healthProfile_id._id}
                     onCreated={handlePrescriptionCreated}

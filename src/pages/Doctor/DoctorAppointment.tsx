@@ -11,30 +11,17 @@ dayjs.extend(utc);
 
 const DoctorAppointment = () => {
     const { user } = useAuth();
-    const [doctorId, setDoctorId] = useState<string>("");
     const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
 
     useEffect(() => {
-        const load = async () => {
-            if (!user?.id) return;
-            const data = await getDoctorByAccountId(user.id);
-            setDoctorId(data?._id || "");
-        };
-        load();
+        loadAppointments();
     }, [user?.id]);
-
-    useEffect(() => {
-        if (doctorId) {
-            loadAppointments();
-        }
-    }, [doctorId]);
-
 
     const loadAppointments = async () => {
         try {
-            const res = await getAppointmentsByDoctor(doctorId);
+            const res = await getAppointmentsByDoctor(user?.id || "");
             setAppointments(res.appointments);
         } catch (err) {
             console.error(err);
@@ -127,7 +114,7 @@ const DoctorAppointment = () => {
         }
     };
 
-    if (!doctorId) {
+    if (!user?.id) {
         return <div>
             Không tìm thấy bác sĩ liên kết với tài khoản của bạn.
         </div>;

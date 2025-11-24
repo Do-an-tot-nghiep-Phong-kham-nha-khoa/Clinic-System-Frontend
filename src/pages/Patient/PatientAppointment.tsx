@@ -5,35 +5,22 @@ import { Badge, Calendar, Modal, type CalendarProps, Button, message } from "ant
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { getPatientByAccountId } from "../../services/PatientService";
 import { MdCancel } from "react-icons/md";
 dayjs.extend(utc);
 
 const PatientAppointment = () => {
     const { user } = useAuth();
-    const [patientId, setPatientId] = useState<string>("");
     const [appointments, setAppointments] = useState<BookerAppointmentModel[]>([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
 
     useEffect(() => {
-        const load = async () => {
-            if (!user?.id) return;
-            const data = await getPatientByAccountId(user.id);
-            setPatientId(data?._id || "")
-        };
-        load();
+        loadAppointments();
     }, [user?.id]);
-
-    useEffect(() => {
-        if (patientId) {
-            loadAppointments();
-        }
-    }, [patientId]);
 
     const loadAppointments = async () => {
         try {
-            const res = await getAppointmentsByBooker(patientId);
+            const res = await getAppointmentsByBooker(user?.id || "");
             setAppointments(res.appointments);
         } catch (err) {
             console.error("Lỗi khi tải danh sách cuộc hẹn:", err);
@@ -125,6 +112,8 @@ const PatientAppointment = () => {
         }
         return info.originNode;
     };
+
+    if (!user?.id) return <div className="p-4">Loading user info...</div>;
 
     return (
         <div className="container mx-auto">
