@@ -77,11 +77,9 @@ const AccountManagement = () => {
         {
             title: "Actions",
             key: "actions",
+            width: 150,            // thêm width cố định
             render: (_: any, record: Account) => (
-                <span className="flex gap-2">
-                    {/* <ButtonPrimary type="link" shape="round" icon={<AiFillEdit />} onClick={() => openEditModal(record._id)}>
-                        Sửa
-                    </ButtonPrimary> */}
+                <div style={{ display: "flex", gap: 8, whiteSpace: "nowrap" }}>
                     <Button type="link" danger shape="round" icon={<FaTrash />} onClick={() => handleDelete(record._id)}>
                         Xoá
                     </Button>
@@ -95,7 +93,7 @@ const AccountManagement = () => {
                     >
                         Xem
                     </Button>
-                </span>
+                </div>
             ),
         },
     ];
