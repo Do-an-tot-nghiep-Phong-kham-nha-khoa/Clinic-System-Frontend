@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getDoctorByAccountId } from "../../services/DoctorService";
-import { getAppointmentsByDoctor, type AppointmentModel } from "../../services/AppointmentService";
+import { getAppointmentsByDoctor, type AppointmentModel, confirmAppointment } from "../../services/AppointmentService";
 import type { Dayjs } from "dayjs";
-import { Badge, Calendar, Modal, type CalendarProps } from "antd";
+import { Badge, Calendar, Modal, type CalendarProps, Button, message } from "antd";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { FaCheckCircle } from "react-icons/fa";
 dayjs.extend(utc);
 
 const DoctorAppointment = () => {
@@ -90,11 +91,29 @@ const DoctorAppointment = () => {
             );
         }
         return info.originNode;
-    };
-
-    const handleClose = () => {
+    }; const handleClose = () => {
         setIsModalVisible(false);
         setSelectedDate(null);
+    };
+
+    const handleConfirmAppointment = async (appointmentId: string) => {
+        Modal.confirm({
+            title: "Xác nhận lịch hẹn",
+            content: "Bạn có chắc chắn muốn xác nhận lịch hẹn này?",
+            okText: "Xác nhận",
+            cancelText: "Đóng",
+            okType: "primary",
+            onOk: async () => {
+                try {
+                    await confirmAppointment(appointmentId);
+                    message.success("Xác nhận lịch hẹn thành công!");
+                    loadAppointments(); // Reload appointments
+                } catch (error: any) {
+                    message.error(error.message || "Không thể xác nhận lịch hẹn. Vui lòng thử lại.");
+                    console.error("Error confirming appointment:", error);
+                }
+            }
+        });
     };
 
     const statusToVietnamese = (status: string) => {
@@ -135,14 +154,26 @@ const DoctorAppointment = () => {
                                 const startA = a.timeSlot.split("-")[0];
                                 const startB = b.timeSlot.split("-")[0];
                                 return startA.localeCompare(startB);
-                            })
-                            .map((a) => (
-                                <li key={a._id} className="mb-3 p-3 shadow rounded-md bg-blue-50">
-                                    <div className="font-semibold">{a.timeSlot}</div>
-                                    <div className="text-sm">Lý do: {a.reason}</div>
-                                    <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
-                                    <div className="text-sm">
-                                        Bệnh nhân: {a.healthProfile_id.owner_detail.name}
+                            }).map((a) => (
+                                <li key={a._id} className="mb-3 p-3 shadow rounded-md bg-blue-50 relative">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex-1">
+                                            <div className="font-semibold">{a.timeSlot}</div>
+                                            <div className="text-sm">Lý do: {a.reason}</div>
+                                            <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
+                                            <div className="text-sm">
+                                                Bệnh nhân: {a.healthProfile_id.owner_detail.name}
+                                            </div>
+                                        </div>
+                                        {(a.status === "pending" || a.status === "waiting_assigned") && (
+                                            <Button
+                                                type="text"
+                                                icon={<FaCheckCircle size={20} />}
+                                                onClick={() => handleConfirmAppointment(a._id)}
+                                                title="Xác nhận lịch hẹn"
+                                                className="flex items-center justify-center !text-blue-600 !hover:text-blue-800"
+                                            />
+                                        )}
                                     </div>
                                 </li>
                             ))}

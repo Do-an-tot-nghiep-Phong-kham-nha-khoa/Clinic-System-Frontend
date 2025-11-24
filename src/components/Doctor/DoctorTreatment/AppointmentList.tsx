@@ -3,7 +3,7 @@ import { Button, Card, Space, Table, Tag, Typography } from "antd";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { getAppointmentsByDoctorToday } from "../../../services/AppointmentService";
-import { ClockCircleOutlined, CalendarOutlined, SolutionOutlined, SyncOutlined, CheckCircleOutlined, ExclamationCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, CalendarOutlined, SolutionOutlined, SyncOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 dayjs.extend(utc);
 
 const { Title, Text } = Typography;
@@ -61,7 +61,7 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
             title: "Bệnh nhân",
             dataIndex: ["healthProfile_id", "owner_detail"],
             key: "patient",
-            render: (owner: any, record: any) => {
+            render: (owner: any) => {
                 const dob = owner?.dob ? dayjs().diff(dayjs(owner.dob), "year") : "N/A";
                 return (
                     <div>
@@ -122,46 +122,50 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
                 </Button>
             )
         }
-    ];
-
-    if (!data) return (
-        <div>
-            <Card variant="outlined" className="shadow-lg">
-                <div>
-                    <Title level={3} className="!mb-0"><CalendarOutlined />
-                        Danh Sách Cuộc Hẹn
-                    </Title>
-                    <Text>Không có cuộc hẹn nào.</Text>
-                </div>
-            </Card>
-        </div>
-    )
-
-    return (
+    ]; return (
         <div>
             <Card variant="outlined" className="shadow-lg">
                 <div className="flex justify-between items-center mb-6">
                     <Title level={3} className="!mb-0"><CalendarOutlined /> Danh Sách Cuộc Hẹn</Title>
-                    <Button
-                        icon={<SyncOutlined />}
-                        onClick={loadData}
-                        loading={loading}
-                        type="default"
-                    >
-                        Làm mới
-                    </Button>
+                    {data && data.length > 0 && (
+                        <Button
+                            icon={<SyncOutlined />}
+                            onClick={loadData}
+                            loading={loading}
+                            type="default"
+                        >
+                            Làm mới
+                        </Button>
+                    )}
                 </div>
 
-                <Table
-                    loading={loading}
-                    dataSource={data}
-                    columns={columns}
-                    rowKey="_id"
-                    pagination={{ pageSize: 10 }}
-                    scroll={{ x: 'max-content' }}
-                />
+                {!data || data.length === 0 ? (
+                    <div className="text-center py-8">
+                        <CalendarOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
+                        <Title level={4} type="secondary">Không có lịch hẹn trong ngày</Title>
+                        <Text type="secondary">Hiện tại không có cuộc hẹn nào được lên lịch cho hôm nay.</Text>
+                        <div className="mt-4">
+                            <Button
+                                icon={<SyncOutlined />}
+                                onClick={loadData}
+                                loading={loading}
+                                type="default"
+                            >
+                                Làm mới
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <Table
+                        loading={loading}
+                        dataSource={data}
+                        columns={columns}
+                        rowKey="_id"
+                        pagination={{ pageSize: 10 }}
+                        scroll={{ x: 'max-content' }}
+                    />
+                )}
             </Card>
-
         </div>
     );
 };

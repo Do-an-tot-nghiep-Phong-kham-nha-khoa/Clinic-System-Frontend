@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, message, Card, Tag } from "antd";
+import { Table, message, Tag } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import { getDoctorsWithPaging } from "../../services/DoctorService";
@@ -86,19 +86,23 @@ const DoctorSchedule = () => {
                     <Tag color="red">Không hoạt động</Tag>
                 );
             }
-        },
-        {
+        }, {
             title: "Hành động",
             key: "actions",
-            render: (_: any, record: Doctor) => (
-                <ButtonPrimary
-                    type="primary"
-                    icon={<CalendarOutlined />}
-                    onClick={() => navigate(`/admin/doctor-schedule/${record._id}`)}
-                >
-                    Xem lịch
-                </ButtonPrimary>
-            )
+            render: (_: any, record: Doctor) => {
+                const isActive = record.accountId?.status === "active";
+                return (
+                    <ButtonPrimary
+                        type="primary"
+                        icon={<CalendarOutlined />}
+                        onClick={() => navigate(`/admin/doctor-schedule/${record._id}`)}
+                        disabled={!isActive}
+                        title={!isActive ? "Bác sĩ không hoạt động" : "Xem lịch trình bác sĩ"}
+                    >
+                        Xem lịch
+                    </ButtonPrimary>
+                );
+            }
         }
     ];
 
@@ -108,32 +112,22 @@ const DoctorSchedule = () => {
                 <h1 className="text-3xl font-bold">Quản lý Lịch Trình Bác Sĩ</h1>
             </div>
 
-            {doctorId && (
-                <Card className="mb-4 bg-blue-50">
-                    <p className="text-lg">
-                        <strong>Doctor ID đã chọn:</strong> {doctorId}
-                    </p>
-                </Card>
-            )}
-
-            <Card>
-                <Table
-                    columns={columns}
-                    dataSource={doctors}
-                    rowKey={(record) => record._id}
-                    loading={loading}
-                    pagination={{
-                        current: page,
-                        pageSize: pageSize,
-                        total: total,
-                        showSizeChanger: true,
-                        pageSizeOptions: [5, 10, 20, 50],
-                        showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} bác sĩ`,
-                    }}
-                    onChange={handleTableChange}
-                    scroll={{ x: 1000 }}
-                />
-            </Card>
+            <Table
+                columns={columns}
+                dataSource={doctors}
+                rowKey={(record) => record._id}
+                loading={loading}
+                pagination={{
+                    current: page,
+                    pageSize: pageSize,
+                    total: total,
+                    showSizeChanger: true,
+                    pageSizeOptions: [5, 10, 20, 50],
+                    showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} bác sĩ`,
+                }}
+                onChange={handleTableChange}
+                scroll={{ x: 1000 }}
+            />
         </div>
     );
 };
