@@ -16,12 +16,18 @@ interface Props {
 
 const getGenderLabel = (gender?: string): string => {
     switch ((gender || "").toLowerCase()) {
+        case "nam":
+            return "Nam";
+        case "nữ":
+            return "Nữ";
+        case "khác":
+            return "Khác";
+        case "other":
+            return "Khác";
         case "male":
             return "Nam";
         case "female":
             return "Nữ";
-        case "other":
-            return "Khác";
         default:
             return "Chưa cập nhật";
     }
@@ -141,16 +147,6 @@ const AppointmentList = ({ onSelect, accountId, onDoctorIdChange }: Props) => {
             <Card variant="outlined" className="shadow-lg">
                 <div className="flex justify-between items-center mb-6">
                     <Title level={3} className="!mb-0"><CalendarOutlined /> Danh Sách Cuộc Hẹn</Title>
-                    {data && data.length > 0 && (
-                        <Button
-                            icon={<SyncOutlined />}
-                            onClick={loadData}
-                            loading={loading}
-                            type="default"
-                        >
-                            Làm mới
-                        </Button>
-                    )}
                 </div>
 
                 {!data || data.length === 0 ? (

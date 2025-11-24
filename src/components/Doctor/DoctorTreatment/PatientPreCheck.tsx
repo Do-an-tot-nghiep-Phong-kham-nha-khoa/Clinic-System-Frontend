@@ -144,6 +144,9 @@ const PatientPreCheck = ({
                         </div>
 
                         <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                            <div className="text-sm ">
+                                Triệu chứng lâm sàng (S):
+                            </div>
                             <Input.TextArea
                                 placeholder="Triệu chứng lâm sàng (S)"
                                 rows={4}
@@ -151,6 +154,9 @@ const PatientPreCheck = ({
                                 onChange={(e) => handleDataChange("symptoms", e.target.value)}
                             />
 
+                            <div className="text-sm ">
+                                Chẩn đoán ban đầu (D):
+                            </div>
                             <Input.TextArea
                                 placeholder="Chẩn đoán ban đầu (D)"
                                 rows={4}
