@@ -104,7 +104,7 @@ const LoginPage: React.FC = () => {
                                 <Checkbox checked={remember} onChange={(e) => setRemember(e.target.checked)}>
                                     <span className="text-gray-600">Ghi nhớ trong 30 ngày</span>
                                 </Checkbox>
-                                <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+                                <a onClick={() => navigate('/auth/forgot')} className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer">
                                     Quên mật khẩu?
                                 </a>
                             </div>
@@ -130,7 +130,7 @@ const LoginPage: React.FC = () => {
 
                         <div className="text-center text-sm mt-3 text-gray-500">
                             Chưa có tài khoản?{' '}
-                            <a href="#" className="font-semibold text-indigo-600 hover:underline">
+                            <a onClick={() => navigate('/register')} className="font-semibold text-indigo-600 hover:underline">
                                 Đăng ký miễn phí
                             </a>
                         </div>
