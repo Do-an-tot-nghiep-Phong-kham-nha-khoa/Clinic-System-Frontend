@@ -282,11 +282,23 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
                     </Space>
 
                     <Text strong>2. Chi tiết hướng dẫn</Text>
+                    <div className="text-sm">
+                        Liều dùng
+                    </div>
                     <Input placeholder="Liều dùng (VD: 1 viên 2 lần/ngày)" value={form.dosage} onChange={e => handleFormChange("dosage", e.target.value)} />
+                    <div className="text-sm">
+                        Tần suất
+                    </div>
                     <Input placeholder="Tần suất (VD: Sáng/Tối)" value={form.frequency} onChange={e => handleFormChange("frequency", e.target.value)} />
+                    <div className="text-sm">
+                        Thời gian
+                    </div>
                     <Input placeholder="Thời gian (VD: 5 ngày)" value={form.duration} onChange={e => handleFormChange("duration", e.target.value)} />
 
                     <Text strong>3. Hướng dẫn thêm</Text>
+                    <div className="text-sm">
+                        Ghi chú/Hướng dẫn
+                    </div>
                     <TextArea placeholder="Ghi chú/Hướng dẫn đặc biệt" rows={3} value={form.instruction} onChange={e => handleFormChange("instruction", e.target.value)} />
                 </Space>
             </Modal>

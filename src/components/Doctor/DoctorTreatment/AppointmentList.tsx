@@ -3,24 +3,31 @@ import { Button, Card, Space, Table, Tag, Typography } from "antd";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { getAppointmentsByDoctorToday } from "../../../services/AppointmentService";
-import { ClockCircleOutlined, CalendarOutlined, SolutionOutlined, SyncOutlined, CheckCircleOutlined, ExclamationCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, CalendarOutlined, SolutionOutlined, SyncOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 dayjs.extend(utc);
 
 const { Title, Text } = Typography;
 
 interface Props {
-    doctorId: string;
+    accountId: string;
     onSelect: (app: any) => void;
+    onDoctorIdChange: (doctorId: string) => void;
 }
 
 const getGenderLabel = (gender?: string): string => {
     switch ((gender || "").toLowerCase()) {
+        case "nam":
+            return "Nam";
+        case "nữ":
+            return "Nữ";
+        case "khác":
+            return "Khác";
+        case "other":
+            return "Khác";
         case "male":
             return "Nam";
         case "female":
             return "Nữ";
-        case "other":
-            return "Khác";
         default:
             return "Chưa cập nhật";
     }
@@ -36,12 +43,14 @@ const getStatusTag = (status: string) => {
             return <Tag icon={<SolutionOutlined />} color="green">Đã hoàn thành</Tag>;
         case "cancelled":
             return <Tag icon={<CloseCircleOutlined />} color="red">Đã hủy</Tag>;
+        case "waiting_assigned":
+            return <Tag icon={<ClockCircleOutlined />} color="purple">Chờ phân công</Tag>;
         default:
             return <Tag>{status}</Tag>;
     }
 };
 
-const AppointmentList = ({ onSelect, doctorId }: Props) => {
+const AppointmentList = ({ onSelect, accountId, onDoctorIdChange }: Props) => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<any[]>([]);
 
@@ -51,8 +60,15 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
 
     const loadData = async () => {
         setLoading(true);
-        const res = await getAppointmentsByDoctorToday(doctorId);
+        const res = await getAppointmentsByDoctorToday(accountId);
         setData(res.appointments);
+
+        // Lấy doctorId từ appointment đầu tiên và truyền lên component cha
+        if (res.appointments && res.appointments.length > 0) {
+            const doctorId = res.appointments[0].doctor_id;
+            onDoctorIdChange(doctorId);
+        }
+
         setLoading(false);
     };
 
@@ -61,7 +77,7 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
             title: "Bệnh nhân",
             dataIndex: ["healthProfile_id", "owner_detail"],
             key: "patient",
-            render: (owner: any, record: any) => {
+            render: (owner: any) => {
                 const dob = owner?.dob ? dayjs().diff(dayjs(owner.dob), "year") : "N/A";
                 return (
                     <div>
@@ -116,52 +132,50 @@ const AppointmentList = ({ onSelect, doctorId }: Props) => {
                     type="primary"
                     icon={<SolutionOutlined />}
                     onClick={() => onSelect(record)}
-                    disabled={record.status.toLowerCase() === 'completed' || record.status.toLowerCase() === 'cancelled'}
+                    disabled={record.status.toLowerCase() === 'completed' ||
+                        record.status.toLowerCase() === 'cancelled' ||
+                        record.status.toLowerCase() === 'pending' ||
+                        record.status.toLowerCase() === 'waiting_assigned'
+                    }
                 >
                     Khám
                 </Button>
             )
         }
-    ];
-
-    if (!data) return (
-        <div>
-            <Card variant="outlined" className="shadow-lg">
-                <div>
-                    <Title level={3} className="!mb-0"><CalendarOutlined />
-                        Danh Sách Cuộc Hẹn
-                    </Title>
-                    <Text>Không có cuộc hẹn nào.</Text>
-                </div>
-            </Card>
-        </div>
-    )
-
-    return (
+    ]; return (
         <div>
             <Card variant="outlined" className="shadow-lg">
                 <div className="flex justify-between items-center mb-6">
                     <Title level={3} className="!mb-0"><CalendarOutlined /> Danh Sách Cuộc Hẹn</Title>
-                    <Button
-                        icon={<SyncOutlined />}
-                        onClick={loadData}
-                        loading={loading}
-                        type="default"
-                    >
-                        Làm mới
-                    </Button>
                 </div>
 
-                <Table
-                    loading={loading}
-                    dataSource={data}
-                    columns={columns}
-                    rowKey="_id"
-                    pagination={{ pageSize: 10 }}
-                    scroll={{ x: 'max-content' }}
-                />
+                {!data || data.length === 0 ? (
+                    <div className="text-center py-8">
+                        <CalendarOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
+                        <Title level={4} type="secondary">Không có lịch hẹn trong ngày</Title>
+                        <Text type="secondary">Hiện tại không có cuộc hẹn nào được lên lịch cho hôm nay.</Text>
+                        <div className="mt-4">
+                            <Button
+                                icon={<SyncOutlined />}
+                                onClick={loadData}
+                                loading={loading}
+                                type="default"
+                            >
+                                Làm mới
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <Table
+                        loading={loading}
+                        dataSource={data}
+                        columns={columns}
+                        rowKey="_id"
+                        pagination={{ pageSize: 10 }}
+                        scroll={{ x: 'max-content' }}
+                    />
+                )}
             </Card>
-
         </div>
     );
 };

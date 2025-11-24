@@ -235,3 +235,17 @@ export async function getAppointmentsByDoctorToday(doctorId: string): Promise<Li
         throw new Error("Lỗi kết nối server");
     }
 }
+
+export async function confirmAppointment(appointmentId: string): Promise<AppointmentPayload> {
+    const url = `/appointments/${appointmentId}/confirm`;
+    try {
+        const res = await api.put(url);
+        return res.data;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            console.error("Lỗi xác nhận lịch hẹn:", error.response.data);
+            throw new Error(error.response.data.message || "Lỗi xác nhận lịch hẹn.");
+        }
+        throw new Error("Lỗi kết nối server");
+    }
+}
