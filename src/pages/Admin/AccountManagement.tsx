@@ -2,24 +2,27 @@ import { useEffect, useState } from "react";
 import { Table, Input, message, Tabs, Button, Modal } from "antd";
 import { FaSearch, FaTrash } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
-import { AiFillEdit } from "react-icons/ai";
+// import { AiFillEdit } from "react-icons/ai";
 import { getAccounts, deleteAccount } from "../../services/AccountService";
 import type { Account } from "../../services/AccountService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
 import ModalCreateAccount from "../../components/Admin/ModalCreateAccount";
-import ModalEditAccount from "../../components/Admin/ModalEditAccount";
+// import ModalEditAccount from "../../components/Admin/ModalEditAccount";
+import ModalViewAccount from "../../components/Admin/ModalViewAccount";
 import { formatDateDDMMYYYY } from "../../utils/date";
-
+import { EyeOutlined } from "@ant-design/icons";
 
 const AccountManagement = () => {
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchInput, setSearchInput] = useState("");
-
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [createOpen, setCreateOpen] = useState(false);
-    const [editOpen, setEditOpen] = useState(false);
-    const [editingId, setEditingId] = useState<string | undefined>(undefined);
+    // const [editOpen, setEditOpen] = useState(false);
+    // const [editingId, setEditingId] = useState<string | undefined>(undefined);
 
+    const [viewOpen, setViewOpen] = useState(false);
+    const [viewAccount, setViewAccount] = useState<Account | null>(null);
     // Load accounts once
     const fetchAccounts = async () => {
         try {
@@ -54,12 +57,7 @@ const AccountManagement = () => {
                 }
             },
         });
-    };
-
-    const openEditModal = (id: string) => {
-        setEditingId(id);
-        setEditOpen(true);
-    };
+    };;
 
     // Table columns
     const columns = [
@@ -79,23 +77,44 @@ const AccountManagement = () => {
         {
             title: "Actions",
             key: "actions",
+            width: 150,            // thêm width cố định
             render: (_: any, record: Account) => (
-                <span className="flex gap-2">
-                    <ButtonPrimary type="link" shape="round" icon={<AiFillEdit />} onClick={() => openEditModal(record._id)}>
-                        Sửa
-                    </ButtonPrimary>
+                <div style={{ display: "flex", gap: 8, whiteSpace: "nowrap" }}>
                     <Button type="link" danger shape="round" icon={<FaTrash />} onClick={() => handleDelete(record._id)}>
                         Xoá
                     </Button>
-                </span>
+                    <Button
+                        type="link"
+                        icon={<EyeOutlined />}
+                        onClick={() => {
+                            setViewAccount(record);
+                            setViewOpen(true);
+                        }}
+                    >
+                        Xem
+                    </Button>
+                </div>
             ),
         },
     ];
 
-    // Filter accounts by role
-    const filterByRole = (roleName: string) => {
-        return accounts.filter(acc => acc.roleId && acc.roleId.name === roleName);
+    const filterAccounts = (roleName: string) => {
+        return accounts.filter(acc => {
+            const matchesRole = acc.roleId?.name === roleName; // lọc theo tab
+            const search = debouncedSearch.toLowerCase();
+            const matchesEmail = acc.email.toLowerCase().includes(search);
+            return matchesRole && matchesEmail;
+        });
     };
+
+    // Debounce searchInput
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchInput);
+        }, 300); // 300ms debounce
+        return () => clearTimeout(handler);
+    }, [searchInput]);
+
 
 
     return (
@@ -124,7 +143,7 @@ const AccountManagement = () => {
                         children: (
                             <Table
                                 columns={columns}
-                                dataSource={filterByRole("patient")}
+                                dataSource={filterAccounts("patient")}
                                 rowKey={record => record._id!}
                                 loading={loading}
                             />
@@ -136,7 +155,7 @@ const AccountManagement = () => {
                         children: (
                             <Table
                                 columns={columns}
-                                dataSource={filterByRole("receptionist")}
+                                dataSource={filterAccounts("receptionist")}
                                 rowKey={record => record._id!}
                                 loading={loading}
                             />
@@ -148,7 +167,7 @@ const AccountManagement = () => {
                         children: (
                             <Table
                                 columns={columns}
-                                dataSource={filterByRole("doctor")}
+                                dataSource={filterAccounts("doctor")}
                                 rowKey={record => record._id!}
                                 loading={loading}
                             />
@@ -160,7 +179,7 @@ const AccountManagement = () => {
                         children: (
                             <Table
                                 columns={columns}
-                                dataSource={filterByRole("admin")}
+                                dataSource={filterAccounts("admin")}
                                 rowKey={record => record._id!}
                                 loading={loading}
                             />
@@ -168,19 +187,17 @@ const AccountManagement = () => {
                     },
                 ]}
             />
-
-
             <ModalCreateAccount
                 open={createOpen}
                 onClose={() => setCreateOpen(false)}
                 onCreated={() => fetchAccounts()}
             />
 
-            <ModalEditAccount
-                open={editOpen}
-                account={accounts.find(acc => acc._id === editingId)}
-                onClose={() => { setEditOpen(false); setEditingId(undefined); }}
-                onUpdated={() => fetchAccounts()}
+            <ModalViewAccount
+                open={viewOpen}
+                onClose={() => setViewOpen(false)}
+                accountId={viewAccount?._id || ""}
+                role={viewAccount?.roleId?.name as "doctor" | "patient" | "receptionist" | "admin"}
             />
         </div>
     );
