@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select, Button, message, DatePicker } from 'antd';
 import { createDoctor } from '../../services/DoctorService';
 import { createPatient } from '../../services/PatientService';
@@ -17,7 +17,12 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<string>('patient');
-
+  useEffect(() => {
+    if (open) {
+      setRole("patient");
+      form.setFieldsValue({ role: "patient" });
+    }
+  }, [open]);
   const handleRoleChange = (value: string) => {
     setRole(value);
     form.resetFields();
@@ -207,9 +212,9 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
 
             {/* ✅ FIX: Thêm name="avatar" vào input */}
             <Form.Item label="Avatar">
-              <input 
-                type="file" 
-                name="avatar" 
+              <input
+                type="file"
+                name="avatar"
                 accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0];

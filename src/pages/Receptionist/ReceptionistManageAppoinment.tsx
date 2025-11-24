@@ -106,7 +106,7 @@ const ReceptionistManageAppointment = () => {
             onOk: async (): Promise<void> => {
                 try {
                     const id = String(_id);
-                    await (AppointmentService as any).deleteAppointment(id);
+                    await AppointmentService.deleteAppointment(id);
                     message.success("Xoá lịch hẹn thành công");
                     fetchAppointments();
                 } catch (err) {
