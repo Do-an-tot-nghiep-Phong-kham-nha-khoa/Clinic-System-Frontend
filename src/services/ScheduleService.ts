@@ -55,7 +55,6 @@ export async function getDoctorSchedule(doctorId: string): Promise<ScheduleEntry
         return Array.isArray(data) ? data : [];
     } catch (e: any) {
         if (e?.response?.status === 404) return [];
-        console.error("getDoctorSchedule error:", e);
         return [];
     }
 }
@@ -103,7 +102,6 @@ export async function updateDoctorScheduleSlot(slotId: string, data: { isBooked:
         const res = await api.put(url, data);
         return res?.data ?? null;
     } catch (error) {
-        console.error("updateDoctorScheduleSlot error:", error);
         return null;
     }
 }
@@ -119,7 +117,6 @@ export async function updateDoctorSchedule(slotId: string, payload: {
         return res?.data ?? null;
     }
     catch (error) {
-        console.error("updateDoctorSchedule error:", error);
         return null;
     }
 }
@@ -130,7 +127,6 @@ export async function deleteDoctorSchedule(scheduleId: string) {
         await api.delete(url);
         return true;
     } catch (error) {
-        console.error("deleteDoctorSchedule error:", error);
         return false;
     }
 }

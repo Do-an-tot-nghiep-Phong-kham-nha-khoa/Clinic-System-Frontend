@@ -20,7 +20,6 @@ export async function getReceptionistById(receptionistId: string): Promise<Recep
         const res = await api.get(url);
         return res?.data ?? null;
     } catch (error) {
-        console.error("Lỗi khi lấy lễ tân theo ID:", error);
         return null;
     }
 }
@@ -32,7 +31,6 @@ export async function getReceptionistByAccountId(accountId: string): Promise<Rec
         const res = await api.get(url);
         return res?.data ?? null;
     } catch (error) {
-        console.error("Lỗi khi lấy lễ tân theo account ID:", error);
         return null;
     }
 }
@@ -48,7 +46,6 @@ export async function updateReceptionist(receptionistId: string, dto: Partial<Re
         return res?.data ?? null;
     }
     catch (error) {
-        console.error("Lỗi khi cập nhật lễ tân:", error);
         return null;
     }
 }

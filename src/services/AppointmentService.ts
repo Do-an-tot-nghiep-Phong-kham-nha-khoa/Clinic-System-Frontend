@@ -151,7 +151,6 @@ export async function createAppointmentBySpecialty(payload: AppointmentBySpecial
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
-            console.error("Lỗi API tạo lịch hẹn:", error.response.data);
             throw new Error(error.response.data.message || "Đã xảy ra lỗi khi tạo lịch hẹn.");
         }
         throw new Error("Lỗi kết nối hoặc xử lý không xác định.");
@@ -166,7 +165,6 @@ export async function createAppointmentByDoctor(payload: AppointmentByDoctorPayl
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
-            console.error("Lỗi API tạo lịch hẹn:", error.response.data);
             throw new Error(error.response.data.message || "Đã xảy ra lỗi khi tạo lịch hẹn.");
         }
         throw new Error("Lỗi kết nối hoặc xử lý không xác định.");
@@ -181,7 +179,6 @@ export async function getAppointmentsByDoctor(doctorId: string): Promise<ListApp
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
-            console.error("Lỗi GET lịch hẹn theo doctor:", error.response.data);
             throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn bác sĩ.");
         }
         throw new Error("Lỗi kết nối server");
@@ -195,7 +192,6 @@ export async function getAppointmentsByBooker(bookerId: string): Promise<ListApp
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
-            console.error("Lỗi GET lịch hẹn theo booker:", error.response.data);
             throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn người đặt.");
         }
         throw new Error("Lỗi kết nối server");
@@ -214,7 +210,6 @@ export async function cancelAppointment(appointmentId: string): Promise<Appointm
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
-            console.error("Lỗi hủy lịch hẹn:", error.response.data);
             throw new Error(error.response.data.message || "Lỗi hủy lịch hẹn.");
         }
         throw new Error("Lỗi kết nối server");
@@ -229,7 +224,6 @@ export async function getAppointmentsByDoctorToday(doctorId: string): Promise<Li
     }
     catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
-            console.error("Lỗi GET lịch hẹn hôm nay theo doctor:", error.response.data);
             throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn bác sĩ hôm nay.");
         }
         throw new Error("Lỗi kết nối server");
@@ -243,7 +237,6 @@ export async function confirmAppointment(appointmentId: string): Promise<Appoint
         return res.data;
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
-            console.error("Lỗi xác nhận lịch hẹn:", error.response.data);
             throw new Error(error.response.data.message || "Lỗi xác nhận lịch hẹn.");
         }
         throw new Error("Lỗi kết nối server");

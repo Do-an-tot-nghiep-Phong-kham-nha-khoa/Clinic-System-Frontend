@@ -18,7 +18,6 @@ export async function getAdminById(adminId: string): Promise<Admin | null> {
         const response = await api.get(`/admins/${adminId}`);
         return response.data?.data ?? response.data ?? null;
     } catch (error) {
-        console.error("Error fetching admin by ID:", error);
         return null;
     }
 }
@@ -27,7 +26,6 @@ export async function getAdminByAccountId(accountId: string): Promise<Admin | nu
         const response = await api.get(`/admins/account/${accountId}`);
         return response.data?.data ?? response.data ?? null;
     } catch (error) {
-        console.error("Error fetching admin by account ID:", error);
         return null;
     }
 }
@@ -40,7 +38,6 @@ export async function updateAdmin(adminId: string, payload: Partial<Admin>): Pro
         const response = await api.put(`/admins/${adminId}`, payload);
         return response.data?.data ?? response.data ?? null;
     } catch (error) {
-        console.error("Error updating admin:", error);
         return null;
     }
 }

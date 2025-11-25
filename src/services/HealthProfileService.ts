@@ -30,7 +30,6 @@ export async function getAllHealthProfiles(patientId: string): Promise<HealthPro
         // API trả về list trực tiếp => return res.data
         return Array.isArray(res.data) ? res.data : [];
     } catch (error) {
-        console.error('Error fetching health profiles:', error);
         throw error;
     }
 }
@@ -43,7 +42,6 @@ export async function createHealthProfileNew(ownerModel: 'Patient' | 'FamilyMemb
         const res = await api.post(url, payload);
         return res.data;
     } catch (error) {
-        console.error('Error creating health profile:', error);
         throw error;
     }
 }
@@ -56,7 +54,6 @@ export async function updateHealthProfileById(profileId: string, updates: Partia
         const res = await api.patch(url, updates);
         return res.data;
     } catch (error) {
-        console.error('Error updating health profile by id:', error);
         throw error;
     }
 }
@@ -67,7 +64,6 @@ export async function deleteHealthProfileById(profileId: string) {
         const res = await api.delete(url);
         return res.data;
     } catch (error) {
-        console.error('Error deleting health profile by id:', error);
         throw error;
     }
 }
