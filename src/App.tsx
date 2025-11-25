@@ -43,6 +43,9 @@ import ReceptionistInvoice from './pages/Receptionist/ReceptionistInvoice'
 import DoctorProfile from './pages/Doctor/DoctorProfile'
 import HealthProfile from './pages/Patient/HealthProfile'
 import LoginPage from './pages/Auth/LoginPage'
+import ForgotEmail from './pages/Auth/ForgotEmail'
+import VerifyOtp from './pages/Auth/VerifyOtp'
+import ResetPassword from './pages/Auth/ResetPassword'
 import ProtectedRoute from './components/ProtectedRoutes'
 
 
@@ -60,6 +63,9 @@ function App() {
           <Route path='chat' element={<Chat />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/forgot" element={<ForgotEmail />} />
+          <Route path="/auth/forgot/verify" element={<VerifyOtp />} />
+          <Route path="/auth/forgot/reset" element={<ResetPassword />} />
         </ Route>
 
         <Route path='admin' element={

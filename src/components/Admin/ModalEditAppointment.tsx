@@ -269,7 +269,6 @@ const ModalEditAppointment: React.FC<ModalEditAppointmentProps> = ({ open, id, o
       onCancel={onClose}
       onOk={handleOk}
       confirmLoading={saving}
-      destroyOnClose
       okText="Lưu"
       width={600}
     >

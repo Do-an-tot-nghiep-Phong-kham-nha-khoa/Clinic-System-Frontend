@@ -1,4 +1,4 @@
-import { Button, Input, message, Table, Modal } from "antd";
+import { Button, Input, message, Table, Modal, Tag  } from "antd";
 import { useEffect, useState } from "react";
 import { FaSearch, FaTrash } from "react-icons/fa";
 import { formatDateDDMMYYYY } from "../../utils/date";
@@ -6,6 +6,7 @@ import * as AppointmentService from "../../services/AppointmentService";
 import type { AppointmentPayload, AppointmentMeta } from "../../services/AppointmentService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
 import { AiFillEdit } from "react-icons/ai";
+import { ClockCircleOutlined, CheckCircleOutlined, SolutionOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import ModalEditAppointment from "../../components/Admin/ModalEditAppointment";
 
 const { Search } = Input;
@@ -27,7 +28,22 @@ const ReceptionistManageAppointment = () => {
     useEffect(() => {
         fetchAppointments();
     }, [page, pageSize, sort, q]);
-
+    const getStatusTag = (status: string) => {
+        switch (status.toLowerCase()) {
+            case "pending":
+                return <Tag icon={<ClockCircleOutlined />} color="orange">Đang chờ</Tag>;
+            case "confirmed":
+                return <Tag icon={<CheckCircleOutlined />} color="blue">Đã xác nhận</Tag>;
+            case "completed":
+                return <Tag icon={<SolutionOutlined />} color="green">Đã hoàn thành</Tag>;
+            case "cancelled":
+                return <Tag icon={<CloseCircleOutlined />} color="red">Đã hủy</Tag>;
+            case "waiting_assigned":
+                return <Tag icon={<ClockCircleOutlined />} color="purple">Chờ phân công</Tag>;
+            default:
+                return <Tag>{status}</Tag>;
+        }
+    };
     const fetchAppointments = async () => {
         try {
             setLoading(true);
@@ -106,7 +122,7 @@ const ReceptionistManageAppointment = () => {
             onOk: async (): Promise<void> => {
                 try {
                     const id = String(_id);
-                    await (AppointmentService as any).deleteAppointment(id);
+                    await AppointmentService.deleteAppointment(id);
                     message.success("Xoá lịch hẹn thành công");
                     fetchAppointments();
                 } catch (err) {
@@ -175,6 +191,7 @@ const ReceptionistManageAppointment = () => {
             title: "Trạng thái",
             dataIndex: "status",
             key: "status",
+            render: (status: string) => getStatusTag(status),
         },
         {
             title: "Lý do",
