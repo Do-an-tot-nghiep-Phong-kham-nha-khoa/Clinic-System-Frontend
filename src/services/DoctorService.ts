@@ -110,7 +110,6 @@ export async function getDoctorsByIds(ids: string[]): Promise<Doctor[]> {
     const res = await api.post(url, { ids }, { withCredentials: true });
     return res?.data?.data ?? res?.data ?? [];
   } catch (e) {
-    console.error('Error fetching doctors by ids', e);
     return [];
   }
 }
@@ -125,7 +124,6 @@ export async function getDoctorById(id: string): Promise<Doctor | null> {
     }
     return res?.data ?? null;
   } catch (e) {
-    console.error('Error fetching doctor by id', e);
     return null;
   }
 }
@@ -136,8 +134,6 @@ export async function createDoctor(dto: Partial<DoctorProfile> | FormData, isFor
     const isFD = isFormData || (typeof FormData !== 'undefined' && dto instanceof FormData);
 
     if (isFD) {
-      console.log('📤 Sending FormData to:', url);
-      console.log('📤 Is FormData?', dto instanceof FormData);
 
       // ✅ CRITICAL: Không set Content-Type, để browser tự động set với boundary
       const res = await api.post(url, dto as FormData, {
@@ -146,14 +142,12 @@ export async function createDoctor(dto: Partial<DoctorProfile> | FormData, isFor
         // ✅ Để browser tự set: 'multipart/form-data; boundary=----WebKitFormBoundary...'
       });
 
-      console.log('✅ Response:', res.data);
       return res?.data?.data ?? res?.data ?? null;
     }
 
     const res = await api.post(url, dto as Partial<DoctorProfile>, { withCredentials: true });
     return res?.data?.data ?? res?.data ?? null;
   } catch (e: any) {
-    console.error('❌ Error creating doctor:', e.response?.data || e);
     throw e;
   }
 }
@@ -163,7 +157,6 @@ export async function updateDoctor(id: string, dto: Partial<DoctorProfile>): Pro
     const res = await api.put(url, dto);
     return res?.data?.data ?? res?.data ?? null;
   } catch (e) {
-    console.error('Error updating doctor', e);
     throw e;
   }
 }
@@ -201,7 +194,6 @@ export async function getDoctors(specialtyId?: string): Promise<Doctor[]> {
     console.warn('getDoctors: unexpected response shape', res.data);
     return [];
   } catch (error) {
-    console.error('Error fetching doctors:', error);
     return [];
   }
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar } from 'antd';
-import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, ScheduleOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, ScheduleOutlined } from '@ant-design/icons';
 import { MdEmail } from 'react-icons/md';
 import { useAuth } from '../../contexts/AuthContext';
 import { getDoctorByAccountId, type DoctorProfile } from "../../services/DoctorService";
@@ -79,14 +79,10 @@ const DoctorProfileComponent: React.FC = () => {
                 </Card>
             </div>
         );
-    }
-
-    const handleDoctorUpdate = (updatedDoctor: DoctorProfile) => {
-        setDoctor(updatedDoctor);
-    };
-
-    const specialtyName = doctor.specialtyId?.name || 'Chưa xác định';
-    const specialtyId = doctor.specialtyId?._id || 'N/A';
+    } const handleDoctorUpdate = async () => {
+        // Tải lại dữ liệu từ server để đảm bảo thông tin đầy đủ và chính xác
+        await fetchDoctorData();
+    }; const specialtyName = doctor.specialtyId?.name || 'Chưa xác định';
     const experience = doctor.experience;
     const email = doctor.accountId?.email || 'N/A';
     const phone = doctor.phone || 'N/A';
@@ -163,11 +159,6 @@ const DoctorProfileComponent: React.FC = () => {
                             <span className="font-semibold text-green-600">{phone}</span>
                         </Descriptions.Item>
 
-                        <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><IdcardOutlined className="mr-2" /> Mã Bác Sĩ</span>}
-                        >
-                            <Tag color="magenta">{doctor._id}</Tag>
-                        </Descriptions.Item>
                         <Descriptions.Item
                             label={<span className="font-medium flex items-center"><ExperimentOutlined className="mr-2" /> Tên Chuyên Khoa</span>}
                         >

@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { Table, Button, message } from "antd";
+import { Table, message, Card, Typography } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
 import { useAuth } from "../../contexts/AuthContext";
-import { getPatientByAccountId } from "../../services/PatientService";
 import { getTreatmentsByBooker, type Treatment } from "../../services/TreatmentService";
 import type { SorterResult } from "antd/es/table/interface";
 import TreatmentDetailModal from "../../components/Patient/TreatmentDetailModal";
 import { FaInfoCircle } from "react-icons/fa";
+import { MdHealthAndSafety } from "react-icons/md";
 import ButtonPrimary from "../../utils/ButtonPrimary";
+
+const { Title, Text } = Typography;
 
 const PatientTreatmentHistory = () => {
     const { user } = useAuth();
@@ -35,18 +37,23 @@ const PatientTreatmentHistory = () => {
                 setTotal(0);
                 return;
             }
-            setLoading(true);
-            try {
+            setLoading(true); try {
                 const res = await getTreatmentsByBooker(user.id, {
                     page,
                     limit,
                     sortBy: sortField,
                     sortOrder,
                 });
-                setTreatments(res.treatments);
-                setTotal(res.meta.total);
+                setTreatments(res.treatments || []);
+                setTotal(res.meta?.total || 0);
             } catch (err) {
-                message.error("Không thể tải dữ liệu ca khám");
+                console.error("Error loading treatments:", err);
+                setTreatments([]);
+                setTotal(0);
+                // Chỉ hiển thị lỗi nếu thực sự có lỗi server, không phải do không có dữ liệu
+                if (err && typeof err === 'object' && 'response' in err) {
+                    message.error("Không thể tải dữ liệu ca khám");
+                }
             } finally {
                 setLoading(false);
             }
@@ -115,29 +122,39 @@ const PatientTreatmentHistory = () => {
                 </ButtonPrimary>
             ),
         },
-    ];
-
-    return (
+    ]; return (
         <div className="p-6">
             <h1 className="text-2xl font-semibold mb-4 text-gray-800">Lịch sử ca khám</h1>
 
-            <Table
-                rowKey="_id"
-                columns={columns}
-                dataSource={treatments}
-                loading={loading}
-                bordered
-                pagination={{
-                    current: page,
-                    pageSize: limit,
-                    total,
-                    showSizeChanger: true,
-                    pageSizeOptions: [5, 10, 20, 50],
-                    showTotal: (total) => `Tổng ${total} ca khám`,
-                }}
-                onChange={handleTableChange}
-                className="bg-white shadow-md rounded-lg"
-            />
+            {!loading && treatments.length === 0 ? (
+                <Card className="bg-white shadow-md rounded-lg">
+                    <div className="text-center py-12">
+                        <MdHealthAndSafety style={{ fontSize: '64px', color: '#d9d9d9', marginBottom: '16px' }} />
+                        <Title level={3} type="secondary">Chưa có ca khám nào</Title>
+                        <Text type="secondary" className="text-base">
+                            Bạn chưa có lịch sử khám bệnh nào. Hãy đặt lịch khám để theo dõi sức khỏe của mình.
+                        </Text>
+                    </div>
+                </Card>
+            ) : (
+                <Table
+                    rowKey="_id"
+                    columns={columns}
+                    dataSource={treatments}
+                    loading={loading}
+                    bordered
+                    pagination={{
+                        current: page,
+                        pageSize: limit,
+                        total,
+                        showSizeChanger: true,
+                        pageSizeOptions: [5, 10, 20, 50],
+                        showTotal: (total) => `Tổng ${total} ca khám`,
+                    }}
+                    onChange={handleTableChange}
+                    className="bg-white shadow-md rounded-lg"
+                />
+            )}
 
             <TreatmentDetailModal
                 visible={modalVisible}

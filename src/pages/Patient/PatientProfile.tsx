@@ -153,12 +153,6 @@ const PatientProfile: React.FC = () => {
                             <span className="font-semibold">{user?.email}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><IdcardOutlined className="mr-2" /> Mã Bệnh Nhân</span>}
-                            span={2}
-                        >
-                            <Tag color="magenta">{patient._id}</Tag>
-                        </Descriptions.Item>
-                        <Descriptions.Item
                             label={<span className="font-medium flex items-center"><UserOutlined className="mr-2" /> Giới Tính</span>}
                         >
                             <span className="font-semibold text-gray-700">{gender}</span>

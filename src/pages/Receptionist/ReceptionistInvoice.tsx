@@ -219,7 +219,7 @@ const ReceptionistInvoice = () => {
                     <Input.Search
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
-                        placeholder="Tìm kiếm ..."
+                        placeholder="Tìm kiếm theo tên bệnh nhân ..."
                         allowClear
                         enterButton={
                             <Button icon={<FaSearch />}

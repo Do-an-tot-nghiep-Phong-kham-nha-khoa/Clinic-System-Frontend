@@ -120,12 +120,6 @@ const ReceptionistProfile: React.FC = () => {
                         >
                             <span className="font-semibold">{user?.email}</span>
                         </Descriptions.Item>
-                        <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><IdcardOutlined className="mr-2" /> Mã Lễ Tân</span>}
-                            span={2}
-                        >
-                            <Tag color="magenta">{receptionist._id}</Tag>
-                        </Descriptions.Item>
                     </Descriptions>
 
                 </Card>
