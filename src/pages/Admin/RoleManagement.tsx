@@ -6,6 +6,7 @@ import type { Role, RoleCreateDTO } from '../../services/RoleService';
 import * as RoleService from '../../services/RoleService';
 import api from '../../services/Api';
 import RolePermissionsModal from '../../components/Admin/RolePermissionsModal';
+import RoleCreateModal from '../../components/Admin/RoleCreateModal';
 import ButtonPrimary from '../../utils/ButtonPrimary';
 import { MdAdd } from 'react-icons/md';
 
@@ -140,6 +141,7 @@ const RoleManagement: React.FC = () => {
 
                 <RoleList roles={roles} loading={loading} onEdit={(r) => { setEditing(r); setModalVisible(true); }} onDelete={handleDelete} onPermissions={handleOpenPermissions} />
 
+                <RoleCreateModal visible={modalVisible} onClose={() => { setModalVisible(false); setEditing(undefined); }} role={editing} onSave={handleCreate} />
                 <RolePermissionsModal visible={permModalVisible} onClose={() => { setPermModalVisible(false); setPermRole(undefined); }} role={permRole} schema={permissionSchema} onSave={handleSavePermissions} />
 
                 {/* Optional: preview permissions list */}
