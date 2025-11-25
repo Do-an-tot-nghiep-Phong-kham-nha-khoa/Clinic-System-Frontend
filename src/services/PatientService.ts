@@ -58,7 +58,7 @@ export async function getPatients(params: PatientQuery = {}): Promise<{ items: P
 
 // Auth-like endpoints (if your patients auth is separate)
 export async function registerPatient(dto: CreatePatientDto): Promise<Patient> {
-    const url = `${URL}/register`;
+    const url = `${URL}/create`;
     const res = await api.post(url, dto);
     return res?.data?.data ?? res?.data;
 }
@@ -94,7 +94,7 @@ export async function resetPassword(payload: { phone?: string; email?: string; o
 
 // CRUD helpers
 export async function createPatient(dto: CreatePatientDto): Promise<Patient> {
-    const url = `${URL}`;
+    const url = `${URL}/register`;
     const res = await api.post(url, dto);
     return res?.data?.data ?? res?.data;
 }

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './Api';
 
 export type Role = {
   _id: string;
@@ -46,37 +46,37 @@ const API = `${BASE_URL}/accounts`;
 // Auth related endpoints
 export async function registerAccount(dto: CreateAccountDto): Promise<Account> {
     const url = `${API}/register`;
-    const res = await axios.post(url, dto);
+    const res = await api.post(url, dto);
     console.log("Register Account Response:", res);
     return res?.data?.data ?? res?.data;
 }
 
 export async function loginAccount(payload: { email: string; password: string }): Promise<any> {
     const url = `${API}/login`;
-    const res = await axios.post(url, payload);
+    const res = await api.post(url, payload);
     return res?.data?.data ?? res?.data;
 }
 
 export async function logoutAccount(): Promise<void> {
     const url = `${API}/logout`;
-    await axios.get(url);
+    await api.get(url);
 }
 
 export async function forgotPassword(payload: { email: string }): Promise<any> {
     const url = `${API}/password/forgot`;
-    const res = await axios.post(url, payload);
+    const res = await api.post(url, payload);
     return res?.data?.data ?? res?.data;
 }
 
 export async function otpPassword(payload: { email: string; otp: string }): Promise<any> {
     const url = `${API}/password/otp`;
-    const res = await axios.post(url, payload);
+    const res = await api.post(url, payload);
     return res?.data?.data ?? res?.data;
 }
 
 export async function resetPassword(payload: { email: string; otp: string; newPassword: string }): Promise<any> {
     const url = `${API}/password/reset`;
-    const res = await axios.post(url, payload);
+    const res = await api.post(url, payload);
     return res?.data?.data ?? res?.data;
 }
 
@@ -84,7 +84,7 @@ export async function resetPassword(payload: { email: string; otp: string; newPa
 
 export async function getAccounts(params: AccountQuery = {}): Promise<{ items: Account[]; meta: AccountMeta | null }> {
     const url = `${API}`;
-    const res = await axios.get(url, { params });
+    const res = await api.get(url, { params });
     const items: Account[] = res?.data?.data ?? res?.data?.accounts ?? res?.data?.items ?? res?.data?.users ?? [];
     const meta: AccountMeta | null = res?.data?.meta ?? null;
     console.log("Get Accounts Response:", res);
@@ -93,7 +93,7 @@ export async function getAccounts(params: AccountQuery = {}): Promise<{ items: A
 
 export async function getRole(id: string): Promise<Role | null> {
     try {
-        const res = await axios.get(`${API}/role/${id}`);
+        const res = await api.get(`${API}/role/${id}`);
         return res?.data?.role ?? null;
     } catch (error) {
         console.error("Error fetching role", error);
@@ -102,12 +102,12 @@ export async function getRole(id: string): Promise<Role | null> {
 }
 
 export async function deleteAccount(id: string): Promise<void> {
-    await axios.delete(`${API}/${id}`);
+    await api.delete(`${API}/${id}`);
 }
 
 export async function getAccountById(id: string): Promise<Account | null> {
     try {
-        const res = await axios.get(`${API}/${id}`);
+        const res = await api.get(`${API}/${id}`);
         return res?.data?.account ?? null;
     } catch (error) {
         console.error("Error fetching account", error);
@@ -116,11 +116,11 @@ export async function getAccountById(id: string): Promise<Account | null> {
 }
 
 export async function createAccount(data: Partial<Account>): Promise<Account> {
-    const res = await axios.post(`${API}/register`, data);
+    const res = await api.post(`${API}/register`, data);
     return res.data;
 }
 
 export async function updateAccount(id: string, data: Partial<Account>): Promise<Account> {
-    const res = await axios.put(`${API}/${id}`, data);
+    const res = await api.put(`${API}/${id}`, data);
     return res.data.account;
 }

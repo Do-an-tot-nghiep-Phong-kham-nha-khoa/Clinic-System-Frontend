@@ -130,9 +130,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } else {
                 throw new Error(response.data.message || 'Đăng nhập thất bại');
             }
-        } catch (error) {
-            console.error('Lỗi đăng nhập:', error);
-            throw error;
+        } catch (err: any) {
+            console.error('Lỗi đăng nhập:', err);
+            // Nếu là lỗi từ axios, ưu tiên lấy message trả về từ backend
+            let message = 'Lỗi đăng nhập';
+            if (axios.isAxiosError && axios.isAxiosError(err)) {
+                const resp = err.response as any;
+                if (resp && resp.data) {
+                    const data = resp.data;
+                    if (typeof data === 'object' && data.message) {
+                        message = String(data.message);
+                    } else if (typeof data === 'string') {
+                        message = data;
+                    }
+                } else if (err.message) {
+                    message = err.message;
+                }
+            } else if (err instanceof Error && err.message) {
+                message = err.message;
+            }
+
+            // Ném Error mới với thông điệp rõ ràng để component gọi login có thể hiển thị
+            throw new Error(message);
         } finally {
             setIsLoading(false);
         }
