@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, InputNumber, Select, Button, message } from 'antd';
+import { Modal, Form, Input, InputNumber, Button, message } from 'antd';
 import {
     getDoctorByAccountId,
     updateDoctorById,
@@ -11,7 +11,7 @@ interface UpdateDoctorProfileModalProps {
     open: boolean;
     accountId: string;
     onClose: () => void;
-    onUpdated: (updated: DoctorProfile) => void;
+    onUpdated: () => void;
 }
 
 type FormValues = UpdateDoctorPayload;
@@ -60,12 +60,11 @@ const UpdateProfileModal: React.FC<UpdateDoctorProfileModalProps> = ({ open, acc
             return;
         }
 
-        setLoading(true);
-        try {
-            const updated = await updateDoctorById(doctorProfile._id, values);
+        setLoading(true); try {
+            await updateDoctorById(doctorProfile._id, values);
 
             message.success('Cập nhật hồ sơ bác sĩ thành công!');
-            onUpdated(updated);
+            onUpdated();
             onClose();
         } catch (e: any) {
             const errorMessage = e.message || 'Cập nhật hồ sơ thất bại. Vui lòng thử lại.';

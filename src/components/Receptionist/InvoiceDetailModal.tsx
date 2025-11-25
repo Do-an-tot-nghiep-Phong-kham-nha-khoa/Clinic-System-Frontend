@@ -95,7 +95,7 @@ const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId
                 invoice && (
                     <div id="invoice-print-content" className="p-6 font-sans">
 
-                        <div id="invoice-print-area" ref={componentRef}>
+                        <div id="invoice-print-area" ref={componentRef} className='p-4'>
                             {/* HEADER */}
                             <div className="text-center mb-6">
                                 <h1 className="text-2xl font-bold">PHÒNG KHÁM PROHEALTH</h1>
