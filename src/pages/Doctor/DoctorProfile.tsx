@@ -82,7 +82,8 @@ const DoctorProfileComponent: React.FC = () => {
     } const handleDoctorUpdate = async () => {
         // Tải lại dữ liệu từ server để đảm bảo thông tin đầy đủ và chính xác
         await fetchDoctorData();
-    }; const specialtyName = doctor.specialtyId?.name || 'Chưa xác định';
+    };
+    const specialtyName = (doctor as any).specialtyId?.name || 'Chưa xác định';
     const experience = doctor.experience;
     const email = doctor.accountId?.email || 'N/A';
     const phone = doctor.phone || 'N/A';

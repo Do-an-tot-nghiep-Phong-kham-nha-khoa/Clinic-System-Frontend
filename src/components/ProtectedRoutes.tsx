@@ -1,10 +1,11 @@
 import { Navigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-
 interface ProtectedRouteProps {
-  children: JSX.Element;
+  children: ReactNode;
   allowedRoles: string[];
 }
+
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user, isAuthenticated } = useAuth();

@@ -5,7 +5,7 @@ import { ExperimentOutlined, RollbackOutlined, PlusOutlined, DeleteOutlined, Sav
 import dayjs, { Dayjs } from "dayjs";
 import { createLabOrder } from "../../../services/LabOrderService";
 import ButtonPrimary from "../../../utils/ButtonPrimary";
-import moment, { type Moment } from 'moment';
+import moment from 'moment';
 
 const { Text, Title } = Typography;
 

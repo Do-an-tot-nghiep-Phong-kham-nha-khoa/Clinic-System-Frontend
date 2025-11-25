@@ -98,6 +98,13 @@ const HealthProfilePage: React.FC = () => {
                 setPatientId(null);
                 return;
             }
+            if (!patient._id) {
+                console.error("Patient record missing _id:", patient);
+                message.error("Thông tin bệnh nhân không đầy đủ");
+                setProfiles([]);
+                setPatientId(null);
+                return;
+            }
             setPatientId(patient._id);
 
             const data = await HealthProfileService.getAllHealthProfiles(patient._id);

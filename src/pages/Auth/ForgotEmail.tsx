@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Button, Form, message, Card } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import api from '../../services/Api';
-import {forgotPassword, otpPassword, resetPassword} from '../../services/AccountService';
+import { forgotPassword } from '../../services/AccountService';
 
 const ForgotEmail: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -12,10 +11,10 @@ const ForgotEmail: React.FC = () => {
     const { email } = values;
     setLoading(true);
     try {
-        // Call backend to request OTP
-        // AccountService.forgotPassword expects an object { email }
-        await forgotPassword({ email });
-        navigate('/auth/forgot/verify', { state: { email } });
+      // Call backend to request OTP
+      // AccountService.forgotPassword expects an object { email }
+      await forgotPassword({ email });
+      navigate('/auth/forgot/verify', { state: { email } });
     } catch (err: any) {
       console.error('Request OTP error', err);
       message.error(err?.response?.data?.message || 'Không thể gửi mã OTP. Vui lòng thử lại.');

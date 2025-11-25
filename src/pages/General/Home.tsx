@@ -1,4 +1,3 @@
-import React from 'react';
 import BgPicture from '../../assets/bg-hero.png'
 import contactBg from '../../assets/contact-picture.png'
 import doctor1 from '../../assets/doctor_1.png'

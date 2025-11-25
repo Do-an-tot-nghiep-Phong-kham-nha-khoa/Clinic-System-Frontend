@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { Table, message, Tag } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getDoctorsWithPaging } from "../../services/DoctorService";
 import type { Doctor } from "../../services/DoctorService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
 
 const DoctorSchedule = () => {
-    const { doctorId } = useParams<{ doctorId?: string }>();
     const navigate = useNavigate();
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [loading, setLoading] = useState(false);

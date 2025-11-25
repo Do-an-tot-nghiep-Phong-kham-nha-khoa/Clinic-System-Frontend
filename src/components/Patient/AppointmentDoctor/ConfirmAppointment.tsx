@@ -1,8 +1,8 @@
 import { Button, Card, Descriptions, Input, Typography, message, Spin, notification } from 'antd';
 import React, { useState } from 'react';
-import { FaArrowLeft, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { FaArrowLeft, FaCheckCircle } from 'react-icons/fa';
 import dayjs from 'dayjs';
-import { createAppointmentBySpecialty, type AppointmentPayload, type AppointmentByDoctorPayload, createAppointmentByDoctor } from '../../../services/AppointmentService';
+import { type AppointmentByDoctorPayload, createAppointmentByDoctor } from '../../../services/AppointmentService';
 import { type HealthProfile } from '../../../services/HealthProfileService';
 import { useAuth } from '../../../contexts/AuthContext';
 
@@ -24,7 +24,7 @@ interface ConfirmAppointmentProps {
 }
 
 
-const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ doctorId, doctorName, specialtyId, specialtyName, dateTime, patientId, displayName, displayPhone, profile, onBack, onSuccess }) => {
+const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ doctorId, doctorName, specialtyName, dateTime, patientId, displayName, displayPhone, profile, onBack, onSuccess }) => {
     const { user } = useAuth();
     const [reason, setReason] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);

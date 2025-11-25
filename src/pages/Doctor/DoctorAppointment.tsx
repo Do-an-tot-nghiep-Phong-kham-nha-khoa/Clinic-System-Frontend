@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getDoctorByAccountId } from "../../services/DoctorService";
 import { getAppointmentsByDoctor, type AppointmentModel, confirmAppointment } from "../../services/AppointmentService";
 import type { Dayjs } from "dayjs";
 import { Badge, Calendar, Modal, type CalendarProps, Button, message } from "antd";

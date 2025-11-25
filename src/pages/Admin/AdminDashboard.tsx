@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Card, Flex, Typography, message } from "antd";
+import { useEffect, useState } from "react";
+import { Card, Flex, Typography, message, Skeleton, Spin } from "antd";
 import CountUp from "react-countup";
 import {
     Chart as ChartJS,
@@ -27,16 +27,21 @@ type StatCardProps = {
     title: string;
     value: number;
     height?: number;
+    loading?: boolean;
 };
 
-const StatCard = ({ title, value, height }: StatCardProps) => {
+const StatCard = ({ title, value, height, loading = false }: StatCardProps) => {
     return (
         <Card variant="outlined" style={{ height: height || 150 }}>
             <Flex vertical gap="large">
                 <Text>{title}</Text>
-                <Typography.Title level={2} style={{ margin: 0 }}>
-                    <CountUp end={value} separator="," />
-                </Typography.Title>
+                {loading ? (
+                    <Skeleton.Input active size="large" style={{ width: '100%', height: '40px' }} />
+                ) : (
+                    <Typography.Title level={2} style={{ margin: 0 }}>
+                        <CountUp end={value} separator="," />
+                    </Typography.Title>
+                )}
             </Flex>
         </Card>
     );
@@ -178,25 +183,50 @@ const AdminDashboard = () => {
     /* RENDER UI */
     return (
         <div className="p-6">
-            <h1 className="font-bold text-2xl mb-4">Thống kê hệ thống</h1>
-
-            {/* LARGE CARDS */}
+            <h1 className="font-bold text-2xl mb-4">Thống kê hệ thống</h1>            {/* LARGE CARDS */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-                <StatCard title="Tổng số lịch hẹn 7 ngày" value={barValues.reduce((a, b) => a + b, 0)} />
-                <StatCard title="Tổng số trạng thái khác nhau" value={statusStats.length} />
-                <StatCard title="Doanh thu 7 ngày gần nhất (VND)" value={revenueLast7Days} />
-                <StatCard title="Tổng doanh thu (VND)" value={totalRevenue} />
+                <StatCard
+                    title="Tổng số lịch hẹn 7 ngày"
+                    value={barValues.reduce((a, b) => a + b, 0)}
+                    loading={loading}
+                />
+                <StatCard
+                    title="Tổng số trạng thái khác nhau"
+                    value={statusStats.length}
+                    loading={loading}
+                />
+                <StatCard
+                    title="Doanh thu 7 ngày gần nhất (VND)"
+                    value={revenueLast7Days}
+                    loading={loadingRevenue}
+                />
+                <StatCard
+                    title="Tổng doanh thu (VND)"
+                    value={totalRevenue}
+                    loading={loadingRevenue}
+                />
             </div>
-
             {/* CHARTS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
                 <Card title="Biểu đồ lịch hẹn 7 ngày" variant="outlined">
-                    <Bar data={barChartData} options={barChartOptions} />
+                    {loading ? (
+                        <div className="flex justify-center items-center h-[300px]">
+                            <Spin size="large" tip="Đang tải dữ liệu biểu đồ..." />
+                        </div>
+                    ) : (
+                        <Bar data={barChartData} options={barChartOptions} />
+                    )}
                 </Card>
 
                 <Card title="Biểu đồ trạng thái lịch hẹn" variant="outlined" className="h-full">
                     <div className="h-[300px]">
-                        <Pie data={pieChartData} options={pieChartOptions} />
+                        {loading ? (
+                            <div className="flex justify-center items-center h-full">
+                                <Spin size="large" tip="Đang tải dữ liệu biểu đồ..." />
+                            </div>
+                        ) : (
+                            <Pie data={pieChartData} options={pieChartOptions} />
+                        )}
                     </div>
                 </Card>
             </div>

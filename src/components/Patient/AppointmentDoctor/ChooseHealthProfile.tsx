@@ -2,7 +2,6 @@ import { Button, Card, Col, Row, Typography, Spin, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { FaArrowLeft, FaHeartbeat, FaPhone, FaUser } from 'react-icons/fa';
 import dayjs from 'dayjs';
-import { useAuth } from '../../../contexts/AuthContext';
 import { getAllHealthProfiles, type HealthProfile } from '../../../services/HealthProfileService';
 import { FaPerson } from 'react-icons/fa6';
 
@@ -22,14 +21,12 @@ interface ChooseHealthProfileProps {
 
 const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({
     specialtyName,
-    doctorId,
     doctorName,
     date,
     timeSlot,
     patientId,
     onNext,
     onBack }) => {
-    const { user } = useAuth();
     const [profiles, setProfiles] = useState<HealthProfile[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedProfile, setSelectedProfile] = useState<HealthProfile | null>(null);
