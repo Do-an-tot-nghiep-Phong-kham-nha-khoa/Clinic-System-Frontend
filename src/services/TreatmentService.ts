@@ -1,7 +1,4 @@
 import api from "./Api";
-import axios from "axios";
-
-const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 
 export type CreateTreatmentDto = {
     healthProfile: string;
