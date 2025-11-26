@@ -1,6 +1,6 @@
 import { Button, Card, Descriptions, Input, Typography, message, Spin, notification } from 'antd';
 import React, { useState } from 'react';
-import { FaArrowLeft, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { FaArrowLeft, FaCheckCircle } from 'react-icons/fa';
 import dayjs from 'dayjs';
 import { createAppointmentBySpecialty, type AppointmentBySpecialtyPayload } from '../../../services/AppointmentService';
 import { type HealthProfile } from '../../../services/HealthProfileService';

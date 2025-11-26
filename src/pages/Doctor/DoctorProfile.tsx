@@ -3,12 +3,12 @@ import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar } from 'a
 import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, ScheduleOutlined } from '@ant-design/icons';
 import { MdEmail } from 'react-icons/md';
 import { useAuth } from '../../contexts/AuthContext';
-import { getDoctorByAccountId, type DoctorProfile } from "../../services/DoctorService";
+import { getDoctorByAccountId, type DoctorProfileNew } from "../../services/DoctorService";
 import UpdateProfileModal from '../../components/Doctor/UpdateProfileModal';
 import ButtonPrimary from '../../utils/ButtonPrimary';
 
 const DoctorProfileComponent: React.FC = () => {
-    const [doctor, setDoctor] = useState<DoctorProfile | null>(null);
+    const [doctor, setDoctor] = useState<DoctorProfileNew | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -82,7 +82,8 @@ const DoctorProfileComponent: React.FC = () => {
     } const handleDoctorUpdate = async () => {
         // Tải lại dữ liệu từ server để đảm bảo thông tin đầy đủ và chính xác
         await fetchDoctorData();
-    }; const specialtyName = doctor.specialtyId?.name || 'Chưa xác định';
+    };
+    const specialtyName = doctor.specialtyId?.name || 'Chưa xác định';
     const experience = doctor.experience;
     const email = doctor.accountId?.email || 'N/A';
     const phone = doctor.phone || 'N/A';

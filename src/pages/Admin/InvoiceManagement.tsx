@@ -9,14 +9,6 @@ import {
     type InvoiceStatus
 } from "../../services/InvoiceService";
 
-const formatGender = (gender: 'male' | 'female' | 'other'): string => {
-    switch (gender) {
-        case 'male': return 'Nam';
-        case 'female': return 'Nữ';
-        default: return 'Khác';
-    }
-}
-
 const InvoiceManagement = () => {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [meta, setMeta] = useState<InvoiceMeta | null>(null);

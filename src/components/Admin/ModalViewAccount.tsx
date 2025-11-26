@@ -24,6 +24,7 @@ interface DoctorProfile {
   specialtyName: string;
   phone: string;
   experience: number;
+  avatar?: string;
 }
 
 interface PatientProfile {
@@ -82,7 +83,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
     const now = Date.now();
     // reset avatar state first to avoid showing previous preview
     if (avatarObjectUrl) {
-      try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+      try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) { }
       setAvatarObjectUrl(undefined);
     }
     setAvatarFile(null);
@@ -197,7 +198,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
           const updated = await DoctorService.updateDoctorById(profile._id, fd);
           // revoke local object URL now that server provided real URL
           if (avatarObjectUrl) {
-            try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+            try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) { }
             setAvatarObjectUrl(undefined);
           }
           setAvatarFile(null);
@@ -253,7 +254,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
     else {
       // cleanup preview/objectURL when modal closed
       if (avatarObjectUrl) {
-        try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+        try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) { }
         setAvatarObjectUrl(undefined);
       }
       setAvatarFile(null);
@@ -345,18 +346,18 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
                   </div>
                   <div>
                     <Upload
-                    beforeUpload={(file) => {
-                      // prevent auto upload
-                      // revoke previous object URL
-                      if (avatarObjectUrl) {
-                        try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
-                      }
-                      const objUrl = URL.createObjectURL(file);
-                      setAvatarObjectUrl(objUrl);
-                      setAvatarFile(file as File);
-                      setAvatarPreview(objUrl);
-                      return false;
-                    }}
+                      beforeUpload={(file) => {
+                        // prevent auto upload
+                        // revoke previous object URL
+                        if (avatarObjectUrl) {
+                          try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) { }
+                        }
+                        const objUrl = URL.createObjectURL(file);
+                        setAvatarObjectUrl(objUrl);
+                        setAvatarFile(file as File);
+                        setAvatarPreview(objUrl);
+                        return false;
+                      }}
                       showUploadList={false}
                       accept="image/*"
                     >
