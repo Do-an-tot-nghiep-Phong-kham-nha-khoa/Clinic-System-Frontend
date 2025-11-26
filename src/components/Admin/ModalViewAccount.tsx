@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Select, DatePicker, message } from "antd";
+import { Modal, Form, Input, Select, DatePicker, message, Upload, Image, Button } from "antd";
+import { UploadOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from "dayjs";
 
 import * as DoctorService from "../../services/DoctorService";
@@ -72,15 +73,33 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
 }) => {
   const [form] = Form.useForm<ProfileData>();
   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
+  const [avatarObjectUrl, setAvatarObjectUrl] = useState<string | undefined>(undefined);
 
   const fetchProfile = async () => {
     const cacheKey = `${role}-${accountId}`;
     const now = Date.now();
+    // reset avatar state first to avoid showing previous preview
+    if (avatarObjectUrl) {
+      try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+      setAvatarObjectUrl(undefined);
+    }
+    setAvatarFile(null);
+    setAvatarPreview(undefined);
 
     // Nếu cache còn hiệu lực thì dùng luôn
     if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_TTL) {
       form.setFieldsValue(cache[cacheKey].data);
       setProfile(cache[cacheKey].data);
+      const cached = cache[cacheKey].data as any;
+      const cachedAvatar = cached?.avatar || cached?.accountId?.avatar;
+      if (cachedAvatar && typeof cachedAvatar === 'string' && cachedAvatar.startsWith('blob:')) {
+        // previously stored object URL may have been revoked; ignore it
+        setAvatarPreview(undefined);
+      } else if (cachedAvatar) {
+        setAvatarPreview(cachedAvatar);
+      } else setAvatarPreview(undefined);
       return;
     }
 
@@ -105,7 +124,13 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
           phone: d.phone,
           experience: d.experience,
           specialtyName: d.specialtyId?.name || "",
+          // include avatar in cached profile so future opens from cache show preview
+          avatar: d.avatar || d.accountId?.avatar || undefined,
         };
+        // set avatar preview if available, otherwise ensure cleared
+        if (d.avatar) setAvatarPreview(d.avatar);
+        else if (d.accountId && d.accountId.avatar) setAvatarPreview(d.accountId.avatar);
+        else setAvatarPreview(undefined);
       } else if (role === "patient") {
         const p = res as any;
         data = {
@@ -140,7 +165,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
       form.setFieldsValue(data);
       setProfile(data);
 
-      // lưu cache
+      // lưu cache (include avatar when available)
       cache[cacheKey] = { data, timestamp: now };
     } catch (err) {
       message.error("Không thể tải dữ liệu");
@@ -159,7 +184,53 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
         payload.dob = (payload.dob as Dayjs).toISOString();
       }
 
-      if (role === "doctor") await DoctorService.updateDoctor(profile._id, payload);
+      if (role === "doctor") {
+        // if avatar selected, send as FormData
+        if (avatarFile) {
+          const fd = new FormData();
+          // append form fields
+          Object.keys(payload).forEach((k) => {
+            if (payload[k] !== undefined && payload[k] !== null) fd.append(k, payload[k]);
+          });
+          fd.append('avatar', avatarFile);
+          // capture updated doctor returned from server
+          const updated = await DoctorService.updateDoctorById(profile._id, fd);
+          // revoke local object URL now that server provided real URL
+          if (avatarObjectUrl) {
+            try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+            setAvatarObjectUrl(undefined);
+          }
+          setAvatarFile(null);
+          // update preview to server URL
+          const serverAvatar = (updated as any).avatar || (updated as any).accountId?.avatar;
+          setAvatarPreview(serverAvatar);
+          // update cache with server data
+          const cacheKey = `${role}-${accountId}`;
+          const newCacheData: any = {
+            _id: (updated as any)._id,
+            accountId: (updated as any).accountId,
+            name: (updated as any).name,
+            phone: (updated as any).phone,
+            experience: (updated as any).experience,
+            specialtyName: (updated as any).specialtyId?.name || '',
+          };
+          cache[cacheKey] = { data: newCacheData, timestamp: Date.now() };
+        } else {
+          const updated = await DoctorService.updateDoctorById(profile._id, payload as any);
+          const serverAvatar = (updated as any).avatar || (updated as any).accountId?.avatar;
+          setAvatarPreview(serverAvatar);
+          const cacheKey = `${role}-${accountId}`;
+          const newCacheData: any = {
+            _id: (updated as any)._id,
+            accountId: (updated as any).accountId,
+            name: (updated as any).name,
+            phone: (updated as any).phone,
+            experience: (updated as any).experience,
+            specialtyName: (updated as any).specialtyId?.name || '',
+          };
+          cache[cacheKey] = { data: newCacheData, timestamp: Date.now() };
+        }
+      }
       if (role === "patient") await PatientService.updatePatient(profile._id, payload);
       if (role === "receptionist") await ReceptionistService.updateReceptionist(profile._id, payload);
       if (role === "admin") await AdminService.updateAdmin(profile._id, payload);
@@ -167,9 +238,11 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
       message.success("Cập nhật thành công");
       onClose();
 
-      // update cache
-      const cacheKey = `${role}-${accountId}`;
-      cache[cacheKey] = { data: payload, timestamp: Date.now() };
+      // if role !== doctor, update cache generically
+      if (role !== 'doctor') {
+        const cacheKey = `${role}-${accountId}`;
+        cache[cacheKey] = { data: payload, timestamp: Date.now() };
+      }
     } catch {
       message.error("Cập nhật thất bại");
     }
@@ -177,6 +250,18 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
 
   useEffect(() => {
     if (open) fetchProfile();
+    else {
+      // cleanup preview/objectURL when modal closed
+      if (avatarObjectUrl) {
+        try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+        setAvatarObjectUrl(undefined);
+      }
+      setAvatarFile(null);
+      setAvatarPreview(undefined);
+      // reset form state
+      form.resetFields();
+      setProfile(null);
+    }
   }, [open]);
 
   return (
@@ -245,9 +330,42 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
         )}
         {
           role === "doctor" && (
-            <Form.Item name="experience" label="Kinh nghiệm (năm)" rules={[{ required: true }]}>
-              <Input type="number" min={0} />
-            </Form.Item>
+            <>
+              <Form.Item name="experience" label="Kinh nghiệm (năm)" rules={[{ required: true }]}>
+                <Input type="number" min={0} />
+              </Form.Item>
+              <Form.Item label="Ảnh đại diện">
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div>
+                    {avatarPreview ? (
+                      <Image src={avatarPreview} alt="avatar" width={80} height={80} />
+                    ) : (
+                      <div style={{ width: 80, height: 80, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>No image</div>
+                    )}
+                  </div>
+                  <div>
+                    <Upload
+                    beforeUpload={(file) => {
+                      // prevent auto upload
+                      // revoke previous object URL
+                      if (avatarObjectUrl) {
+                        try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+                      }
+                      const objUrl = URL.createObjectURL(file);
+                      setAvatarObjectUrl(objUrl);
+                      setAvatarFile(file as File);
+                      setAvatarPreview(objUrl);
+                      return false;
+                    }}
+                      showUploadList={false}
+                      accept="image/*"
+                    >
+                      <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                    </Upload>
+                  </div>
+                </div>
+              </Form.Item>
+            </>
           )
         }
       </Form>
