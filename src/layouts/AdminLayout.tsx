@@ -70,6 +70,12 @@ const AdminLayout = () => {
             label: "Quản lý hoá đơn",
             onClick: () => navigate("/admin/invoices"),
         },
+        {
+            key: "specialties",
+            icon: <BsPersonVcard size={20} />,
+            label: "Quản lý chuyên khoa",
+            onClick: () => navigate("/admin/specialties"),
+        },
     ];
 
     const pathname = location.pathname || "";
