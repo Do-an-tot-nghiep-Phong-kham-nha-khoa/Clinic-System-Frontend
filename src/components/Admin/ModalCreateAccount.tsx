@@ -43,7 +43,6 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             formData.append('phone', values.phone);
             formData.append('experience', values.experience || '');
 
-            // ✅ FIX: Lấy file từ input có name="avatar"
             const avatarInput = document.querySelector('input[name="avatar"]') as HTMLInputElement;
             if (avatarInput?.files?.[0]) {
               const file = avatarInput.files[0];
@@ -54,13 +53,7 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
               });
               formData.append('avatar', file);
             } else {
-              console.log('⚠️ No avatar file selected');
-            }
-
-            // Debug FormData
-            console.log('📤 FormData entries:');
-            for (let [key, value] of formData.entries()) {
-              console.log(key, value);
+              console.log('No avatar file selected');
             }
 
             await createDoctor(formData, true);
@@ -69,7 +62,7 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             onCreated?.();
             onClose();
           } catch (err: any) {
-            console.error('❌ Create doctor error:', err);
+            console.error('Create doctor error:', err);
             message.error(err.response?.data?.message || 'Tạo bác sĩ thất bại');
           } finally {
             setLoading(false);
@@ -98,8 +91,6 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
             password: values.password,
             name: values.name,
             phone: values.phone,
-            note: values.note,
-            avatar: values.avatar,
           });
           message.success('Tạo admin thành công');
           form.resetFields();
@@ -256,12 +247,6 @@ const ModalCreateAccount = ({ open, onClose, onCreated }: Props) => {
           <>
             <Form.Item label="Số điện thoại" name="phone">
               <Input placeholder="Nhập số điện thoại" />
-            </Form.Item>
-            <Form.Item label="Ghi chú" name="note">
-              <Input placeholder="Nhập ghi chú" />
-            </Form.Item>
-            <Form.Item label="Avatar URL" name="avatar">
-              <Input placeholder="Nhập URL avatar" />
             </Form.Item>
           </>
         )}

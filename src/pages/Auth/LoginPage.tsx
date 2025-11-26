@@ -39,8 +39,21 @@ const LoginPage: React.FC = () => {
                 default:
                     navigate('/');
             }
-        } catch (err) {
-            setError('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.');
+        } catch (err: any) {
+            console.error('Lỗi khi đăng nhập:', err);
+            let msg = 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.';
+            const resp = err && (err as any).response;
+            if (resp && resp.data) {
+                const data = resp.data;
+                if (typeof data === 'object' && data.message) {
+                    msg = String(data.message);
+                } else if (typeof data === 'string') {
+                    msg = data;
+                }
+            } else if (err && err.message) {
+                msg = err.message;
+            }
+            setError(msg);
         } finally {
             setLoading(false);
         }

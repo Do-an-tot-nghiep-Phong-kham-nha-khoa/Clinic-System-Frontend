@@ -134,12 +134,8 @@ export async function createDoctor(dto: Partial<DoctorProfile> | FormData, isFor
     const isFD = isFormData || (typeof FormData !== 'undefined' && dto instanceof FormData);
 
     if (isFD) {
-
-      // ✅ CRITICAL: Không set Content-Type, để browser tự động set với boundary
       const res = await api.post(url, dto as FormData, {
         withCredentials: true,
-        // ❌ KHÔNG làm thế này: headers: { 'Content-Type': 'multipart/form-data' }
-        // ✅ Để browser tự set: 'multipart/form-data; boundary=----WebKitFormBoundary...'
       });
 
       return res?.data?.data ?? res?.data ?? null;
@@ -151,10 +147,20 @@ export async function createDoctor(dto: Partial<DoctorProfile> | FormData, isFor
     throw e;
   }
 }
-export async function updateDoctor(id: string, dto: Partial<DoctorProfile>): Promise<DoctorProfile | null> {
+export async function updateDoctor(dto: Partial<DoctorProfile> | FormData, isFormData = false): Promise<DoctorProfile | null> {
   const url = `/doctors/${id}`;
   try {
-    const res = await api.put(url, dto);
+    const isFD = isFormData || (typeof FormData !== 'undefined' && dto instanceof FormData);
+
+    if (isFD) {
+      const res = await api.post(url, dto as FormData, {
+        withCredentials: true,
+      });
+
+      return res?.data?.data ?? res?.data ?? null;
+    }
+
+    const res = await api.put(url, dto as Partial<DoctorProfile>, { withCredentials: true });
     return res?.data?.data ?? res?.data ?? null;
   } catch (e) {
     throw e;
@@ -211,12 +217,15 @@ export async function getDoctorByAccountId(accountId: string): Promise<DoctorPro
 
 export async function updateDoctorById(
   doctorId: string,
-  payload: UpdateDoctorPayload
+  payload: UpdateDoctorPayload | FormData
 ): Promise<DoctorProfile> {
   const url = `/doctors/${doctorId}`;
 
   try {
-    const res = await api.put<DoctorResponse>(url, payload);
+    const isForm = typeof FormData !== 'undefined' && payload instanceof FormData;
+    const res = isForm
+      ? await api.put<DoctorResponse>(url, payload, { withCredentials: true })
+      : await api.put<DoctorResponse>(url, payload as UpdateDoctorPayload, { withCredentials: true });
     return res.data.data;
   } catch (error) {
     throw new Error('Lỗi không xác định khi cập nhật hồ sơ bác sĩ.');

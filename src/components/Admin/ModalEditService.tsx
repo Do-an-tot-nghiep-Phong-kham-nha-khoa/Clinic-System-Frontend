@@ -71,9 +71,9 @@ const ModalEditService: React.FC<ModalEditServiceProps> = ({ open, id, onClose, 
             maskClosable={!loading}
         >
             <Form form={form} layout="vertical" preserve={false} disabled={loading}>
-                <Form.Item name="name" label="Tên thuốc"
-                    rules={[{ required: true, message: 'Vui lòng nhập tên thuốc' }]}>
-                    <Input placeholder="Tên thuốc" />
+                <Form.Item name="name" label="Tên dịch vụ"
+                    rules={[{ required: true, message: 'Vui lòng nhập tên dịch vụ' }]}>
+                    <Input placeholder="Tên dịch vụ" />
                 </Form.Item>
                 <Form.Item name="price" label="Giá"
                     rules={[{ required: true, message: 'Vui lòng nhập giá' }]}>
