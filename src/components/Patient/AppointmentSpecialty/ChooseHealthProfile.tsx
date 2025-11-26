@@ -2,7 +2,6 @@ import { Button, Card, Col, Row, Typography, Spin, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { FaArrowLeft, FaHeartbeat, FaPhone, FaUser } from 'react-icons/fa';
 import dayjs from 'dayjs';
-import { useAuth } from '../../../contexts/AuthContext';
 import { getAllHealthProfiles, type HealthProfile } from '../../../services/HealthProfileService';
 import { FaPerson } from 'react-icons/fa6';
 
@@ -25,7 +24,6 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({
     patientId,
     onNext,
     onBack }) => {
-    const { user } = useAuth();
     const [profiles, setProfiles] = useState<HealthProfile[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedProfile, setSelectedProfile] = useState<HealthProfile | null>(null);
@@ -98,7 +96,7 @@ const ChooseHealthProfile: React.FC<ChooseHealthProfileProps> = ({
                         {profile.emergencyContact && (
                             <p className="flex items-center">
                                 <FaPhone className="mr-2 text-green-500" />
-                                Người liên hệ khẩn cấp: {profile.emergencyContact.name} ({profile.emergencyContact.relationship})
+                                Người liên hệ khẩn cấp: {profile.emergencyContact.name} ({profile.emergencyContact.phone})
                             </p>
                         )}
                     </div>

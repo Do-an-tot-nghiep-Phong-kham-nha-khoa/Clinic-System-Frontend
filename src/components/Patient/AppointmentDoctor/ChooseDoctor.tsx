@@ -20,7 +20,7 @@ const ChooseDoctor: React.FC<ChooseDoctorProps> = ({ onNext, selectedDoctorId, d
     (async () => {
       try {
         const sp = await getSpecialties();
-        setSpecialties(sp);
+        setSpecialties(sp.items);
       } catch (err) {
         message.error('Lỗi tải danh sách chuyên khoa');
       }
