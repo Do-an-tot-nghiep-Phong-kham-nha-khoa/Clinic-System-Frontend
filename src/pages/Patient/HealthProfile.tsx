@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Button, List, Avatar, Tag, Drawer, Form, Input, Select, Space, message,
+    Button, List, Tag, Drawer, Form, Input, Select, Space, message,
     Empty, Card, DatePicker, Row, Col, Descriptions, Popconfirm
 } from 'antd';
 import { FaUser } from 'react-icons/fa';
@@ -10,8 +10,6 @@ import * as HealthProfileService from '../../services/HealthProfileService';
 import * as FamilyMemberService from '../../services/FamilyMemberService';
 import type { HealthProfile } from '../../services/HealthProfileService';
 import { getPatientByAccountId } from "../../services/PatientService";
-import dayjs from 'dayjs';
-
 const { Option } = Select;
 
 // ✨ Card hiển thị hồ sơ với nút xóa
@@ -98,10 +96,10 @@ const HealthProfilePage: React.FC = () => {
                 setPatientId(null);
                 return;
             }
-            setPatientId(patient._id);
+            setPatientId(patient?._id || null);
 
-            const data = await HealthProfileService.getAllHealthProfiles(patient._id);
-            const profilesArray = Array.isArray(data) ? data : (data?.data || []);
+            const data = await HealthProfileService.getAllHealthProfiles(patient?._id || '');
+            const profilesArray = Array.isArray(data) ? data : [];
             setProfiles(profilesArray);
         } catch (err) {
             console.error(err);
@@ -134,8 +132,6 @@ const HealthProfilePage: React.FC = () => {
             medications: (p.medications || []).join(", "),
             emergencyContactName: p.emergencyContact?.name,
             emergencyContactPhone: p.emergencyContact?.phone,
-            dob: p.dob ? dayjs(p.dob) : undefined,
-            familyMemberPhone: p.phone
         });
         setDrawerOpen(true);
     };
@@ -173,7 +169,7 @@ const HealthProfilePage: React.FC = () => {
                     dob: values.dob?.toISOString(),
                     phone: values.familyMemberPhone
                 });
-                ownerId = fm._id;
+                ownerId = fm._id || '';
             }
 
             const healthPayload: any = {

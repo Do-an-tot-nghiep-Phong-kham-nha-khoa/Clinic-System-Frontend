@@ -18,11 +18,10 @@ const AccountManagement = () => {
     const [searchInput, setSearchInput] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [createOpen, setCreateOpen] = useState(false);
-    // const [editOpen, setEditOpen] = useState(false);
-    // const [editingId, setEditingId] = useState<string | undefined>(undefined);
-
     const [viewOpen, setViewOpen] = useState(false);
     const [viewAccount, setViewAccount] = useState<Account | null>(null);
+
+    
     // Load accounts once
     const fetchAccounts = async () => {
         try {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Input, Button, Form, message, Card } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
-
+import {resetPassword} from '../../services/AccountService';
 const ResetPassword: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -10,8 +10,8 @@ const ResetPassword: React.FC = () => {
   const email = (location.state as any)?.email || '';
 
   const handleSubmit = async (values: any) => {
-    const { password, confirm } = values;
-    if (password !== confirm) {
+    const { password, confirmPassword } = values;
+    if (password !== confirmPassword) {
       message.error('Mật khẩu xác nhận không khớp');
       return;
     }
@@ -20,7 +20,7 @@ const ResetPassword: React.FC = () => {
       // Call backend to reset password
       // Backend route: POST /accounts/password/reset
       // Backend expects the reset token in cookie (set after OTP verify), so only send password
-      await api.post('/accounts/password/reset', { password });
+      await resetPassword({ email, newPassword: password, confirmPassword });
       message.success('Đổi mật khẩu thành công. Vui lòng đăng nhập.');
       navigate('/login');
     } catch (err: any) {
@@ -44,10 +44,9 @@ const ResetPassword: React.FC = () => {
                 <Form.Item name="password" label={<span className="font-medium text-gray-700">Mật khẩu mới</span>} rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}>
                   <Input.Password placeholder="Nhập mật khẩu mới" size="large" />
                 </Form.Item>
-                <Form.Item name="confirm" label={<span className="font-medium text-gray-700">Xác nhận mật khẩu</span>} rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu' }]}>
+                <Form.Item name="confirmPassword" label={<span className="font-medium text-gray-700">Xác nhận mật khẩu</span>} rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu' }]}>
                   <Input.Password placeholder="Xác nhận mật khẩu" size="large" />
                 </Form.Item>
-
                 <Form.Item>
                   <Button type="primary" htmlType="submit" loading={loading} className="w-full">
                     Đổi mật khẩu
