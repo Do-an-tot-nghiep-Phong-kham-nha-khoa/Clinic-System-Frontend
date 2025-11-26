@@ -1,4 +1,4 @@
-import { Button, Input, message, Table, Modal, Tag  } from "antd";
+import { Button, Input, message, Table, Modal, Tag, Select } from "antd";
 import { useEffect, useState } from "react";
 import { FaSearch, FaTrash } from "react-icons/fa";
 import { formatDateDDMMYYYY } from "../../utils/date";
@@ -8,8 +8,6 @@ import ButtonPrimary from "../../utils/ButtonPrimary";
 import { AiFillEdit } from "react-icons/ai";
 import { ClockCircleOutlined, CheckCircleOutlined, SolutionOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import ModalEditAppointment from "../../components/Admin/ModalEditAppointment";
-
-const { Search } = Input;
 
 const ReceptionistManageAppointment = () => {
     const [appointments, setAppointments] = useState<AppointmentPayload[]>([]);
@@ -24,10 +22,12 @@ const ReceptionistManageAppointment = () => {
     const [loading, setLoading] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | undefined>(undefined);
+    const [specialtyFilter, setSpecialtyFilter] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
 
     useEffect(() => {
         fetchAppointments();
-    }, [page, pageSize, sort, q]);
+    }, [page, pageSize, sort, q, specialtyFilter, statusFilter]);
     const getStatusTag = (status: string) => {
         switch (status.toLowerCase()) {
             case "pending":
@@ -47,23 +47,134 @@ const ReceptionistManageAppointment = () => {
     const fetchAppointments = async () => {
         try {
             setLoading(true);
-            const result: any = await (AppointmentService as any).getAppointments({
-                page,
-                limit: pageSize,
-                sort,
-                q,
-            });
 
-            // normalize result -> items array
-            const items: AppointmentPayload[] = Array.isArray(result)
-                ? result
-                : result?.items ?? result?.data ?? result?.appointments ?? [];
+            // Check if we need client-side filtering (search or filters active)
+            const hasSearchOrFilter = q || specialtyFilter || statusFilter;
 
-            const metaObj: AppointmentMeta | null = result?.meta ?? null;
+            let result: any;
+            let items: AppointmentPayload[];
+            let metaObj: AppointmentMeta | null;
 
-            setAppointments(items);
-            setMeta(metaObj);
-            return items;
+            if (hasSearchOrFilter) {
+                // 🔹 Fetch ALL data for client-side filtering/search
+                result = await (AppointmentService as any).getAppointments({
+                    page: 1,
+                    limit: 1000, // Large limit to get all data
+                });
+
+                items = Array.isArray(result)
+                    ? result
+                    : result?.items ?? result?.data ?? result?.appointments ?? [];
+
+                let filtered = [...items];
+
+                // 🔹 Search theo tên bệnh nhân và bác sĩ
+                if (q) {
+                    const searchLower = q.toLowerCase();
+                    filtered = filtered.filter(
+                        (a) =>
+                            getPatientName(a).toLowerCase().includes(searchLower) ||
+                            getDoctorName(a).toLowerCase().includes(searchLower)
+                    );
+                }
+
+                // 🔹 Filter theo chuyên khoa
+                if (specialtyFilter) {
+                    filtered = filtered.filter(
+                        (a) => {
+                            const specialtyName = typeof a?.specialty_id === 'object'
+                                ? (a.specialty_id as any)?.name
+                                : (a?.specialty_id ?? "");
+                            return specialtyName.toLowerCase().includes(specialtyFilter.toLowerCase());
+                        }
+                    );
+                }
+
+                // 🔹 Filter theo trạng thái
+                if (statusFilter) {
+                    filtered = filtered.filter(
+                        (a) => (a.status ?? "").toLowerCase() === statusFilter.toLowerCase()
+                    );
+                }
+
+                // 🔹 Client-side sort
+                if (sort) {
+                    const [field, order] = sort.split("_"); // ex: patient_asc
+                    filtered.sort((a, b) => {
+                        let aVal = "";
+                        let bVal = "";
+
+                        switch (field) {
+                            case "patient":
+                                aVal = getPatientName(a);
+                                bVal = getPatientName(b);
+                                break;
+                            case "doctor":
+                                aVal = getDoctorName(a);
+                                bVal = getDoctorName(b);
+                                break;
+                            case "specialty":
+                                aVal = typeof a?.specialty_id === 'object'
+                                    ? (a.specialty_id as any)?.name
+                                    : (a?.specialty_id ?? "");
+                                bVal = typeof b?.specialty_id === 'object'
+                                    ? (b.specialty_id as any)?.name
+                                    : (b?.specialty_id ?? "");
+                                break;
+                            case "status":
+                                aVal = a.status ?? "";
+                                bVal = b.status ?? "";
+                                break;
+                            case "appointmentDate":
+                                aVal = a.appointmentDate ?? a.appointment_date ?? a.createdAt ?? "";
+                                bVal = b.appointmentDate ?? b.appointment_date ?? b.createdAt ?? "";
+                                break;
+                            case "timeSlot":
+                                aVal = a.timeSlot ?? a.time_slot ?? "";
+                                bVal = b.timeSlot ?? b.time_slot ?? "";
+                                break;
+                            case "reason":
+                                aVal = a.reason ?? "";
+                                bVal = b.reason ?? "";
+                                break;
+                        }
+
+                        if (order === "asc") return String(aVal).localeCompare(String(bVal));
+                        return String(bVal).localeCompare(String(aVal));
+                    });
+                }
+
+                // 🔹 Client-side pagination
+                const start = (page - 1) * pageSize;
+                const end = start + pageSize;
+                const paged = filtered.slice(start, end);
+
+                setAppointments(paged);
+                setMeta({
+                    total: filtered.length,
+                    page,
+                    limit: pageSize,
+                    totalPages: Math.ceil(filtered.length / pageSize)
+                });
+                return paged;
+            } else {
+                // 🔹 No search/filter - use server-side pagination
+                result = await (AppointmentService as any).getAppointments({
+                    page,
+                    limit: pageSize,
+                    sort,
+                });
+
+                items = Array.isArray(result)
+                    ? result
+                    : result?.items ?? result?.data ?? result?.appointments ?? [];
+
+                metaObj = result?.meta ?? null;
+
+                setAppointments(items);
+                setMeta(metaObj);
+                return items;
+            }
         } catch (error: any) {
             console.error("fetchAppointments error:", error);
             message.error("Lỗi khi lấy danh sách lịch hẹn");
@@ -73,33 +184,81 @@ const ReceptionistManageAppointment = () => {
         }
     };
 
+
+    const handleSearchInputChange = (value: string) => {
+        setSearchInput(value);
+    };
+
+    const handleSearchSubmit = () => {
+        setPage(1);
+        setQ(searchInput.trim());
+    };
+
+    const handleClearSearch = () => {
+        setSearchInput("");
+        setQ("");
+        setSpecialtyFilter("");
+        setStatusFilter("");
+        setPage(1);
+    };
     const handleTableChange = (
         pagination: { current?: number; pageSize?: number },
         _filters: any,
         sorter: any
     ) => {
-        // pagination
         if (pagination.current) setPage(pagination.current);
         if (pagination.pageSize) setPageSize(pagination.pageSize);
 
-        // sorting
-        if (Array.isArray(sorter)) {
-            sorter = sorter[0];
-        }
         if (sorter && sorter.field) {
             const field = sorter.field as string;
             const order = sorter.order as "ascend" | "descend" | undefined;
-            if (order === "ascend") setSort(field);
-            else if (order === "descend") setSort(`-${field}`);
-            else setSort(undefined);
+
+            if (!order) {
+                setSort(undefined);
+                return;
+            }
+
+            // patientName
+            if (field === "patientName") {
+                setSort(order === "ascend" ? "patient_asc" : "patient_desc");
+                return;
+            }
+
+            // doctorName
+            if (field === "doctorName") {
+                setSort(order === "ascend" ? "doctor_asc" : "doctor_desc");
+                return;
+            }
+
+            // specialty
+            if (field === "specialty") {
+                setSort(order === "ascend" ? "specialty_asc" : "specialty_desc");
+                return;
+            }
+
+            // status
+            if (field === "status") {
+                setSort(order === "ascend" ? "status_asc" : "status_desc");
+                return;
+            }
+
+            // timeSlot
+            if (field === "timeSlot") {
+                setSort(order === "ascend" ? "timeSlot" : "-timeSlot");
+                return;
+            }
+
+            // reason
+            if (field === "reason") {
+                setSort(order === "ascend" ? "reason" : "-reason");
+                return;
+            }
+
+            // default: ngày hẹn
+            setSort(order === "ascend" ? "appointmentDate" : "-appointmentDate");
         } else {
             setSort(undefined);
         }
-    };
-
-    const onSearch = () => {
-        setPage(1);
-        setQ(searchInput.trim());
     };
 
     const openEditModal = (record: AppointmentPayload) => {
@@ -156,13 +315,25 @@ const ReceptionistManageAppointment = () => {
     };
     const columns = [
         {
+            title: "STT",
+            key: "index",
+            width: 70,
+            render: (_: any, __: any, index: number) => {
+                const current = page;
+                const size = pageSize;
+                return (current - 1) * size + index + 1;
+            }
+        },
+        {
             title: "Bệnh nhân",
             key: "patientName",
+            sorter: true,
             render: (_: any, record: any) => getPatientName(record),
         },
         {
             title: "Bác sĩ",
             key: "doctorName",
+            sorter: true,
             render: (_: any, record: any) => getDoctorName(record),
         },
         {
@@ -180,23 +351,27 @@ const ReceptionistManageAppointment = () => {
             title: "Khung giờ",
             dataIndex: "timeSlot",
             key: "timeSlot",
+            sorter: true,
             render: (_: any, record: any) => record.timeSlot ?? record.time_slot ?? "-",
         },
         {
             title: "Chuyên khoa",
             key: "specialty",
+            sorter: true,
             render: (_: any, record: any) => record?.specialty_id?.name ?? record?.specialty?.name ?? "-",
         },
         {
             title: "Trạng thái",
             dataIndex: "status",
             key: "status",
+            sorter: true,
             render: (status: string) => getStatusTag(status),
         },
         {
             title: "Lý do",
             dataIndex: "reason",
             key: "reason",
+            sorter: true,
         },
         {
             title: "Actions",
@@ -230,27 +405,54 @@ const ReceptionistManageAppointment = () => {
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-4">Quản lý lịch hẹn</h1>
             <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div style={{ minWidth: 240, width: "100%", maxWidth: 420 }}>
-                    <Search
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        placeholder="Tìm kiếm lịch hẹn..."
+                <div className="flex flex-col sm:flex-row gap-2 flex-1">
+                    <div style={{ minWidth: 300, width: "100%", maxWidth: 500 }}>
+                        <Input
+                            placeholder="Tìm kiếm theo tên bệnh nhân, bác sĩ, hoặc thông tin khác..."
+                            value={searchInput}
+                            onChange={(e) => handleSearchInputChange(e.target.value)}
+                            onPressEnter={handleSearchSubmit}
+                            allowClear
+                            onClear={handleClearSearch}
+                        />
+                    </div>
+                    <Button
+                        icon={<FaSearch />}
+                        style={{
+                            backgroundColor: "var(--color-primary)",
+                            color: "white",
+                            borderColor: "var(--color-primary)",
+                        }}
+                        onClick={handleSearchSubmit}
+                    >
+                        Tìm kiếm
+                    </Button>
+                    <Select
+                        placeholder="Lọc theo chuyên khoa"
                         allowClear
-                        enterButton={
-                            <Button
-                                icon={<FaSearch />}
-                                style={{
-                                    backgroundColor: "var(--color-primary)",
-                                    color: "white",
-                                    borderColor: "var(--color-primary)",
-                                }}
-                            >
-                                Search
-                            </Button>
-                        }
-                        className="text-[var(--color-primary)]"
-                        onSearch={onSearch}
-                    />
+                        value={specialtyFilter || undefined}
+                        onChange={(value) => setSpecialtyFilter(value || "")}
+                        style={{ minWidth: 150 }}
+                    >
+                        <Select.Option value="Nhi">Nhi</Select.Option>
+                        <Select.Option value="Sản phụ khoa">Sản phụ khoa</Select.Option>
+                        <Select.Option value="Tim mạch">Tim mạch</Select.Option>
+                        <Select.Option value="Tai mũi họng">Tai mũi họng</Select.Option>
+                        <Select.Option value="Da liễu">Da liễu</Select.Option>
+                    </Select>
+                    <Select
+                        placeholder="Lọc theo trạng thái"
+                        allowClear
+                        value={statusFilter || undefined}
+                        onChange={(value) => setStatusFilter(value || "")}
+                        style={{ minWidth: 150 }}
+                    >
+                        <Select.Option value="pending">Đang chờ</Select.Option>
+                        <Select.Option value="confirmed">Đã xác nhận</Select.Option>
+                        <Select.Option value="completed">Đã hoàn thành</Select.Option>
+                        <Select.Option value="cancelled">Đã hủy</Select.Option>
+                        <Select.Option value="waiting_assigned">Chờ phân công</Select.Option>
+                    </Select>
                 </div>
             </div>
 

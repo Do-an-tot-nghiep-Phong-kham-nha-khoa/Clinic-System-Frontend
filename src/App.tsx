@@ -47,6 +47,7 @@ import ForgotEmail from './pages/Auth/ForgotEmail'
 import VerifyOtp from './pages/Auth/VerifyOtp'
 import ResetPassword from './pages/Auth/ResetPassword'
 import ProtectedRoute from './components/ProtectedRoutes'
+import SpecialtyManagement from './pages/Admin/SpecialtyManagement'
 
 
 function App() {
@@ -81,6 +82,7 @@ function App() {
           <Route path='users' element={<AccountManagement />} />
           <Route path='doctor-schedule' element={<DoctorSchedule />} />
           <Route path='doctor-schedule/:doctorId' element={<ScheduleManagement />} />
+          <Route path='specialties' element={<SpecialtyManagement />} />
         </Route>
 
         <Route path='doctor' element={
