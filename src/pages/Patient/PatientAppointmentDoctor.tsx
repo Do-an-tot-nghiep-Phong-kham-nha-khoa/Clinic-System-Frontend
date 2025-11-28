@@ -1,4 +1,4 @@
-import { message, Steps, Typography } from "antd";
+import { message, Steps, Typography, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { FaCalendarAlt, FaCalendarCheck, FaUserCheck, FaUserMd } from "react-icons/fa";
 import ChooseDoctor from "../../components/Patient/AppointmentDoctor/ChooseDoctor";
@@ -150,11 +150,13 @@ const PatientAppointmentDoctor = () => {
                     }}
                 />
             );
-        }
-
-        switch (currentStep) {
+        } switch (currentStep) {
             case 0:
-                return <ChooseDoctor onNext={handleDoctorSelected} selectedDoctorId={selectedDoctor?.id || null} />;
+                return (
+                    <Spin spinning={loading} tip="Đang tải thông tin bác sĩ...">
+                        <ChooseDoctor onNext={handleDoctorSelected} selectedDoctorId={selectedDoctor?.id || null} />
+                    </Spin>
+                );
             case 1:
                 if (!selectedDoctor) return <div>Vui lòng chọn bác sĩ trước.</div>;
                 return (
@@ -206,15 +208,25 @@ const PatientAppointmentDoctor = () => {
         <div className="container mx-auto p-4 max-w-6xl">
             <Title level={2} className="text-center !mb-6 !font-bold">
                 Đặt Lịch Khám Theo Bác Sĩ
-            </Title>
-
-            {/* Steps hiển thị tiến trình */}
+            </Title>            {/* Steps hiển thị tiến trình */}
             <div className="mb-8">
-                <Steps current={currentStep} items={APPOINTMENT_STEPS} />
+                <Steps
+                    current={currentStep}
+                    items={APPOINTMENT_STEPS}
+                    className={loading ? 'opacity-60 pointer-events-none' : ''}
+                />
             </div>
 
             {/* Nội dung của bước hiện tại */}
-            <div className="bg-white p-6 shadow-md rounded-lg">{renderStepContent()}</div>
+            <div className="bg-white p-6 shadow-md rounded-lg">
+                {loading && currentStep === 0 ? (
+                    <div className="flex justify-center items-center py-20">
+                        <Spin size="large" tip="Đang xử lý thông tin bác sĩ..." />
+                    </div>
+                ) : (
+                    renderStepContent()
+                )}
+            </div>
         </div>
     );
 };

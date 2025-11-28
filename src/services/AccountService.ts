@@ -1,21 +1,21 @@
 import api from './Api';
 
 export type Role = {
-  _id: string;
-  name: string;
+    _id: string;
+    name: string;
 };
 
 export type Account = {
-  _id: string;
-  email: string;
-  password?: string;
-  roleId?: Role | null; // object role hoặc null
-  status?: string;
-  deleted?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  __v?: number;
-}; 
+    _id: string;
+    email: string;
+    password?: string;
+    roleId?: Role | null; // object role hoặc null
+    status?: string;
+    deleted?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+    __v?: number;
+};
 export type AccountMeta = {
     total: number;
     page: number;
@@ -74,7 +74,7 @@ export async function otpPassword(payload: { email: string; otp: string }): Prom
     return res?.data?.data ?? res?.data;
 }
 
-export async function resetPassword(payload: { email: string; otp: string; newPassword: string }): Promise<any> {
+export async function resetPassword(payload: { email: string; newPassword: string; confirmPassword: string }): Promise<any> {
     const url = `${API}/password/reset`;
     const res = await api.post(url, payload);
     return res?.data?.data ?? res?.data;

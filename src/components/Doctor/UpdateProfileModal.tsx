@@ -3,7 +3,7 @@ import { Modal, Form, Input, InputNumber, Button, message } from 'antd';
 import {
     getDoctorByAccountId,
     updateDoctorById,
-    type DoctorProfile,
+    type DoctorProfileNew,
     type UpdateDoctorPayload
 } from '../../services/DoctorService';
 
@@ -20,7 +20,7 @@ const UpdateProfileModal: React.FC<UpdateDoctorProfileModalProps> = ({ open, acc
     const [form] = Form.useForm<FormValues>();
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(false);
-    const [doctorProfile, setDoctorProfile] = useState<DoctorProfile | null>(null);
+    const [doctorProfile, setDoctorProfile] = useState<DoctorProfileNew | null>(null);
 
     // 2. Tải dữ liệu bác sĩ theo accountId khi modal mở
     useEffect(() => {

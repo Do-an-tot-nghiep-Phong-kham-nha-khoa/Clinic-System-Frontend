@@ -12,7 +12,6 @@ import {
     MdPunchClock,
 } from "react-icons/md";
 import { useState } from "react";
-import { FaListCheck } from "react-icons/fa6";
 import { FaClipboardList, FaFileInvoiceDollar } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import { GiMedicines } from "react-icons/gi";
@@ -69,6 +68,12 @@ const AdminLayout = () => {
             icon: <FaFileInvoiceDollar size={20} />,
             label: "Quản lý hoá đơn",
             onClick: () => navigate("/admin/invoices"),
+        },
+        {
+            key: "specialties",
+            icon: <BsPersonVcard size={20} />,
+            label: "Quản lý chuyên khoa",
+            onClick: () => navigate("/admin/specialties"),
         },
     ];
 

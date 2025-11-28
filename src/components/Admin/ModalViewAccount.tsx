@@ -24,6 +24,7 @@ interface DoctorProfile {
   specialtyName: string;
   phone: string;
   experience: number;
+  avatar?: string;
 }
 
 interface PatientProfile {
@@ -82,25 +83,30 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
     const now = Date.now();
     // reset avatar state first to avoid showing previous preview
     if (avatarObjectUrl) {
-      try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+      try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) { }
       setAvatarObjectUrl(undefined);
     }
     setAvatarFile(null);
     setAvatarPreview(undefined);
 
-    // Nếu cache còn hiệu lực thì dùng luôn
+    // Nếu cache còn hiệu lực thì dùng luôn (trừ khi cache thiếu specialtyName cho bác sĩ)
     if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_TTL) {
-      form.setFieldsValue(cache[cacheKey].data);
-      setProfile(cache[cacheKey].data);
       const cached = cache[cacheKey].data as any;
-      const cachedAvatar = cached?.avatar || cached?.accountId?.avatar;
-      if (cachedAvatar && typeof cachedAvatar === 'string' && cachedAvatar.startsWith('blob:')) {
-        // previously stored object URL may have been revoked; ignore it
-        setAvatarPreview(undefined);
-      } else if (cachedAvatar) {
-        setAvatarPreview(cachedAvatar);
-      } else setAvatarPreview(undefined);
-      return;
+      // If doctor and cached entry lacks specialtyName, ignore cache and fetch fresh
+      if (role === 'doctor' && (!cached || !cached.specialtyName)) {
+        // fall through to fetch from server
+      } else {
+        form.setFieldsValue(cached);
+        setProfile(cached);
+        const cachedAvatar = cached?.avatar || cached?.accountId?.avatar;
+        if (cachedAvatar && typeof cachedAvatar === 'string' && cachedAvatar.startsWith('blob:')) {
+          // previously stored object URL may have been revoked; ignore it
+          setAvatarPreview(undefined);
+        } else if (cachedAvatar) {
+          setAvatarPreview(cachedAvatar);
+        } else setAvatarPreview(undefined);
+        return;
+      }
     }
 
     try {
@@ -197,7 +203,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
           const updated = await DoctorService.updateDoctorById(profile._id, fd);
           // revoke local object URL now that server provided real URL
           if (avatarObjectUrl) {
-            try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+            try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) { }
             setAvatarObjectUrl(undefined);
           }
           setAvatarFile(null);
@@ -213,6 +219,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
             phone: (updated as any).phone,
             experience: (updated as any).experience,
             specialtyName: (updated as any).specialtyId?.name || '',
+            avatar: serverAvatar,
           };
           cache[cacheKey] = { data: newCacheData, timestamp: Date.now() };
         } else {
@@ -227,6 +234,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
             phone: (updated as any).phone,
             experience: (updated as any).experience,
             specialtyName: (updated as any).specialtyId?.name || '',
+            avatar: serverAvatar,
           };
           cache[cacheKey] = { data: newCacheData, timestamp: Date.now() };
         }
@@ -253,7 +261,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
     else {
       // cleanup preview/objectURL when modal closed
       if (avatarObjectUrl) {
-        try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
+        try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) { }
         setAvatarObjectUrl(undefined);
       }
       setAvatarFile(null);
@@ -345,18 +353,18 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
                   </div>
                   <div>
                     <Upload
-                    beforeUpload={(file) => {
-                      // prevent auto upload
-                      // revoke previous object URL
-                      if (avatarObjectUrl) {
-                        try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) {}
-                      }
-                      const objUrl = URL.createObjectURL(file);
-                      setAvatarObjectUrl(objUrl);
-                      setAvatarFile(file as File);
-                      setAvatarPreview(objUrl);
-                      return false;
-                    }}
+                      beforeUpload={(file) => {
+                        // prevent auto upload
+                        // revoke previous object URL
+                        if (avatarObjectUrl) {
+                          try { URL.revokeObjectURL(avatarObjectUrl); } catch (e) { }
+                        }
+                        const objUrl = URL.createObjectURL(file);
+                        setAvatarObjectUrl(objUrl);
+                        setAvatarFile(file as File);
+                        setAvatarPreview(objUrl);
+                        return false;
+                      }}
                       showUploadList={false}
                       accept="image/*"
                     >

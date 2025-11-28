@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Modal, Form, Input, Button } from 'antd';
 import type { Role } from '../../services/RoleService';
 import type { RoleCreateDTO } from '../../services/RoleService';

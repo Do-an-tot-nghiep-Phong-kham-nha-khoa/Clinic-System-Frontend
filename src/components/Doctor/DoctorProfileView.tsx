@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar } from 'antd';
-import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import { getDoctorById, type Doctor } from "../../services/DoctorService";
 import { getAccountById } from '../../services/AccountService';
@@ -85,7 +85,6 @@ const DoctorProfileView: React.FC = () => {
     }
 
     const specialtyName = doctor.specialtyId?.name || 'Chưa xác định';
-    const specialtyId = doctor.specialtyId?._id || 'N/A';
     const experience = doctor.experience;
     const phone = doctor.phone || 'N/A';
 

@@ -11,6 +11,7 @@ const { Option } = Select;
 
 const ReceptionistAppointment = () => {
     const [appointments, setAppointments] = useState<AppointmentPayload[]>([]);
+    const [allAppointments, setAllAppointments] = useState<AppointmentPayload[]>([]);
     const [loading, setLoading] = useState(false);
     const [specialties, setSpecialties] = useState<Specialty[]>([]);
     const [filterSpecialty, setFilterSpecialty] = useState<string>();
@@ -20,11 +21,12 @@ const ReceptionistAppointment = () => {
 
     useEffect(() => {
         fetchSpecialties();
+        fetchAllAppointments();
     }, []);
 
     useEffect(() => {
-        fetchAppointments();
-    }, [filterSpecialty]);
+        filterAppointments();
+    }, [filterSpecialty, allAppointments]);
 
     const fetchSpecialties = async () => {
         try {
@@ -33,12 +35,12 @@ const ReceptionistAppointment = () => {
         } catch { }
     };
 
-    const fetchAppointments = async () => {
+    const fetchAllAppointments = async () => {
         try {
             setLoading(true);
 
-            const params: any = { page: 1, limit: 200 };
-            if (filterSpecialty) params.specialtyId = filterSpecialty;
+            // Fetch all appointments without specialty filter
+            const params: any = { page: 1, limit: 1000 }; // Large limit to get all data
 
             const result: any = await AppointmentService.getAppointments(params);
 
@@ -50,14 +52,35 @@ const ReceptionistAppointment = () => {
             // filter appointment chưa có doctor
             const doctorless = items.filter(a => !a.doctor_id);
 
-
-            setAppointments(doctorless);
+            setAllAppointments(doctorless);
         } catch (err) {
             console.error(err);
             message.error("Lỗi khi lấy lịch hẹn");
         } finally {
             setLoading(false);
         }
+    };
+
+    const filterAppointments = () => {
+        if (!allAppointments.length) return;
+
+        let filtered = [...allAppointments];
+
+        // Client-side specialty filtering
+        if (filterSpecialty) {
+            filtered = filtered.filter(appointment => {
+                const specialtyId = appointment.specialty_id;
+                // Handle both string and object specialty_id
+                if (typeof specialtyId === 'string') {
+                    return specialtyId === filterSpecialty;
+                } else if (typeof specialtyId === 'object' && specialtyId) {
+                    return (specialtyId as any)._id === filterSpecialty;
+                }
+                return false;
+            });
+        }
+
+        setAppointments(filtered);
     };
     const openAssignModal = async (appointment: AppointmentPayload) => {
         try {
@@ -171,7 +194,7 @@ const ReceptionistAppointment = () => {
                 onAssigned={async () => {
                     setAssignModalOpen(false);
                     setSelectedAppointment(null);
-                    await fetchAppointments();
+                    await fetchAllAppointments();
                 }}
             />
         </div>

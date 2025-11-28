@@ -24,7 +24,7 @@ const ChooseSpecialty: React.FC<ChooseSpecialtyProps> = ({ onNext, selectedSpeci
         try {
             setLoading(true);
             const data = await getSpecialties();
-            setSpecialties(data);
+            setSpecialties(data.items);
         } catch (error) {
             message.error("Lỗi khi lấy danh sách chuyên khoa.");
         } finally {
