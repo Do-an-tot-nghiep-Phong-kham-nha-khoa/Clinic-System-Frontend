@@ -88,19 +88,24 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
     setAvatarFile(null);
     setAvatarPreview(undefined);
 
-    // Nếu cache còn hiệu lực thì dùng luôn
+    // Nếu cache còn hiệu lực thì dùng luôn (trừ khi cache thiếu specialtyName cho bác sĩ)
     if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_TTL) {
-      form.setFieldsValue(cache[cacheKey].data);
-      setProfile(cache[cacheKey].data);
       const cached = cache[cacheKey].data as any;
-      const cachedAvatar = cached?.avatar || cached?.accountId?.avatar;
-      if (cachedAvatar && typeof cachedAvatar === 'string' && cachedAvatar.startsWith('blob:')) {
-        // previously stored object URL may have been revoked; ignore it
-        setAvatarPreview(undefined);
-      } else if (cachedAvatar) {
-        setAvatarPreview(cachedAvatar);
-      } else setAvatarPreview(undefined);
-      return;
+      // If doctor and cached entry lacks specialtyName, ignore cache and fetch fresh
+      if (role === 'doctor' && (!cached || !cached.specialtyName)) {
+        // fall through to fetch from server
+      } else {
+        form.setFieldsValue(cached);
+        setProfile(cached);
+        const cachedAvatar = cached?.avatar || cached?.accountId?.avatar;
+        if (cachedAvatar && typeof cachedAvatar === 'string' && cachedAvatar.startsWith('blob:')) {
+          // previously stored object URL may have been revoked; ignore it
+          setAvatarPreview(undefined);
+        } else if (cachedAvatar) {
+          setAvatarPreview(cachedAvatar);
+        } else setAvatarPreview(undefined);
+        return;
+      }
     }
 
     try {
@@ -213,6 +218,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
             phone: (updated as any).phone,
             experience: (updated as any).experience,
             specialtyName: (updated as any).specialtyId?.name || '',
+            avatar: serverAvatar,
           };
           cache[cacheKey] = { data: newCacheData, timestamp: Date.now() };
         } else {
@@ -227,6 +233,7 @@ const ModalViewAccount: React.FC<ModalViewAccountProps> = ({
             phone: (updated as any).phone,
             experience: (updated as any).experience,
             specialtyName: (updated as any).specialtyId?.name || '',
+            avatar: serverAvatar,
           };
           cache[cacheKey] = { data: newCacheData, timestamp: Date.now() };
         }
