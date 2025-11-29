@@ -32,7 +32,7 @@ const checkTokenExpiration = (token: string | undefined): boolean => { ... };
 const USER_DATA_COOKIE_NAME = 'userData'; // Chỉ cần cookie này
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const BASE_URL = import.meta.env.BACKEND_URL || 'https://clinic-system-backend-virid.vercel.app/';
+    const BASE_URL = import.meta.env.BACKEND_URL || 'https://clinic-system-backend-virid.vercel.app';
 
     // Hàm khôi phục trạng thái từ Cookie
     const getInitialAuthState = () => {
