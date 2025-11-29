@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import api from "../services/Api";
 
 export default function Chatbot() {
+  type Message = { role: "user" | "assistant"; content: string; timestamp: Date };
   const [open, setOpen] = useState(false);
   const [conversationId, setConversationId] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const bottomRef = useRef(null);
-
+  const bottomRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (open && !conversationId) {
       createConversation();
@@ -25,18 +25,23 @@ export default function Chatbot() {
       const res = await api.post("/chatbot/new-conversation");
       setConversationId(res.data.conversationId);
       // initial assistant msg
-      setMessages([{ role: "assistant", content: "Xin chào! Tôi là trợ lý ảo..." , timestamp: new Date() }]);
+      setMessages([{ role: "assistant", content: "Xin chào! Tôi là trợ lý ảo...", timestamp: new Date() }]);
     } catch (err) {
       console.error("Create conv err", err);
       setErrorMsg("Không thể tạo cuộc trò chuyện. Vui lòng thử lại.");
     }
   };
 
-  const sendMessage = async (e) => {
+  interface ChatApiData {
+    success?: boolean;
+    message?: string;
+  }
+
+  const sendMessage = async (e?: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e?.preventDefault();
     if (!input.trim() || loading) return;
     setErrorMsg("");
-    const userMessage = { role: "user", content: input.trim(), timestamp: new Date() };
+    const userMessage: Message = { role: "user", content: input.trim(), timestamp: new Date() };
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setLoading(true);
@@ -45,16 +50,16 @@ export default function Chatbot() {
     // implement simple counter:
     // (in production use server-side enforcement or Redis)
     try {
-      const res = await api.post("/chatbot/chat", { message: userMessage.content, conversationId });
+      const res = await api.post<ChatApiData>("/chatbot/chat", { message: userMessage.content, conversationId });
       if (res.data?.success) {
-        setMessages(prev => [...prev, { role: "assistant", content: res.data.message, timestamp: new Date() }]);
+        setMessages(prev => [...prev, { role: "assistant", content: res.data.message || "", timestamp: new Date() }]);
       } else {
         setMessages(prev => [...prev, { role: "assistant", content: "Xin lỗi, đã có lỗi xảy ra.", timestamp: new Date() }]);
         setErrorMsg(res.data?.message || "Lỗi từ server");
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Chat error:", err);
-      const status = err?.response?.status;
+      const status = (err as { response?: { status?: number } })?.response?.status;
       if (status === 429) {
         setErrorMsg("Bạn gửi quá nhiều yêu cầu. Vui lòng đợi rồi thử lại.");
       } else {
