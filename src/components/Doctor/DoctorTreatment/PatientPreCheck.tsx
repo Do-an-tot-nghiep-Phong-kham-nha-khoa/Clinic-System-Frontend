@@ -145,20 +145,20 @@ const PatientPreCheck = ({
 
                         <Space direction="vertical" style={{ width: '100%' }} size="middle">
                             <div className="text-sm ">
-                                Triệu chứng lâm sàng (S):
+                                Triệu chứng lâm sàng:
                             </div>
                             <Input.TextArea
-                                placeholder="Triệu chứng lâm sàng (S)"
+                                placeholder="Triệu chứng lâm sàng"
                                 rows={4}
                                 value={precheckData.symptoms}
                                 onChange={(e) => handleDataChange("symptoms", e.target.value)}
                             />
 
                             <div className="text-sm ">
-                                Chẩn đoán ban đầu (D):
+                                Chẩn đoán:
                             </div>
                             <Input.TextArea
-                                placeholder="Chẩn đoán ban đầu (D)"
+                                placeholder="Chẩn đoán"
                                 rows={4}
                                 value={precheckData.diagnosis}
                                 onChange={(e) => handleDataChange("diagnosis", e.target.value)}
