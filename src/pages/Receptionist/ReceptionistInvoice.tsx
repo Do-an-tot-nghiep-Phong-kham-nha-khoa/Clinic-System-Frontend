@@ -54,26 +54,36 @@ const ReceptionistInvoice = () => {
         }
     }
 
+    const getStatusText = (status: InvoiceStatus): string => {
+        switch (status) {
+            case 'Paid':
+                return 'Đã thanh toán';
+            case 'Cancelled':
+                return 'Đã hủy';
+            case 'Refunded':
+                return 'Đã hoàn tiền';
+            case 'Pending':
+            default:
+                return 'Chờ thanh toán';
+        }
+    };
+
     const getStatusTag = (status: InvoiceStatus) => {
         let color;
-        let statusText;
+        const statusText = getStatusText(status);
         switch (status) {
             case 'Paid':
                 color = 'green';
-                statusText = 'Đã thanh toán';
                 break;
             case 'Cancelled':
                 color = 'red';
-                statusText = 'Đã hủy';
                 break;
             case 'Refunded':
                 color = 'volcano';
-                statusText = 'Đã hoàn tiền';
                 break;
             case 'Pending':
             default:
                 color = 'gold';
-                statusText = 'Chờ thanh toán';
                 break;
         }
         return <Tag color={color}>{statusText}</Tag>;
@@ -265,14 +275,13 @@ const ReceptionistInvoice = () => {
                     <div>
                         <span className="text-sm text-gray-600">Trạng thái hiện tại:</span>
                         <div className="mt-1">{currentStatus && (<> {getStatusTag(currentStatus)} </>)}</div>
-                    </div>
-                    <div>
+                    </div>                    <div>
                         <span className="text-sm text-gray-600">Chọn trạng thái mới:</span>
                         <Select
                             className="w-full mt-1"
                             value={selectedStatus}
                             onChange={(val: InvoiceStatus) => setSelectedStatus(val)}
-                            options={allowedStatuses.map(s => ({ label: s, value: s }))}
+                            options={allowedStatuses.map(s => ({ label: getStatusText(s), value: s }))}
                         />
                     </div>
                 </div>
