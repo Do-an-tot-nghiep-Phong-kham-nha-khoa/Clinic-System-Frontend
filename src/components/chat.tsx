@@ -1,117 +1,96 @@
-import { useEffect, useRef, useState } from "react";
-import "./chat.css";
+import React, { useState, useEffect, useRef } from "react";
+import api from "../services/Api";
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
-
-let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-
-export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function Chatbot() {
+  const [open, setOpen] = useState(false);
+  const [conversationId, setConversationId] = useState("");
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const bottomRef = useRef(null);
 
-  const sendMessage = async (msg?: string) => {
-    const messageToSend = msg ?? input.trim();
-    if (!messageToSend) return;
+  useEffect(() => {
+    if (open && !conversationId) {
+      createConversation();
+    }
+  }, [open]);
 
-    const userMsg: Message = { role: "user", content: messageToSend };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput("");
-    setIsLoading(true);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
+  const createConversation = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: messageToSend }),
-      });
-
-      const data = await res.json();
-      const botMsg: Message = { role: "assistant", content: data.reply };
-      setMessages((prev) => [...prev, botMsg]);
-    } catch {
-      const errMsg: Message = { role: "assistant", content: "Lỗi kết nối server." };
-      setMessages((prev) => [...prev, errMsg]);
-    } finally {
-      setIsLoading(false);
+      const res = await api.post("/chatbot/new-conversation");
+      setConversationId(res.data.conversationId);
+      // initial assistant msg
+      setMessages([{ role: "assistant", content: "Xin chào! Tôi là trợ lý ảo..." , timestamp: new Date() }]);
+    } catch (err) {
+      console.error("Create conv err", err);
+      setErrorMsg("Không thể tạo cuộc trò chuyện. Vui lòng thử lại.");
     }
   };
 
-  // Auto-scroll
-  useEffect(() => {
-    scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
-  }, [messages, isLoading]);
+  const sendMessage = async (e) => {
+    e?.preventDefault();
+    if (!input.trim() || loading) return;
+    setErrorMsg("");
+    const userMessage = { role: "user", content: input.trim(), timestamp: new Date() };
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setLoading(true);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const val = e.target.value;
-    setInput(val);
-
-    if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      if (val.trim()) sendMessage(val.trim());
-    }, 1500);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (debounceTimer) clearTimeout(debounceTimer);
-      sendMessage();
+    // basic client-side rate limiting: max 6 messages / minute
+    // implement simple counter:
+    // (in production use server-side enforcement or Redis)
+    try {
+      const res = await api.post("/chatbot/chat", { message: userMessage.content, conversationId });
+      if (res.data?.success) {
+        setMessages(prev => [...prev, { role: "assistant", content: res.data.message, timestamp: new Date() }]);
+      } else {
+        setMessages(prev => [...prev, { role: "assistant", content: "Xin lỗi, đã có lỗi xảy ra.", timestamp: new Date() }]);
+        setErrorMsg(res.data?.message || "Lỗi từ server");
+      }
+    } catch (err) {
+      console.error("Chat error:", err);
+      const status = err?.response?.status;
+      if (status === 429) {
+        setErrorMsg("Bạn gửi quá nhiều yêu cầu. Vui lòng đợi rồi thử lại.");
+      } else {
+        setErrorMsg("Lỗi kết nối. Vui lòng thử lại.");
+      }
+      setMessages(prev => [...prev, { role: "assistant", content: "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.", timestamp: new Date() }]);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="chat-root">
-      <div className="chat-window" ref={scrollRef}>
-        {messages.length === 0 && (
-          <div className="chat-empty">Chào! Hãy nhập câu hỏi của bạn.</div>
-        )}
+    <>
+      <button onClick={() => setOpen(o => !o)}>{open ? "✕" : "💬"}</button>
 
-        {messages.map((m, i) => (
-          <div key={i} className={`chat-message ${m.role}`}>
-            <div className="bubble">
-              <div className="meta">
-                <span className="speaker">{m.role === "user" ? "Bạn" : "Bot"}</span>
+      {open && (
+        <div className="chat-window">
+          <div className="messages">
+            {messages.map((m, i) => (
+              <div key={i} className={`msg ${m.role}`}>
+                <div className="text">{m.content}</div>
+                <div className="time">{new Date(m.timestamp).toLocaleTimeString('vi-VN')}</div>
               </div>
-              <div className="content">{m.content}</div>
-            </div>
+            ))}
+            {loading && <div className="msg assistant">Đang suy nghĩ...</div>}
+            <div ref={bottomRef} />
           </div>
-        ))}
 
-        {isLoading && (
-          <div className="chat-message assistant">
-            <div className="bubble">
-              <div className="content">...</div>
-            </div>
-          </div>
-        )}
-      </div>
+          {errorMsg && <div className="error">{errorMsg}</div>}
 
-      <div className="chat-input-row">
-        <textarea
-          className="chat-input"
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder="Gõ tin nhắn và nhấn Enter để gửi (Shift+Enter xuống dòng)"
-          rows={2}
-          disabled={isLoading}
-        />
-        <button
-          className="chat-send"
-          onClick={() => {
-            if (debounceTimer) clearTimeout(debounceTimer);
-            sendMessage();
-          }}
-          disabled={isLoading || !input.trim()}
-        >
-          {isLoading ? "Đang gửi..." : "Gửi"}
-        </button>
-      </div>
-    </div>
+          <form onSubmit={sendMessage} className="input-area">
+            <input value={input} onChange={e => setInput(e.target.value)} disabled={loading} placeholder="Nhập tin nhắn..." />
+            <button type="submit" disabled={loading || !input.trim()}>Gửi</button>
+          </form>
+        </div>
+      )}
+    </>
   );
 }

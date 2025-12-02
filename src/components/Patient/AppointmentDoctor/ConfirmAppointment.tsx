@@ -1,8 +1,8 @@
 import { Button, Card, Descriptions, Input, Typography, message, Spin, notification } from 'antd';
 import React, { useState } from 'react';
-import { FaArrowLeft, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { FaArrowLeft, FaCheckCircle } from 'react-icons/fa';
 import dayjs from 'dayjs';
-import { createAppointmentBySpecialty, type AppointmentPayload, type AppointmentByDoctorPayload, createAppointmentByDoctor } from '../../../services/AppointmentService';
+import { type AppointmentByDoctorPayload, createAppointmentByDoctor } from '../../../services/AppointmentService';
 import { type HealthProfile } from '../../../services/HealthProfileService';
 import { useAuth } from '../../../contexts/AuthContext';
 
@@ -24,7 +24,7 @@ interface ConfirmAppointmentProps {
 }
 
 
-const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ doctorId, doctorName, specialtyId, specialtyName, dateTime, patientId, displayName, displayPhone, profile, onBack, onSuccess }) => {
+const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ doctorId, doctorName, specialtyName, dateTime, patientId, displayName, displayPhone, profile, onBack, onSuccess }) => {
     const { user } = useAuth();
     const [reason, setReason] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -74,16 +74,16 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ doctorId, docto
 
             <Card title="Thông tin Lịch hẹn" variant='outlined' className="mb-6 ">
                 <Descriptions column={1} bordered size="small">
-                    <Descriptions.Item label="Chuyên khoa" labelStyle={{ fontWeight: 'bold' }}>
+                    <Descriptions.Item label="Chuyên khoa" styles={{ label: { fontWeight: 'bold', width: '30%' } }}>
                         {specialtyName}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Bác sĩ" labelStyle={{ fontWeight: 'bold' }}>
+                    <Descriptions.Item label="Bác sĩ" styles={{ label: { fontWeight: 'bold', width: '30%' } }}>
                         {doctorName}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Ngày khám" labelStyle={{ fontWeight: 'bold' }}>
+                    <Descriptions.Item label="Ngày khám" styles={{ label: { fontWeight: 'bold', width: '30%' } }}>
                         {dayjs(dateTime.date).format('dddd, DD/MM/YYYY')}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Khung giờ" labelStyle={{ fontWeight: 'bold' }}>
+                    <Descriptions.Item label="Khung giờ" styles={{ label: { fontWeight: 'bold', width: '30%' } }}>
                         {dateTime.timeSlot}
                     </Descriptions.Item>
                 </Descriptions>
@@ -91,13 +91,13 @@ const ConfirmAppointment: React.FC<ConfirmAppointmentProps> = ({ doctorId, docto
 
             <Card title="Thông tin Hồ sơ Sức khỏe" variant='outlined' className="mb-6 bg-blue-50">
                 <Descriptions column={1} bordered size="small">
-                    <Descriptions.Item label="Tên" labelStyle={{ fontWeight: 'bold' }}>
+                    <Descriptions.Item label="Tên" styles={{ label: { fontWeight: 'bold', width: '30%' } }}>
                         {displayName}
                     </Descriptions.Item>
-                    <Descriptions.Item label="SĐT" labelStyle={{ fontWeight: 'bold' }}>
+                    <Descriptions.Item label="SĐT" styles={{ label: { fontWeight: 'bold', width: '30%' } }}>
                         {displayPhone}
                     </Descriptions.Item>
-                    <Descriptions.Item label="email" labelStyle={{ fontWeight: 'bold' }}>
+                    <Descriptions.Item label="email" styles={{ label: { fontWeight: 'bold', width: '30%' } }}>
                         {user?.email || 'Chưa có'}
                     </Descriptions.Item>
                 </Descriptions>

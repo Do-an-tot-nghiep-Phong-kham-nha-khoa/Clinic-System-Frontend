@@ -1,5 +1,5 @@
 // context/AuthContext.tsx
-import React, { createContext, useState, useCallback, useMemo, useEffect } from 'react';
+import React, { createContext, useState, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 

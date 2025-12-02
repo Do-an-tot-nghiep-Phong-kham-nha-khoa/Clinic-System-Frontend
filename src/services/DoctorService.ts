@@ -41,11 +41,29 @@ export interface DoctorProfile {
   experience: number; // Số năm kinh nghiệm
 }
 
+export interface DoctorProfileNew {
+  _id: string;
+  accountId: Account;
+  name: string;
+  specialtyId: Specialty;
+  phone: string;
+  experience: number; // Số năm kinh nghiệm
+}
+
+export interface Specialty {
+  _id: string;
+  name: string;
+}
+
 interface DoctorResponse {
   message: string;
   data: DoctorProfile;
 }
 
+interface DoctorResponseNew {
+  message: string;
+  data: DoctorProfileNew;
+}
 
 interface DoctorResponse {
   message: string;
@@ -147,7 +165,7 @@ export async function createDoctor(dto: Partial<DoctorProfile> | FormData, isFor
     throw e;
   }
 }
-export async function updateDoctor(id: string, dto: Partial<DoctorProfile> | FormData, isFormData = false): Promise<DoctorProfile | null> {
+export async function updateDoctor(dto: Partial<DoctorProfile>, id: string | FormData, isFormData = false): Promise<DoctorProfile | null> {
   const url = `/doctors/${id}`;
   try {
     const isFD = isFormData || (typeof FormData !== 'undefined' && dto instanceof FormData);
@@ -204,11 +222,11 @@ export async function getDoctors(specialtyId?: string): Promise<Doctor[]> {
   }
 }
 
-export async function getDoctorByAccountId(accountId: string): Promise<DoctorProfile> {
+export async function getDoctorByAccountId(accountId: string): Promise<DoctorProfileNew> {
   const url = `/doctors/account/${accountId}`;
 
   try {
-    const res = await api.get<DoctorResponse>(url);
+    const res = await api.get<DoctorResponseNew>(url);
     return res.data.data;
   } catch (error) {
     throw new Error('Lỗi không xác định khi tải hồ sơ bác sĩ.');

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Form, Button, message, Checkbox, Space, Input, Typography, Divider, Alert, Card, Tooltip } from 'antd';
 import type { Role, PermissionItem } from '../../services/RoleService';
 import { SaveOutlined, CloseOutlined, WarningOutlined, SettingOutlined } from '@ant-design/icons';

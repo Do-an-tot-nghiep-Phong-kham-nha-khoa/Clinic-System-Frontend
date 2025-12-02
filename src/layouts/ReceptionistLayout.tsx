@@ -10,7 +10,7 @@ import {
 } from "react-icons/md";
 import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
-import { FaFileMedical, FaMoneyBill } from "react-icons/fa";
+import { FaMoneyBill } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 
 const { Header, Sider, Content } = Layout;

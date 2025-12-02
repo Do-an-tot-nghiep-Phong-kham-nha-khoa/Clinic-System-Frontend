@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Button, Form, message, Card } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import api from '../../services/Api';
-import {resetPassword} from '../../services/AccountService';
+import { resetPassword } from '../../services/AccountService';
 const ResetPassword: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();

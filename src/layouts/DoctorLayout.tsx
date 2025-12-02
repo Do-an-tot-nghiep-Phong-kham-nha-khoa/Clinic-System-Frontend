@@ -9,7 +9,7 @@ import {
 } from "react-icons/md";
 import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
-import { FaFileMedical, FaHandHoldingMedical } from "react-icons/fa";
+import { FaHandHoldingMedical } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import { CgProfile } from "react-icons/cg";
 

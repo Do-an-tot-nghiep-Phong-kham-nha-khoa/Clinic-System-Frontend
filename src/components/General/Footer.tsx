@@ -1,4 +1,3 @@
-import React from "react";
 import { FaEnvelope, FaFacebook, FaInstagram, FaPhone, FaTwitter, FaYoutube } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 

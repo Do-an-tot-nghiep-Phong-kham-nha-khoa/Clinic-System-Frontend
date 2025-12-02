@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, message, Card, Typography } from "antd";
+import { Table, Card, Typography } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -48,12 +48,6 @@ const PatientTreatmentHistory = () => {
                 setTotal(res.meta?.total || 0);
             } catch (err) {
                 console.error("Error loading treatments:", err);
-                setTreatments([]);
-                setTotal(0);
-                // Chỉ hiển thị lỗi nếu thực sự có lỗi server, không phải do không có dữ liệu
-                if (err && typeof err === 'object' && 'response' in err) {
-                    message.error("Không thể tải dữ liệu ca khám");
-                }
             } finally {
                 setLoading(false);
             }
