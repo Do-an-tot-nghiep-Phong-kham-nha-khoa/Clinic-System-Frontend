@@ -33,7 +33,7 @@ import PatientAppointmentDoctor from './pages/Patient/PatientAppointmentDoctor'
 import PatientAppointment from './pages/Patient/PatientAppointment'
 import PatientTreatmentHistory from './pages/Patient/PatientTreatmentHistory'
 import PatientAppointmentSpecialty from './pages/Patient/PatientAppointmentSpecialty'
-import Chat from './components/chat'
+import Chat from './pages/Patient/AIChatBot'
 // Receptionist Pages & Layouts
 import ReceptionistLayout from './layouts/ReceptionistLayout'
 import ReceptionistProfile from './pages/Receptionist/ReceptionistProfile'
