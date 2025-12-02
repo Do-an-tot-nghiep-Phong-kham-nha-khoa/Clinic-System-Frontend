@@ -33,7 +33,8 @@ const DoctorsPage: React.FC = () => {
   const fetchSpecialties = async () => {
     try {
       const list = await getSpecialties();
-      setSpecialties(list || []);
+      // getSpecialties returns an object like { items: Specialty[], meta: ... }
+      setSpecialties(list?.items ?? []);
     } catch (e) {
       // ignore
     }

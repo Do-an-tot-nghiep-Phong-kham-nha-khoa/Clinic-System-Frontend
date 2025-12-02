@@ -147,7 +147,7 @@ export async function createDoctor(dto: Partial<DoctorProfile> | FormData, isFor
     throw e;
   }
 }
-export async function updateDoctor(dto: Partial<DoctorProfile> | FormData, isFormData = false): Promise<DoctorProfile | null> {
+export async function updateDoctor(id: string, dto: Partial<DoctorProfile> | FormData, isFormData = false): Promise<DoctorProfile | null> {
   const url = `/doctors/${id}`;
   try {
     const isFD = isFormData || (typeof FormData !== 'undefined' && dto instanceof FormData);

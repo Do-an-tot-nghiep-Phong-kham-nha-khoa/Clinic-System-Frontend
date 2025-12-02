@@ -24,6 +24,7 @@ interface DoctorProfile {
   specialtyName: string;
   phone: string;
   experience: number;
+  avatar?: string;
 }
 
 interface PatientProfile {
