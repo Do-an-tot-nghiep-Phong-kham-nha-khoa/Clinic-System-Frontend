@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar } from 'antd';
-import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined } from '@ant-design/icons';
+import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar, Button, Input, message } from 'antd';
+import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, InfoCircleOutlined, EditOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
-import { getDoctorById, type Doctor } from "../../services/DoctorService";
+import { getDoctorById, type Doctor, updateDoctorBio } from "../../services/DoctorService";
 import { getAccountById } from '../../services/AccountService';
 import NavbarDark from '../General/NavbarDark';
 import Footer from '../General/Footer';
@@ -11,6 +11,9 @@ const DoctorProfileView: React.FC = () => {
     const [doctor, setDoctor] = useState<Doctor | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [editingBio, setEditingBio] = useState<boolean>(false);
+    const [bioValue, setBioValue] = useState<string>('');
+    const [updatingBio, setUpdatingBio] = useState<boolean>(false);
 
     // Lấy doctorId từ URL
     const { doctorId } = useParams<{ doctorId: string }>();
@@ -32,6 +35,10 @@ const DoctorProfileView: React.FC = () => {
             setDoctor(data);
             console.log(data)
             setError(null);
+            // Set bio value for editing
+            if (data) {
+                setBioValue(data.bio || '');
+            }
         } catch (err) {
             console.error("Lỗi khi tải dữ liệu bác sĩ:", err);
             setError("Không thể tải thông tin hồ sơ bác sĩ. Vui lòng thử lại.");
@@ -43,6 +50,35 @@ const DoctorProfileView: React.FC = () => {
     useEffect(() => {
         fetchDoctorData();
     }, [doctorId]);
+
+    const handleEditBio = () => {
+        setEditingBio(true);
+        setBioValue(doctor?.bio || '');
+    };
+
+    const handleCancelEditBio = () => {
+        setEditingBio(false);
+        setBioValue(doctor?.bio || '');
+    };
+
+    const handleSaveBio = async () => {
+        if (!doctor) return;
+
+        try {
+            setUpdatingBio(true);
+            const updatedDoctor = await updateDoctorBio(doctor._id, bioValue);
+            if (updatedDoctor) {
+                setDoctor({ ...doctor, bio: bioValue });
+                message.success('Cập nhật tiểu sử thành công!');
+            }
+            setEditingBio(false);
+        } catch (error) {
+            console.error('Lỗi khi cập nhật tiểu sử:', error);
+            message.error('Không thể cập nhật tiểu sử. Vui lòng thử lại.');
+        } finally {
+            setUpdatingBio(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -87,6 +123,7 @@ const DoctorProfileView: React.FC = () => {
     const specialtyName = doctor.specialtyId?.name || 'Chưa xác định';
     const experience = doctor.experience;
     const phone = doctor.phone || 'N/A';
+    const bio = doctor.bio || 'Chưa có thông tin tiểu sử.';
 
     return (
         <div className=''>
@@ -102,23 +139,19 @@ const DoctorProfileView: React.FC = () => {
                             </div>
                         }
                     >
-                        <div className="flex flex-col md:flex-row items-start md:items-center mb-6 border-b pb-4">
-                            <Avatar
-                                size={96}
-                                src={(doctor as any).avatar || (doctor.accountId as any)?.avatar}
-                                icon={<UserOutlined />}
-                                className="bg-cyan-100 text-cyan-600 text-5xl font-bold shadow-lg mr-6 flex-shrink-0 !object-contain"
-                            >
-                                {(!((doctor as any).avatar) && !(doctor.accountId as any)?.avatar) && doctor.name.charAt(0)}
-                            </Avatar>
+                        <div className="relative mb-14">
+                            <div className="h-80 w-full bg-cover bg-center bg-[url('https://png.pngtree.com/background/20210711/original/pngtree-blue-flat-medical-banner-background-picture-image_1101136.jpg')] rounded-xl"></div>
 
-                            <div className="mt-4 md:mt-0 mx-4">
-                                <h3 className="text-3xl font-extrabold text-gray-900 leading-tight">{doctor.name}</h3>
-                                <div className="mt-1 space-x-2">
-                                    <Tag color="processing" icon={<ExperimentOutlined />} className="text-base px-3 py-1 font-semibold">
-                                        {specialtyName}
-                                    </Tag>
-                                </div>
+
+                            <div className="absolute left-6 bottom-[-48px]">
+                                <Avatar
+                                    size={144}
+                                    src={(doctor as any).avatar || (doctor.accountId as any)?.avatar}
+                                    icon={<UserOutlined />}
+                                    className="bg-cyan-100 text-cyan-600 text-5xl font-bold shadow-lg !object-contain"
+                                >
+                                    {(!((doctor as any).avatar) && !(doctor.accountId as any)?.avatar) && doctor.name.charAt(0)}
+                                </Avatar>
                             </div>
                         </div>
 
@@ -153,6 +186,59 @@ const DoctorProfileView: React.FC = () => {
                             >
                                 {specialtyName}
                             </Descriptions.Item>
+                            <Descriptions.Item
+                                label={<span className="font-medium flex items-center"><InfoCircleOutlined className="mr-2" /> Tiểu Sử</span>}
+                            >
+                                <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                        {editingBio ? (
+                                            <Input.TextArea
+                                                value={bioValue}
+                                                onChange={(e) => setBioValue(e.target.value)}
+                                                placeholder="Nhập tiểu sử bác sĩ..."
+                                                rows={4}
+                                                className="w-full"
+                                                disabled={updatingBio}
+                                            />
+                                        ) : (
+                                            <span className="text-gray-700">{bio}</span>
+                                        )}
+                                    </div>
+                                    <div className="ml-4 flex space-x-2">
+                                        {editingBio ? (
+                                            <>
+                                                <Button
+                                                    type="primary"
+                                                    icon={<SaveOutlined />}
+                                                    onClick={handleSaveBio}
+                                                    loading={updatingBio}
+                                                    size="small"
+                                                >
+                                                    Lưu
+                                                </Button>
+                                                <Button
+                                                    icon={<CloseOutlined />}
+                                                    onClick={handleCancelEditBio}
+                                                    disabled={updatingBio}
+                                                    size="small"
+                                                >
+                                                    Hủy
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <Button
+                                                type="link"
+                                                icon={<EditOutlined />}
+                                                onClick={handleEditBio}
+                                                size="small"
+                                            >
+                                                Sửa
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            </Descriptions.Item>
+
                         </Descriptions>
                     </Card>
                 </div>
