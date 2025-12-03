@@ -16,7 +16,8 @@ import {
     getAppointmentsLast7Days,
     getRevenueLast7Days,
     getAppointmentStatusStats,
-    getTotalRevenue
+    getTotalRevenue,
+    getTotalAppointments
 } from "../../services/StatsService";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
@@ -54,6 +55,7 @@ const AdminDashboard = () => {
     const [statusStats, setStatusStats] = useState<any[]>([]);
     const [revenueLast7Days, setRevenueLast7Days] = useState<number>(0);
     const [totalRevenue, setTotalRevenue] = useState<number>(0);
+    const [totalAppointments, setTotalAppointments] = useState<number>(0);
 
     const [loading, setLoading] = useState(true);
     const [loadingRevenue, setLoadingRevenue] = useState<boolean>(true);
@@ -102,9 +104,11 @@ const AdminDashboard = () => {
         try {
             const last7 = await getAppointmentsLast7Days();
             const status = await getAppointmentStatusStats();
+            const totalApp = await getTotalAppointments();
 
             setLast7DaysAppointments(last7);
             setStatusStats(status);
+            setTotalAppointments(totalApp.totalAppointments || 0);
         } catch (err) {
             message.error("Không thể tải dữ liệu thống kê");
             console.error(err);
@@ -193,8 +197,8 @@ const AdminDashboard = () => {
                     loading={loading}
                 />
                 <StatCard
-                    title="Tổng số trạng thái khác nhau"
-                    value={statusStats.length}
+                    title="Tổng số lịch hẹn trong hệ thống"
+                    value={totalAppointments}
                     loading={loading}
                 />
                 <StatCard

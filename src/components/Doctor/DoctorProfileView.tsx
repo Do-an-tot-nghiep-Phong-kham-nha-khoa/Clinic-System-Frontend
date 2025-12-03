@@ -204,38 +204,6 @@ const DoctorProfileView: React.FC = () => {
                                             <span className="text-gray-700">{bio}</span>
                                         )}
                                     </div>
-                                    <div className="ml-4 flex space-x-2">
-                                        {editingBio ? (
-                                            <>
-                                                <Button
-                                                    type="primary"
-                                                    icon={<SaveOutlined />}
-                                                    onClick={handleSaveBio}
-                                                    loading={updatingBio}
-                                                    size="small"
-                                                >
-                                                    Lưu
-                                                </Button>
-                                                <Button
-                                                    icon={<CloseOutlined />}
-                                                    onClick={handleCancelEditBio}
-                                                    disabled={updatingBio}
-                                                    size="small"
-                                                >
-                                                    Hủy
-                                                </Button>
-                                            </>
-                                        ) : (
-                                            <Button
-                                                type="link"
-                                                icon={<EditOutlined />}
-                                                onClick={handleEditBio}
-                                                size="small"
-                                            >
-                                                Sửa
-                                            </Button>
-                                        )}
-                                    </div>
                                 </div>
                             </Descriptions.Item>
 

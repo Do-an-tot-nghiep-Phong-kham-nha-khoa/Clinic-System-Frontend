@@ -1,27 +1,26 @@
-import axios from "axios";
-
-const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
+import api from "./Api";
 
 export async function getAppointmentsLast7Days() {
-    const url = `${BASE_URL}/stats/appointments/last7days`;
-    const res = await axios.get(url);
+    const res = await api.get("/stats/appointments/last7days");
     return res.data;
 }
 
 export async function getRevenueLast7Days() {
-    const url = `${BASE_URL}/stats/revenue/last7days`;
-    const res = await axios.get(url);
+    const res = await api.get("/stats/revenue/last7days");
     return res.data;
 }
 
 export async function getAppointmentStatusStats() {
-    const url = `${BASE_URL}/stats/appointments/status`;
-    const res = await axios.get(url);
+    const res = await api.get("/stats/appointments/status");
     return res.data;
 }
 
 export async function getTotalRevenue() {
-    const url = `${BASE_URL}/stats/revenue/total`;
-    const res = await axios.get(url);
+    const res = await api.get("/stats/revenue/total");
+    return res.data;
+}
+
+export async function getTotalAppointments() {
+    const res = await api.get("/stats/appointments/total");
     return res.data;
 }

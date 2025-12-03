@@ -35,7 +35,7 @@ import PatientTreatmentHistory from './pages/Patient/PatientTreatmentHistory'
 import PatientAppointmentSpecialty from './pages/Patient/PatientAppointmentSpecialty'
 import PatientInvoices from './pages/Patient/PatientInvoices'
 import PaymentResult from './pages/Patient/PaymentResult'
-import Chat from './components/chat'
+import Chat from './pages/Patient/AIChatBot'
 // Receptionist Pages & Layouts
 import ReceptionistLayout from './layouts/ReceptionistLayout'
 import ReceptionistProfile from './pages/Receptionist/ReceptionistProfile'
