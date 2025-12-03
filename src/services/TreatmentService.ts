@@ -1,5 +1,6 @@
 import api from "./Api";
 
+
 export type CreateTreatmentDto = {
     healthProfile: string;
     doctor: string;

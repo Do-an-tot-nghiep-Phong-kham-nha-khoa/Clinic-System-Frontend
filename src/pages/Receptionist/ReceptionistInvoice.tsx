@@ -8,6 +8,7 @@ import {
     type InvoiceMeta,
     type InvoiceStatus,
     updateInvoiceStatus,
+    payCashInvoice,
 } from "../../services/InvoiceService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
 import InvoiceDetailModal from "../../components/Receptionist/InvoiceDetailModal";
@@ -152,6 +153,24 @@ const ReceptionistInvoice = () => {
         setInvoiceDetailOpen(true);
     };
 
+    const handleCashPayment = async (invoiceId: string) => {
+        Modal.confirm({
+            title: "Xác nhận thanh toán tiền mặt",
+            content: "Bệnh nhân đã thanh toán tiền mặt tại quầy?",
+            okText: "Xác nhận",
+            cancelText: "Hủy",
+            onOk: async () => {
+                try {
+                    await payCashInvoice(invoiceId);
+                    message.success("Đã xác nhận thanh toán thành công");
+                    fetchInvoices();
+                } catch (error) {
+                    message.error("Lỗi khi xác nhận thanh toán");
+                }
+            },
+        });
+    };
+
     const columns = [
         {
             title: 'Mã HĐ',
@@ -197,25 +216,42 @@ const ReceptionistInvoice = () => {
         {
             title: 'Hành động',
             key: 'actions',
-            width: 140,
+            width: 280,
             render: (_: any, record: Invoice) => (
-                <div className="flex gap-2 justify-end">
-                    <ButtonPrimary
-                        type="primary"
-                        icon={<FaRegEdit />}
-                        disabled={record.status === 'Cancelled' || record.status === 'Refunded'}
-                        onClick={() => openStatusModal(record)}
-                    >
-                        Sửa trạng thái
-                    </ButtonPrimary>
+                <div className="flex flex-col gap-1.5">
+                    {record.status === 'Pending' && (
+                        <Button
+                            type="primary"
+                            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                            onClick={() => handleCashPayment(record._id)}
+                            size="small"
+                            block
+                        >
+                            Thanh toán
+                        </Button>
+                    )}
+                    <div className="flex gap-1.5">
+                        <ButtonPrimary
+                            type="primary"
+                            icon={<FaRegEdit />}
+                            disabled={record.status === 'Cancelled' || record.status === 'Refunded'}
+                            onClick={() => openStatusModal(record)}
+                            size="small"
+                            style={{ flex: 1 }}
+                        >
+                            Sửa trạng thái
+                        </ButtonPrimary>
 
-                    <Button
-                        type="default"
-                        onClick={() => handlePrintInvoice(record._id)}
-                        icon={<FaInfoCircle />}
-                    >
-                        Xem chi tiết
-                    </Button>
+                        <Button
+                            type="default"
+                            onClick={() => handlePrintInvoice(record._id)}
+                            icon={<FaInfoCircle />}
+                            size="small"
+                            style={{ flex: 1 }}
+                        >
+                            Chi tiết
+                        </Button>
+                    </div>
                 </div>
             )
         }
