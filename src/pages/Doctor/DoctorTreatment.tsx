@@ -18,24 +18,26 @@ const DoctorTreatment = () => {
         temperature: "",
         symptoms: "",
         diagnosis: "",
-    });
-    const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+    });    const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
     const [currentLabOrderId, setCurrentLabOrderId] = useState<string | null>(null);
+    const [currentLabOrderData, setCurrentLabOrderData] = useState<any>(null);
     const [currentPrescriptionId, setCurrentPrescriptionId] = useState<string | null>(null);
+    const [currentPrescriptionData, setCurrentPrescriptionData] = useState<any>(null);
     const [isSaving, setIsSaving] = useState(false);
 
     const handleDoctorIdChange = (id: string) => {
         setDoctorId(id);
-    };
-
-    const goPreCheck = (appointment: any) => {
+    };    
+    const goPreCheck = (appointment: any) => {        
         setSelectedAppointment(appointment);
         setCurrentLabOrderId(null);
+        setCurrentLabOrderData(null);
         setCurrentPrescriptionId(null);
+        setCurrentPrescriptionData(null);
         setPrecheckData({
             bloodPressure: "",
             heartRate: "",
-            temperature: "",
+            temperature: "",        
             symptoms: "",
             diagnosis: "",
         });
@@ -57,17 +59,21 @@ const DoctorTreatment = () => {
     const goBackToList = () => {
         setSelectedAppointment(null);
         setCurrentLabOrderId(null);
+        setCurrentLabOrderData(null);
         setCurrentPrescriptionId(null);
+        setCurrentPrescriptionData(null);
         setScreen("list");
     }
 
-    const handleLabOrderCreated = (labOrderId: string) => {
+    const handleLabOrderCreated = (labOrderId: string, labOrderData: any) => {
         setCurrentLabOrderId(labOrderId);
+        setCurrentLabOrderData(labOrderData);
         setScreen("precheck");
     }
 
-    const handlePrescriptionCreated = (prescriptionId: string) => {
+    const handlePrescriptionCreated = (prescriptionId: string, prescriptionData: any) => {
         setCurrentPrescriptionId(prescriptionId);
+        setCurrentPrescriptionData(prescriptionData);
         setScreen("precheck");
     }
 
@@ -126,9 +132,7 @@ const DoctorTreatment = () => {
                     onSelect={goPreCheck}
                     onDoctorIdChange={handleDoctorIdChange}
                 />
-            )}
-
-            {screen === "precheck" && selectedAppointment && (
+            )}            {screen === "precheck" && selectedAppointment && (
                 <PatientPreCheck
                     appointment={selectedAppointment}
                     precheckData={precheckData}
@@ -141,9 +145,12 @@ const DoctorTreatment = () => {
                     onBack={goBackToList}
 
                     currentLabOrderId={currentLabOrderId}
+                    currentLabOrderData={currentLabOrderData}
                     currentPrescriptionId={currentPrescriptionId}
+                    currentPrescriptionData={currentPrescriptionData}
                 />
-            )}            {screen === "createLabOrder" && selectedAppointment && doctorId && (
+            )}
+            {screen === "createLabOrder" && selectedAppointment && doctorId && (
                 <CreateLabOrder
                     healthProfileId={selectedAppointment.healthProfile_id._id}
                     onCreated={handleLabOrderCreated}

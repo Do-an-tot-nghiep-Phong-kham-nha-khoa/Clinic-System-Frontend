@@ -1,9 +1,9 @@
-import { Button, Input, Space, Card, Divider, message, Spin, Table, Empty, Typography } from "antd";
-import { UserOutlined, HeartOutlined, FileTextOutlined, SaveOutlined, ArrowLeftOutlined, ExperimentOutlined, MedicineBoxOutlined } from "@ant-design/icons";
+import { Button, Input, Space, Card, Divider, Table, Empty, Typography } from "antd";
+import { UserOutlined, HeartOutlined, FileTextOutlined, SaveOutlined, ArrowLeftOutlined, ExperimentOutlined, MedicineBoxOutlined, PrinterOutlined } from "@ant-design/icons";
 import ButtonPrimary from "../../../utils/ButtonPrimary";
 import { useEffect, useState } from "react";
-import { getPrescriptionById } from "../../../services/PrescriptionService";
-import { getLabOrderById } from "../../../services/LabOrderService";
+import LabOrderDetailModal from "./LabOrderDetailModal";
+import PrescriptionDetailModal from "./PrescriptionDetailModal";
 
 const { Text } = Typography;
 
@@ -25,7 +25,9 @@ interface Props {
     onGotoPrescription: () => void;
     onSaveTreatment: () => void;
     currentLabOrderId?: string | null;
+    currentLabOrderData?: any | null;
     currentPrescriptionId?: string | null;
+    currentPrescriptionData?: any | null;
 }
 
 const PatientPreCheck = ({
@@ -38,40 +40,31 @@ const PatientPreCheck = ({
     onGotoPrescription,
     onSaveTreatment,
     currentLabOrderId,
+    currentLabOrderData,
     currentPrescriptionId,
-}: Props) => {
-    const hp = appointment.healthProfile_id;
-    const owner = hp?.owner_detail;
-    const [labOrder, setLabOrder] = useState<any>(null);
+    currentPrescriptionData,
+}: Props) => {const hp = appointment.healthProfile_id;    const owner = hp?.owner_detail;    const [labOrder, setLabOrder] = useState<any>(null);
     const [prescription, setPrescription] = useState<any>(null);
-    const [loadingLab, setLoadingLab] = useState(false);
-    const [loadingPres, setLoadingPres] = useState(false);
+    const [labOrderModalOpen, setLabOrderModalOpen] = useState(false);
+    const [prescriptionModalOpen, setPrescriptionModalOpen] = useState(false);
 
-    // Fetch Lab Order
+    // Sử dụng data trực tiếp thay vì fetch API
     useEffect(() => {
-        if (currentLabOrderId) {
-            setLoadingLab(true);
-            getLabOrderById(currentLabOrderId)
-                .then(setLabOrder)
-                .catch(() => message.error("Không tải được chỉ định CLS"))
-                .finally(() => setLoadingLab(false));
+        if (currentLabOrderData) {
+            setLabOrder(currentLabOrderData);
         } else {
             setLabOrder(null);
         }
-    }, [currentLabOrderId]);
+    }, [currentLabOrderData]);
 
-    // Fetch Prescription
+    // Sử dụng prescription data trực tiếp thay vì fetch API
     useEffect(() => {
-        if (currentPrescriptionId) {
-            setLoadingPres(true);
-            getPrescriptionById(currentPrescriptionId)
-                .then(setPrescription)
-                .catch(() => message.error("Không tải được đơn thuốc"))
-                .finally(() => setLoadingPres(false));
+        if (currentPrescriptionData) {
+            setPrescription(currentPrescriptionData);
         } else {
             setPrescription(null);
         }
-    }, [currentPrescriptionId]);
+    }, [currentPrescriptionData]);
 
     const handleDataChange = (field: keyof PrecheckData, value: string) => {
         onPrecheckDataChange({
@@ -164,7 +157,8 @@ const PatientPreCheck = ({
                                 onChange={(e) => handleDataChange("diagnosis", e.target.value)}
                             />
                         </Space>
-                    </Card>                    <div className="mb-4 "></div>
+                    </Card>                    
+                    <div className="mb-4 "></div>
                     <Card variant="outlined" className="shadow-md">
                         <div className="text-base font-semibold mb-3"><FileTextOutlined /> Hành động</div>
                         <Space size="middle" className="w-full justify-end">
@@ -195,26 +189,35 @@ const PatientPreCheck = ({
                         </Space>
                     </Card>
                 </div>
-            </div>
-
-            {/* Hiển thị 2 bảng lab order và prescription nếu có */}
+            </div>            {/* Hiển thị 2 bảng lab order và prescription nếu có */}
             <Card
                 title={<><ExperimentOutlined /> Chỉ định Cận Lâm Sàng</>}
                 variant="outlined"
                 className="shadow-md !mt-4"
+                extra={
+                    labOrder && (
+                        <ButtonPrimary 
+                            type="primary" 
+                            icon={<PrinterOutlined />}
+                            onClick={() => setLabOrderModalOpen(true)}
+                        >
+                            In Phiếu Chỉ Định
+                        </ButtonPrimary>
+                    )
+                }
             >
-                {loadingLab ? <Spin /> : labOrder ? (
+                {labOrder ? (
                     <Table
                         size="small"
                         pagination={false}
                         dataSource={labOrder.items}
                         scroll={{ x: 1200 }}
-                        rowKey={(record) => record.serviceId || Math.random().toString()}
+                        rowKey={(record) => record._id || record.serviceId?._id || Math.random().toString()}
                         columns={[
                             {
                                 title: "Dịch vụ",
                                 key: "name",
-                                render: (_: any, record: any) => record.service?.name || "Dịch vụ không xác định"
+                                render: (_: any, record: any) => record.serviceId?.name || "Dịch vụ không xác định"
                             },
                             { title: "Số lượng", dataIndex: "quantity", key: "quantity", width: 80, align: "center" as const },
                             { title: "Ghi chú", dataIndex: "description", key: "description" },
@@ -228,17 +231,25 @@ const PatientPreCheck = ({
                 ) : (
                     <Empty description="Chưa có chỉ định cận lâm sàng" />
                 )}
-            </Card>
+            </Card>              
             {/* Đơn thuốc đã tạo */}
             <Card
                 title={<><MedicineBoxOutlined /> Đơn Thuốc</>}
                 variant="outlined"
                 className="shadow-md !mt-4"
-
+                extra={
+                    prescription && (
+                        <ButtonPrimary 
+                            type="primary" 
+                            icon={<PrinterOutlined />}
+                            onClick={() => setPrescriptionModalOpen(true)}
+                        >
+                            In Đơn Thuốc
+                        </ButtonPrimary>
+                    )
+                }
             >
-                {loadingPres ? (
-                    <div className="text-center py-8"><Spin /></div>
-                ) : prescription ? (
+                {prescription ? (
                     <Table
                         size="small"
                         pagination={false}
@@ -284,10 +295,25 @@ const PatientPreCheck = ({
                             },
                         ]}
                     />
-                ) : (
-                    <Empty description="Chưa kê đơn thuốc" />
+                ) : (                    
+                <Empty description="Chưa kê đơn thuốc" />
                 )}
-            </Card>
+            </Card>            
+            {/* Lab Order Detail Modal */}
+            <LabOrderDetailModal
+                open={labOrderModalOpen}
+                labOrderData={labOrder}
+                patientInfo={owner}
+                onClose={() => setLabOrderModalOpen(false)}
+            />
+
+            {/* Prescription Detail Modal */}
+            <PrescriptionDetailModal
+                open={prescriptionModalOpen}
+                prescriptionData={prescription}
+                patientInfo={owner}
+                onClose={() => setPrescriptionModalOpen(false)}
+            />
         </div>
     );
 };

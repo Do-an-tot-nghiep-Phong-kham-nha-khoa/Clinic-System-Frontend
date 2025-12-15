@@ -11,7 +11,7 @@ const { Text, Title } = Typography;
 
 type Props = {
     healthProfileId: string;
-    onCreated: (labOrderId: string) => void;
+    onCreated: (labOrderId: string, labOrderData: any) => void;
     onBack: () => void;
 }
 
@@ -84,14 +84,12 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
                 quantity: item.quantity,
                 description: item.description,
             }))
-        };
-
-        try {
+        };        try {
             setLoading(true);
             const result = await createLabOrder(payload);
 
             message.success("Tạo chỉ định Cận Lâm Sàng thành công!");
-            onCreated(result._id);
+            onCreated(result._id, result);
 
         } catch (error) {
             message.error("Tạo chỉ định thất bại. Vui lòng thử lại.");
