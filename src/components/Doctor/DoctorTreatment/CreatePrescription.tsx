@@ -11,7 +11,7 @@ const { TextArea } = Input;
 
 interface Props {
     healthProfileId: string;
-    onCreated: (prescriptionId: string) => void; // Hàm callback trả về ID
+    onCreated: (prescriptionId: string, prescriptionData: any) => void;
     onBack: () => void;
 }
 
@@ -131,13 +131,11 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
                 duration: item.duration,
                 instruction: item.instruction,
             }))
-        };
-
-        try {
+        };        try {
             setLoading(true);
             const result = await createPrescription(payload);
             message.success("Tạo đơn thuốc thành công!");
-            onCreated(result.id);
+            onCreated(result.id, result);
         } catch (error) {
             message.error("Tạo đơn thuốc thất bại. Vui lòng thử lại.");
         } finally {
@@ -166,7 +164,8 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
                 </ButtonPrimary>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">                {/* Cột 1 & 2: Danh sách Thuốc */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">                
+                {/* Cột 1 & 2: Danh sách Thuốc */}
                 <Card
                     title="Danh Sách Thuốc Có Sẵn"
                     variant="outlined"
