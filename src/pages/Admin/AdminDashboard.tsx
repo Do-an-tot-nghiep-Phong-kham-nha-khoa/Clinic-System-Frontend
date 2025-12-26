@@ -53,6 +53,7 @@ const AdminDashboard = () => {
     const [statusStats, setStatusStats] = useState<any[]>([]);
     const [revenueLast7Days, setRevenueLast7Days] = useState<number>(0);
     const [totalRevenue, setTotalRevenue] = useState<number>(0);
+    const [totalAppointments, setTotalAppointments] = useState<number>(0);
 
     const [loading, setLoading] = useState(true);
 
@@ -169,8 +170,8 @@ const AdminDashboard = () => {
                     loading={loading}
                 />
                 <StatCard
-                    title="Tổng số trạng thái khác nhau"
-                    value={statusStats.length}
+                    title="Tổng số lịch hẹn trong hệ thống"
+                    value={totalAppointments}
                     loading={loading}
                 />
                 <StatCard

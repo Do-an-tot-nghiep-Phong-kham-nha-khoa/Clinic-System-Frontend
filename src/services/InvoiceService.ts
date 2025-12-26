@@ -110,11 +110,15 @@ export async function getInvoiceById(id: string): Promise<Invoice> {
     return res?.data ?? res?.data?.data;
 }
 
-// Lấy danh sách hóa đơn theo Patient ID
-export async function getInvoicesByPatientId(patientId: string): Promise<Invoice[]> {
-    const url = `/invoices/patient`;
-    const res = await api.get(url, { params: { patientId } });
-    return res?.data?.data ?? [];
+// Lấy danh sách hóa đơn của bệnh nhân đang đăng nhập
+export async function getInvoicesByPatient(params: InvoiceQuery = {}): Promise<{ data: Invoice[]; meta: InvoiceMeta | null }> {
+    const url = `/invoices/patient/${params.id}`;
+    const res = await api.get(url);
+    // Backend trả về { invoices: [...] }, cần format lại
+    return { 
+        data: res?.data?.invoices || [], 
+        meta: null 
+    };
 }
 
 // Câp nhật trạng thái của một hóa đơn
@@ -128,5 +132,19 @@ export async function updateInvoiceStatus(id: string, dto: UpdateInvoiceStatusDt
 export async function createInvoice(dto: CreateInvoiceDto): Promise<Invoice> {
     const url = `/invoices`;
     const res = await api.post(url, dto);
+    return res?.data ?? res?.data?.data;
+}
+
+// Thanh toán tiền mặt
+export async function payCashInvoice(invoiceId: string, amount?: number, note?: string): Promise<any> {
+    const url = `/invoices/${invoiceId}/pay/cash`;
+    const res = await api.post(url, { amount, note });
+    return res?.data ?? res?.data?.data;
+}
+
+// Create a VNPay-like checkout (mock) and return checkout URL
+export async function createVNPayPayment(invoiceId: string, returnUrl?: string): Promise<{ checkoutUrl: string }> {
+    const url = `/invoices/${invoiceId}/pay/vnpay`;
+    const res = await api.post(url, { returnUrl });
     return res?.data ?? res?.data?.data;
 }

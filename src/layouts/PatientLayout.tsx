@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import { FaListCheck } from "react-icons/fa6";
 import { FaFileMedical, FaRegCalendarPlus, FaRobot } from "react-icons/fa";
+import { MdOutlineReceiptLong } from "react-icons/md";
 import { useAuth } from "../contexts/AuthContext";
 
 const { Header, Sider, Content } = Layout;
@@ -64,6 +65,12 @@ const PatientLayout = () => {
             onClick: () => navigate("/patient/medical-records"),
         },
         {
+            key: "invoices",
+            icon: <MdOutlineReceiptLong size={20} />,
+            label: "Hóa đơn của tôi",
+            onClick: () => navigate("/patient/invoices"),
+        },
+        {
             key: "chatbot",
             icon: <FaRobot size={20} />,
             label: "Chatbot tư vấn",
@@ -74,6 +81,8 @@ const PatientLayout = () => {
     const pathname = location.pathname || "";
     let selectedKey = "profile";
     if (pathname.startsWith("/patient/medical-records")) selectedKey = "medical-records";
+    else if (pathname.startsWith("/patient/invoices")) selectedKey = "invoices";
+    else if (pathname.startsWith("/patient/payment-result")) selectedKey = "invoices";
     else if (pathname.startsWith("/patient/chatbot")) selectedKey = "chatbot";
     else if (pathname.startsWith("/patient/health-profile")) selectedKey = "health-profile";
     else if (pathname.startsWith("/patient/appointments-doctor")) selectedKey = "appointments-doctor";

@@ -33,7 +33,9 @@ import PatientAppointmentDoctor from './pages/Patient/PatientAppointmentDoctor'
 import PatientAppointment from './pages/Patient/PatientAppointment'
 import PatientTreatmentHistory from './pages/Patient/PatientTreatmentHistory'
 import PatientAppointmentSpecialty from './pages/Patient/PatientAppointmentSpecialty'
-import Chat from './components/chat'
+import PatientInvoices from './pages/Patient/PatientInvoices'
+import PaymentResult from './pages/Patient/PaymentResult'
+import Chat from './pages/Patient/AIChatBot'
 // Receptionist Pages & Layouts
 import ReceptionistLayout from './layouts/ReceptionistLayout'
 import ReceptionistProfile from './pages/Receptionist/ReceptionistProfile'
@@ -106,6 +108,8 @@ function App() {
           <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
           <Route path='appointments-doctor' element={<PatientAppointmentDoctor />} />
           <Route path='medical-records' element={<PatientTreatmentHistory />} />
+          <Route path='invoices' element={<PatientInvoices />} />
+          <Route path='payment-result' element={<PaymentResult />} />
           <Route path='chatbot' element={<Chat />} />
           <Route path='health-profile' element={<HealthProfile />} />
         </Route>
