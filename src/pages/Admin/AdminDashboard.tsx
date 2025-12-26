@@ -12,16 +12,13 @@ import {
 } from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
 
-import {
-    getAppointmentsLast7Days,
-    getRevenueLast7Days,
-    getAppointmentStatusStats,
-    getTotalRevenue
-} from "../../services/StatsService";
+import { getDashboardStats } from "../../services/StatsService";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 const { Text } = Typography;
+
+/* ---------- STAT CARD (GIỮ NGUYÊN) ---------- */
 
 type StatCardProps = {
     title: string;
@@ -49,6 +46,8 @@ const StatCard = ({ title, value, height, loading = false }: StatCardProps) => {
     );
 };
 
+/* ---------- MAIN ---------- */
+
 const AdminDashboard = () => {
     const [last7DaysAppointments, setLast7DaysAppointments] = useState<any[]>([]);
     const [statusStats, setStatusStats] = useState<any[]>([]);
@@ -56,64 +55,38 @@ const AdminDashboard = () => {
     const [totalRevenue, setTotalRevenue] = useState<number>(0);
 
     const [loading, setLoading] = useState(true);
-    const [loadingRevenue, setLoadingRevenue] = useState<boolean>(true);
 
     useEffect(() => {
-        loadStats();
-    }, []);
-
-    useEffect(() => {
-        const fetchRevenue = async () => {
+        const loadDashboard = async () => {
             try {
-                setLoadingRevenue(true);
+                setLoading(true);
 
-                const [last7Res, totalRes] = await Promise.all([
-                    getRevenueLast7Days(),
-                    getTotalRevenue()
-                ]);
+                const data = await getDashboardStats();
 
-                // Hỗ trợ cả 2 cấu trúc: { data: ... } và trực tiếp object
-                const getData = (res: any) => res?.data ?? res;
+                setLast7DaysAppointments(data.appointmentsLast7Days);
+                setStatusStats(data.appointmentStatusStats);
 
-                // Tổng doanh thu
-                setTotalRevenue(getData(totalRes)?.totalRevenue ?? 0);
+                const sum = data.revenueLast7Days.reduce(
+                    (acc: number, cur: any) => acc + (cur.totalRevenue || 0),
+                    0
+                );
 
-                // Doanh thu 7 ngày
-                const arr = getData(last7Res);
-                if (Array.isArray(arr) && arr.length > 0) {
-                    const sum = arr.reduce((acc: number, cur: any) => acc + (cur.totalRevenue || 0), 0);
-                    setRevenueLast7Days(sum);
-                } else {
-                    setRevenueLast7Days(0);
-                }
+                setRevenueLast7Days(sum);
+                setTotalRevenue(data.totalRevenue);
 
-            } catch (error) {
-                console.error("Lỗi load doanh thu:", error);
-                message.error("Không thể tải dữ liệu doanh thu");
+            } catch (err) {
+                console.error(err);
+                message.error("Không thể tải dữ liệu thống kê");
             } finally {
-                setLoadingRevenue(false);
+                setLoading(false);
             }
         };
 
-        fetchRevenue();
+        loadDashboard();
     }, []);
 
-    const loadStats = async () => {
-        try {
-            const last7 = await getAppointmentsLast7Days();
-            const status = await getAppointmentStatusStats();
+    /* ---------- BAR CHART (GIỮ NGUYÊN) ---------- */
 
-            setLast7DaysAppointments(last7);
-            setStatusStats(status);
-        } catch (err) {
-            message.error("Không thể tải dữ liệu thống kê");
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    /* PROCESS DATA FOR BAR CHART */
     const barLabels = last7DaysAppointments.map(item => item._id);
     const barValues = last7DaysAppointments.map(item => item.count);
 
@@ -144,7 +117,8 @@ const AdminDashboard = () => {
         }
     };
 
-    /* PROCESS DATA FOR PIE CHART */
+    /* ---------- PIE CHART (GIỮ NGUYÊN) ---------- */
+
     const pieLabels = statusStats.map(item => item._id);
     const pieValues = statusStats.map(item => item.count);
 
@@ -182,10 +156,12 @@ const AdminDashboard = () => {
         aspectRatio: 1,
     };
 
-    /* RENDER UI */
+    /* ---------- RENDER (GIỮ NGUYÊN) ---------- */
+
     return (
         <div className="p-6">
-            <h1 className="font-bold text-2xl mb-4">Thống kê hệ thống</h1>            {/* LARGE CARDS */}
+            <h1 className="font-bold text-2xl mb-4">Thống kê hệ thống</h1>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
                 <StatCard
                     title="Tổng số lịch hẹn 7 ngày"
@@ -200,14 +176,15 @@ const AdminDashboard = () => {
                 <StatCard
                     title="Doanh thu 7 ngày gần nhất (VND)"
                     value={revenueLast7Days}
-                    loading={loadingRevenue}
+                    loading={loading}
                 />
                 <StatCard
                     title="Tổng doanh thu (VND)"
                     value={totalRevenue}
-                    loading={loadingRevenue}
+                    loading={loading}
                 />
-            </div>            {/* CHARTS */}
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
                 <Card title="Biểu đồ lịch hẹn 7 ngày" variant="outlined">
                     {loading ? (
