@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, Button, Table, message, Divider, Tag } from 'antd';
-import { getInvoiceById, type Invoice, type InvoiceStatus } from '../../services/InvoiceService';
+import { getInvoiceById, type Invoice, type InvoiceStatus, createVNPayPayment, payCashInvoice } from '../../services/InvoiceService';
 import { formatDateDDMMYYYY } from '../../utils/date';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { FaPrint } from 'react-icons/fa';
+import { FaCreditCard, FaMoneyBillWave, FaPrint } from 'react-icons/fa';
 
 interface InvoiceDetailModalProps {
     open: boolean;
     invoiceId?: string | null;
     onClose: () => void;
+    onSuccess?: () => void; // Callback khi thanh toán thành công
 }
 
 const formatGender = (gender: 'male' | 'female' | 'other'): string => {
@@ -38,10 +39,11 @@ const statusColor = (status: InvoiceStatus) => {
     }
 };
 
-const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId, onClose }) => {
+const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId, onClose, onSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [invoice, setInvoice] = useState<Invoice | null>(null);
     const componentRef = useRef<HTMLDivElement>(null);
+    const [paymentLoading, setPaymentLoading] = useState<string | null>(null);
 
     useEffect(() => {
         const load = async () => {
@@ -58,6 +60,59 @@ const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId
         };
         load();
     }, [open, invoiceId]);
+    
+    const handleCashPayment = async(invoiceId: string) => {
+        Modal.confirm({
+            title: "Xác nhận thanh toán tiền mặt",
+            content: "Bệnh nhân đã thanh toán tiền mặt tại quầy?",
+            okText: "Xác nhận",
+            cancelText: "Hủy",
+            onOk: async () => {
+                try {
+                    await payCashInvoice(invoiceId);
+                    message.success("Đã xác nhận thanh toán thành công");
+                    
+                    // Đóng modal và reload table
+                    onClose();
+                    if (onSuccess) {
+                        onSuccess();
+                    }
+                } catch (error: any) {
+                    message.error(error?.response?.data?.message || "Lỗi khi xác nhận thanh toán");
+                }
+            },
+        });
+    };    
+    const handleVNPayPayment = async (invoiceId: string) => {
+        console.log("=== handleVNPayPayment called ===");
+        console.log("Invoice ID:", invoiceId);
+        
+        setPaymentLoading(invoiceId);
+        try {
+            // Tạo returnUrl để redirect về trang receptionist invoice
+            const returnUrl = `${window.location.origin}/receptionist/invoice`;
+            console.log("Return URL:", returnUrl);
+            console.log("Calling createVNPayPayment...");
+            
+            const res = await createVNPayPayment(invoiceId, returnUrl);
+            console.log("VNPay response:", res);
+            
+            if (res.checkoutUrl) {
+                console.log("Redirecting to:", res.checkoutUrl);
+                // Redirect to VNPay checkout
+                window.location.href = res.checkoutUrl;
+            } else {
+                console.error("No checkoutUrl in response");
+                message.error("Không nhận được đường dẫn thanh toán");
+            }
+        } catch (err: any) {
+            console.error("Error creating VNPay payment:", err);
+            console.error("Error response:", err?.response);
+            message.error(err?.response?.data?.message || "Không thể tạo thanh toán VNPay");
+        } finally {
+            setPaymentLoading(null);
+        }
+    };
 
     const handleDownloadPDF = async () => {
         const element = document.getElementById("invoice-print-content");
@@ -73,6 +128,36 @@ const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId
 
         pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
         pdf.save(`invoice-${invoice?._id?.slice(0, 8)}.pdf`);
+    };    
+    // Xác định footer buttons dựa trên trạng thái
+    const getFooterButtons = () => {
+        if (!invoice) return [];
+
+        // Nếu trạng thái là "Chờ thanh toán" (Pending)
+        if (invoice.status === 'Pending') {
+            return [
+                <Button key="cancel" onClick={onClose}>
+                    Đóng
+                </Button>,
+                <Button key="cash" variant='solid' color='green' onClick={() => handleCashPayment(invoice._id)} icon={<FaMoneyBillWave />}>
+                    Thanh toán tiền mặt
+                </Button>,
+                <Button key="card" type="primary" onClick={() => handleVNPayPayment(invoice._id)} icon={<FaCreditCard />}>
+                    Thanh toán VNPAY
+                </Button>,
+            ];
+        }
+
+        // Các trạng thái khác (Paid, Cancelled, Refunded) - chỉ hiện nút Tải PDF
+        return [
+            <Button key="cancel" onClick={onClose}>
+                Đóng
+            </Button>,
+            <Button key="download" type="primary" icon={<FaPrint />}
+                onClick={handleDownloadPDF}>
+                Tải PDF
+            </Button>,
+        ];
     };
 
     return (
@@ -80,13 +165,7 @@ const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId
             title={null}
             open={open}
             onCancel={onClose}
-            footer={[
-                <Button key="back" onClick={onClose}>Đóng</Button>,
-                <Button key="download" type="primary" icon={<FaPrint />}
-                    onClick={handleDownloadPDF} disabled={!invoice}>
-                    Tải PDF
-                </Button>,
-            ]}
+            footer={getFooterButtons()}
             width={900}
         >
             {loading ? (
@@ -109,7 +188,7 @@ const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId
                             <div className="grid grid-cols-2 gap-6 text-sm mt-4 mb-6">
                                 <div className="space-y-1">
                                     <p><strong>Mã hóa đơn:</strong> {invoice._id.slice(0, 8)}</p>
-                                    <p><strong>Ngày tạo:</strong> {formatDateDDMMYYYY(invoice.created_at)}</p>
+                                    <p><strong>Ngày tạo:</strong> {formatDateDDMMYYYY(invoice.issued_at)}</p>
                                     <p>
                                         <strong>Trạng thái:</strong>{' '}
                                         <Tag color={statusColor(invoice.status)}>

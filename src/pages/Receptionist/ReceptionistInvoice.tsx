@@ -8,14 +8,15 @@ import {
     type InvoiceMeta,
     type InvoiceStatus,
     updateInvoiceStatus,
-    payCashInvoice,
 } from "../../services/InvoiceService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
 import InvoiceDetailModal from "../../components/Receptionist/InvoiceDetailModal";
+import { useSearchParams } from "react-router-dom";
 
 const ReceptionistInvoice = () => {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [meta, setMeta] = useState<InvoiceMeta | null>(null);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // table query state
     const [page, setPage] = useState(1);
@@ -34,6 +35,20 @@ const ReceptionistInvoice = () => {
 
     const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
     const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+
+    // Xử lý khi quay về từ VNPay
+    useEffect(() => {
+        const status = searchParams.get('vnp_ResponseCode');
+        if (status) {
+            if (status === '00') {
+                message.success('Thanh toán VNPay thành công!');
+            } else {
+                message.error('Thanh toán VNPay thất bại!');
+            }
+            // Xóa query params sau khi hiển thị message
+            setSearchParams({});
+        }
+    }, [searchParams, setSearchParams]);
 
     useEffect(() => {
         fetchInvoices();
@@ -153,24 +168,6 @@ const ReceptionistInvoice = () => {
         setInvoiceDetailOpen(true);
     };
 
-    const handleCashPayment = async (invoiceId: string) => {
-        Modal.confirm({
-            title: "Xác nhận thanh toán tiền mặt",
-            content: "Bệnh nhân đã thanh toán tiền mặt tại quầy?",
-            okText: "Xác nhận",
-            cancelText: "Hủy",
-            onOk: async () => {
-                try {
-                    await payCashInvoice(invoiceId);
-                    message.success("Đã xác nhận thanh toán thành công");
-                    fetchInvoices();
-                } catch (error) {
-                    message.error("Lỗi khi xác nhận thanh toán");
-                }
-            },
-        });
-    };
-
     const columns = [
         {
             title: 'Mã HĐ',
@@ -207,8 +204,8 @@ const ReceptionistInvoice = () => {
         },
         {
             title: 'Ngày tạo',
-            dataIndex: 'created_at',
-            key: 'created_at',
+            dataIndex: 'issued_at',
+            key: 'issued_at',
             sorter: true,
             width: 120,
             render: (value: string) => formatDateDDMMYYYY(value)
@@ -219,17 +216,6 @@ const ReceptionistInvoice = () => {
             width: 280,
             render: (_: any, record: Invoice) => (
                 <div className="flex flex-col gap-1.5">
-                    {record.status === 'Pending' && (
-                        <Button
-                            type="primary"
-                            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
-                            onClick={() => handleCashPayment(record._id)}
-                            size="small"
-                            block
-                        >
-                            Thanh toán
-                        </Button>
-                    )}
                     <div className="flex gap-1.5">
                         <ButtonPrimary
                             type="primary"
@@ -321,14 +307,16 @@ const ReceptionistInvoice = () => {
                         />
                     </div>
                 </div>
-            </Modal>
-
-            <InvoiceDetailModal
+            </Modal>            <InvoiceDetailModal
                 open={invoiceDetailOpen}
                 invoiceId={selectedInvoiceId}
                 onClose={() => {
                     setInvoiceDetailOpen(false);
                     setSelectedInvoiceId(null);
+                }}
+                onSuccess={() => {
+                    // Reload table sau khi thanh toán thành công
+                    fetchInvoices();
                 }}
             />
         </div>

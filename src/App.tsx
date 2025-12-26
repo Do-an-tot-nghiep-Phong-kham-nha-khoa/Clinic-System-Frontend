@@ -122,7 +122,6 @@ function App() {
           <Route index element={<ReceptionistProfile />} />
           <Route path='assignments' element={<ReceptionistAppointment />} />
           <Route path='appointments' element={<ReceptionistManageAppointment />} />
-          {/* <Route path='treatments' element={<ReceptionistTreatment />} /> */}
           <Route path='invoices' element={<ReceptionistInvoice />} />
         </Route>
       </Routes>

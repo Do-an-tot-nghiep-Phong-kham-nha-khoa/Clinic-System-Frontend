@@ -45,7 +45,7 @@ export type LabOrderInfo = {
 
 export type Invoice = {
     _id: string;
-    created_at: string;
+    issued_at: string;
     totalPrice: number;
     status: InvoiceStatus;
 
