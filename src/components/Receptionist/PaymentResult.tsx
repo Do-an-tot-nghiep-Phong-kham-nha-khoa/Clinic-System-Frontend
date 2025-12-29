@@ -22,10 +22,9 @@ const PaymentResult = () => {
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, []);
-
+    }, []);    
     const handleBackToInvoices = () => {
-        navigate("/patient/invoices");
+        navigate("/receptionist/invoice");
     };
 
     if (loading) {

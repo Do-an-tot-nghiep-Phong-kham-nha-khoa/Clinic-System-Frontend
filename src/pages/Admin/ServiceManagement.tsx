@@ -9,6 +9,7 @@ import ButtonPrimary from "../../utils/ButtonPrimary";
 import { AiFillEdit } from "react-icons/ai";
 import ModalCreateService from "../../components/Admin/ModalCreateService";
 import ModalEditService from "../../components/Admin/ModalEditService";
+import { CacheService } from "../../services/CacheService";
 
 const ServiceManagement = () => {
     const [services, setServices] = useState<Service[]>([]);
@@ -25,16 +26,38 @@ const ServiceManagement = () => {
     const [createOpen, setCreateOpen] = useState(false);
 
     const [editOpen, setEditOpen] = useState(false);
-    const [editingId, setEditingId] = useState<string | undefined>(undefined);
-
+    const [editingId, setEditingId] = useState<string | undefined>(undefined);    
     useEffect(() => {
         fetchServices();
     }, [page, pageSize, sort, q]);
 
+    // Helper function to generate cache key
+    const getCacheKey = (p: number, ps: number, s: string | undefined, query: string) => {
+        return `services_${p}_${ps}_${s || 'nosort'}_${query || 'noquery'}`;
+    };
+
     const fetchServices = async () => {
         try {
             setLoading(true);
+            
+            // Generate cache key based on current query params
+            const cacheKey = getCacheKey(page, pageSize, sort, q);
+            
+            // Try to get from cache first
+            const cached = CacheService.get<{ items: Service[]; meta: ServiceMeta | null }>(cacheKey);
+            if (cached) {
+                setServices(cached.items);
+                setMeta(cached.meta);
+                setLoading(false);
+                return cached.items;
+            }
+            
+            // If not in cache, fetch from API
             const { items, meta } = await getServices({ page, limit: pageSize, sort, q });
+            
+            // Store in cache
+            CacheService.set(cacheKey, { items, meta });
+            
             setServices(items);
             setMeta(meta);
             return items;
@@ -95,12 +118,16 @@ const ServiceManagement = () => {
             content: 'Bạn có chắc muốn xoá dịch vụ này? Hành động này không thể hoàn tác.',
             okText: 'Xoá',
             okType: 'danger',
-            cancelText: 'Huỷ',
+            cancelText: 'Huỷ',            
             onOk: async (): Promise<void> => {
                 try {
                     const id = String(_id);
                     await deleteService(id);
                     message.success("Xoá dịch vụ thành công");
+                    
+                    // Clear cache after deleting
+                    CacheService.clear();
+                    
                     fetchServices();
                 } catch {
                     message.error("Xoá dịch vụ thất bại");
@@ -179,12 +206,13 @@ const ServiceManagement = () => {
                     pageSizeOptions: [5, 10, 20, 50],
                 }}
                 onChange={handleTableChange}
-            />
-
+            />            
             <ModalCreateService
                 open={createOpen}
                 onClose={() => setCreateOpen(false)}
                 onCreated={() => {
+                    // Clear cache after creating new service
+                    CacheService.clear();
                     setPage(1);
                     fetchServices();
                 }}
@@ -194,7 +222,11 @@ const ServiceManagement = () => {
                 open={editOpen}
                 id={editingId}
                 onClose={() => { setEditOpen(false); setEditingId(undefined); }}
-                onUpdated={() => fetchServices()}
+                onUpdated={() => {
+                    // Clear cache after updating service
+                    CacheService.clear();
+                    fetchServices();
+                }}
             />
 
         </div>

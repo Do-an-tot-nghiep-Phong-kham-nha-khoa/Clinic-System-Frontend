@@ -242,3 +242,79 @@ export async function confirmAppointment(appointmentId: string): Promise<Appoint
         throw new Error("Lỗi kết nối server");
     }
 }
+
+export interface MonthAppointmentResponse {
+    count: number;
+    appointments: BookerAppointmentModel[];
+    month: number;
+    year: number;
+}
+
+export interface MonthAppointmentByDoctorResponse {
+    count: number;
+    appointments: AppointmentModel[];
+    month: number;
+    year: number;
+}
+
+export async function getMonthAppointmentByBooker(
+    bookerId: string,
+    year?: number,
+    month?: number,
+    status?: string
+): Promise<MonthAppointmentResponse> {
+    const url = `/appointments/booker/${bookerId}/month`;
+    
+    try {
+        const params: any = {};
+        
+        // Nếu có year và month, tạo date string
+        if (year && month) {
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
+            params.date = dateStr;
+        }
+        
+        if (status) {
+            params.status = status;
+        }
+        
+        const res = await api.get(url, { params });
+        return res.data;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn tháng.");
+        }
+        throw new Error("Lỗi kết nối server");
+    }
+}
+
+export async function getMonthAppointmentByDoctor(
+    doctorId: string,
+    year?: number,
+    month?: number,
+    status?: string
+): Promise<MonthAppointmentByDoctorResponse> {
+    const url = `/appointments/doctor/${doctorId}/month`;
+    
+    try {
+        const params: any = {};
+        
+        // Nếu có year và month, tạo date string
+        if (year && month) {
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
+            params.date = dateStr;
+        }
+        
+        if (status) {
+            params.status = status;
+        }
+        
+        const res = await api.get(url, { params });
+        return res.data;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn tháng của bác sĩ.");
+        }
+        throw new Error("Lỗi kết nối server");
+    }
+}

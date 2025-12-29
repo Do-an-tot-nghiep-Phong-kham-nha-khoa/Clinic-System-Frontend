@@ -307,7 +307,8 @@ const ReceptionistInvoice = () => {
                         />
                     </div>
                 </div>
-            </Modal>            <InvoiceDetailModal
+            </Modal>            
+            <InvoiceDetailModal
                 open={invoiceDetailOpen}
                 invoiceId={selectedInvoiceId}
                 onClose={() => {

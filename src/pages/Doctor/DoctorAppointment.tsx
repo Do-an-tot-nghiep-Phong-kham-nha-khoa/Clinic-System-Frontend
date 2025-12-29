@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getAppointmentsByDoctor, type AppointmentModel, confirmAppointment } from "../../services/AppointmentService";
+import { getMonthAppointmentByDoctor, type AppointmentModel, confirmAppointment } from "../../services/AppointmentService";
 import type { Dayjs } from "dayjs";
 import { Badge, Calendar, Modal, type CalendarProps, Button, message } from "antd";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { FaCheckCircle } from "react-icons/fa";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const DoctorAppointment = () => {
     const { user } = useAuth();
@@ -14,24 +18,67 @@ const DoctorAppointment = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
 
+    // State for month/year navigation
+    const [currentYear, setCurrentYear] = useState(dayjs().year());
+    const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1); // 1-12
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         loadAppointments();
-    }, [user?.id]);
+    }, [user?.id, currentYear, currentMonth]);
 
     const loadAppointments = async () => {
+        if (!user?.id) return;
+        
         try {
-            const res = await getAppointmentsByDoctor(user?.id || "");
+            setLoading(true);
+            const res = await getMonthAppointmentByDoctor(
+                user.id,
+                currentYear,
+                currentMonth
+            );
             setAppointments(res.appointments);
         } catch (err) {
-            console.error(err);
+            console.error("Lỗi khi tải danh sách cuộc hẹn:", err);
+            message.error("Không thể tải lịch hẹn");
+        } finally {
+            setLoading(false);
         }
     };
 
+    const handlePreviousMonth = () => {
+        if (currentMonth === 1) {
+            setCurrentMonth(12);
+            setCurrentYear(currentYear - 1);
+        } else {
+            setCurrentMonth(currentMonth - 1);
+        }
+    };
+
+    const handleNextMonth = () => {
+        if (currentMonth === 12) {
+            setCurrentMonth(1);
+            setCurrentYear(currentYear + 1);
+        } else {
+            setCurrentMonth(currentMonth + 1);
+        }
+    };
+
+    const handleToday = () => {
+        const now = dayjs();
+        setCurrentYear(now.year());
+        setCurrentMonth(now.month() + 1);
+    };
+
     const getAppointmentsForDate = (date: Dayjs) => {
-        // Dùng UTC để không bị lệch ngày khi parse từ DB
-        return appointments.filter((a) =>
-            dayjs.utc(a.appointmentDate).isSame(date, "day")
-        );
+        return appointments.filter((a) => {
+            // Parse appointmentDate as UTC - chỉ lấy date string (không có time)
+            const appointmentDateStr = a.appointmentDate.split('T')[0]; // "2025-12-25"
+            const calendarDateStr = date.format('YYYY-MM-DD'); // "2025-12-25"
+            
+            // So sánh trực tiếp string để tránh mọi vấn đề timezone
+            return appointmentDateStr === calendarDateStr;
+        });
     };
 
     const statusToBadge = (status: string) => {
@@ -122,9 +169,41 @@ const DoctorAppointment = () => {
     return (
         <div className="">
             <div className="container mx-auto ">
-                <h1 className="text-3xl font-bold mb-4">Danh sách các cuộc hẹn</h1>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-3xl font-bold">Lịch hẹn của tôi</h1>
+                
+                {/* Month/Year Navigation */}
+                <div className="flex items-center gap-3">
+                    <Button
+                        type="default"
+                        icon={<MdChevronLeft />}
+                        onClick={handlePreviousMonth}
+                        disabled={loading}
+                    />
+                    <div className="font-semibold text-lg min-w-[150px] text-center">
+                        Tháng {currentMonth}/{currentYear}
+                    </div>
+                    <Button
+                        type="default"
+                        icon={<MdChevronRight />}
+                        onClick={handleNextMonth}
+                        disabled={loading}
+                    />
+                    <Button
+                        type="primary"
+                        onClick={handleToday}
+                        disabled={loading}
+                    >
+                        Hôm nay
+                    </Button>
+                </div>
+            </div>
 
-                <Calendar cellRender={cellRender} className="!p-2" />
+                <Calendar 
+                    cellRender={cellRender} 
+                    className="!p-2"
+                    value={dayjs().year(currentYear).month(currentMonth - 1)}
+                />
             </div>
 
             <Modal

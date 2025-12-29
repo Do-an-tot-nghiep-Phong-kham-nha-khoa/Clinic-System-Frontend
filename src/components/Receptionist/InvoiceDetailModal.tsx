@@ -82,15 +82,16 @@ const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId
                 }
             },
         });
-    };    
+    };      
+    
     const handleVNPayPayment = async (invoiceId: string) => {
         console.log("=== handleVNPayPayment called ===");
         console.log("Invoice ID:", invoiceId);
         
         setPaymentLoading(invoiceId);
         try {
-            // Tạo returnUrl để redirect về trang receptionist invoice
-            const returnUrl = `${window.location.origin}/receptionist/invoice`;
+            // Tạo returnUrl để redirect về trang payment result
+            const returnUrl = `${window.location.origin}/receptionist/payment-result`;
             console.log("Return URL:", returnUrl);
             console.log("Calling createVNPayPayment...");
             
@@ -104,12 +105,12 @@ const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId
             } else {
                 console.error("No checkoutUrl in response");
                 message.error("Không nhận được đường dẫn thanh toán");
+                setPaymentLoading(null);
             }
         } catch (err: any) {
             console.error("Error creating VNPay payment:", err);
             console.error("Error response:", err?.response);
             message.error(err?.response?.data?.message || "Không thể tạo thanh toán VNPay");
-        } finally {
             setPaymentLoading(null);
         }
     };
@@ -128,22 +129,43 @@ const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ open, invoiceId
 
         pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
         pdf.save(`invoice-${invoice?._id?.slice(0, 8)}.pdf`);
-    };    
+    };      
+    
     // Xác định footer buttons dựa trên trạng thái
     const getFooterButtons = () => {
         if (!invoice) return [];
 
         // Nếu trạng thái là "Chờ thanh toán" (Pending)
         if (invoice.status === 'Pending') {
+            const isPaymentProcessing = paymentLoading === invoice._id;
+            
             return [
-                <Button key="cancel" onClick={onClose}>
+                <Button 
+                    key="cancel" 
+                    onClick={onClose}
+                    disabled={isPaymentProcessing}
+                >
                     Đóng
                 </Button>,
-                <Button key="cash" variant='solid' color='green' onClick={() => handleCashPayment(invoice._id)} icon={<FaMoneyBillWave />}>
+                <Button 
+                    key="cash" 
+                    variant='solid' 
+                    color='green' 
+                    onClick={() => handleCashPayment(invoice._id)} 
+                    icon={<FaMoneyBillWave />}
+                    disabled={isPaymentProcessing}
+                >
                     Thanh toán tiền mặt
                 </Button>,
-                <Button key="card" type="primary" onClick={() => handleVNPayPayment(invoice._id)} icon={<FaCreditCard />}>
-                    Thanh toán VNPAY
+                <Button 
+                    key="card" 
+                    type="primary" 
+                    onClick={() => handleVNPayPayment(invoice._id)} 
+                    icon={<FaCreditCard />}
+                    loading={isPaymentProcessing}
+                    disabled={isPaymentProcessing}
+                >
+                    {isPaymentProcessing ? 'Đang chuyển hướng...' : 'Thanh toán VNPAY'}
                 </Button>,
             ];
         }
