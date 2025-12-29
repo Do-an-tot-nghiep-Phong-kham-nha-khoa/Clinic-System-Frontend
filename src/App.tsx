@@ -34,7 +34,7 @@ import PatientAppointment from './pages/Patient/PatientAppointment'
 import PatientTreatmentHistory from './pages/Patient/PatientTreatmentHistory'
 import PatientAppointmentSpecialty from './pages/Patient/PatientAppointmentSpecialty'
 import PatientInvoices from './pages/Patient/PatientInvoices'
-import PaymentResult from './pages/Patient/PaymentResult'
+import PaymentResult from './components/Receptionist/PaymentResult'
 import Chat from './pages/Patient/AIChatBot'
 // Receptionist Pages & Layouts
 import ReceptionistLayout from './layouts/ReceptionistLayout'
@@ -109,7 +109,7 @@ function App() {
           <Route path='appointments-doctor' element={<PatientAppointmentDoctor />} />
           <Route path='medical-records' element={<PatientTreatmentHistory />} />
           <Route path='invoices' element={<PatientInvoices />} />
-          <Route path='payment-result' element={<PaymentResult />} />
+          
           <Route path='chatbot' element={<Chat />} />
           <Route path='health-profile' element={<HealthProfile />} />
         </Route>
@@ -122,8 +122,8 @@ function App() {
           <Route index element={<ReceptionistProfile />} />
           <Route path='assignments' element={<ReceptionistAppointment />} />
           <Route path='appointments' element={<ReceptionistManageAppointment />} />
-          {/* <Route path='treatments' element={<ReceptionistTreatment />} /> */}
           <Route path='invoices' element={<ReceptionistInvoice />} />
+          <Route path='payment-result' element={<PaymentResult />} />
         </Route>
       </Routes>
     </AuthProvider>

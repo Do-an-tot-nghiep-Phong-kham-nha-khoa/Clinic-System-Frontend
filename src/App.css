@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --color-primary: #1da1f2;
@@ -37,13 +36,14 @@ body {
   border-bottom: 1px solid #f0f0f0;
 }
 
-/* Xóa border thừa bên phải của cột cuối cùng (Thứ Bảy) */
+/* Xóa border thừa bên phải của cột cuối cùng  */
 .custom-calendar-grid .ant-picker-cell:nth-child(7n) {
   border-right: none;
 }
 
-/* Xóa border thừa bên trái của cột đầu tiên (Chủ Nhật) */
+/* Xóa border thừa bên trái của cột đầu tiên  */
 .custom-calendar-grid .ant-picker-cell:nth-child(7n + 1) {
+  border-left: none;
 }
 
 @media print {
