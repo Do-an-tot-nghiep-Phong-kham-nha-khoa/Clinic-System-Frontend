@@ -91,7 +91,7 @@ const PatientProfile: React.FC = () => {
     };
 
     return (
-        <div className="p-4 sm:p-8 ">
+        <div className="container p-4 sm:p-8 ">
             <div className=" mx-auto">
                 <Card
                     className="shadow-2xl rounded-2xl border-t-4 border-indigo-500"

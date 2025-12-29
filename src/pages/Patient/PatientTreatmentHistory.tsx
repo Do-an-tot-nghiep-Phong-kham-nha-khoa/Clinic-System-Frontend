@@ -117,7 +117,7 @@ const PatientTreatmentHistory = () => {
             ),
         },
     ]; return (
-        <div className="p-6">
+        <div className="p-6 container">
             <h1 className="text-2xl font-semibold mb-4 text-gray-800">Lịch sử ca khám</h1>
 
             {!loading && treatments.length === 0 ? (

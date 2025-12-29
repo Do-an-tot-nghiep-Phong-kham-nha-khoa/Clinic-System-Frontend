@@ -24,7 +24,7 @@ const PaymentResult = () => {
         return () => clearTimeout(timer);
     }, []);    
     const handleBackToInvoices = () => {
-        navigate("/receptionist/invoice");
+        navigate("/receptionist/invoices");
     };
 
     if (loading) {

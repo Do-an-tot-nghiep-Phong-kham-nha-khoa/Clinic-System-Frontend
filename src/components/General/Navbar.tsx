@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import logo from '../../assets/logo.svg';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button, message } from 'antd';
 import { FaUserLarge } from 'react-icons/fa6';
@@ -49,10 +49,10 @@ const Navbar = () => {
                             }`}
                     >
                         <>
-                            <a href="/patient/" className='text-base font-semibold'>ĐẶT LỊCH</a>
-                            <a href="/doctors" className='text-base font-semibold'>BÁC SĨ</a>
-                            <a href="/about" className='text-base font-semibold'>GIỚI THIỆU</a>
-                            <a href="/contact" className='text-base font-semibold'>LIÊN HỆ</a>
+                            <Link to="/patient/appointments-specialty" className='text-base font-semibold'>ĐẶT LỊCH</Link>
+                            <Link to="/doctors" className='text-base font-semibold'>BÁC SĨ</Link>
+                            <Link to="/about" className='text-base font-semibold'>GIỚI THIỆU</Link>
+                            <Link to="/contact" className='text-base font-semibold'>LIÊN HỆ</Link>
                         </>
 
                         <div className='flex items-center gap-3'>
