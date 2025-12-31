@@ -11,10 +11,12 @@ import {
 } from "../../services/InvoiceService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
 import InvoiceDetailModal from "../../components/Receptionist/InvoiceDetailModal";
+import { useSearchParams } from "react-router-dom";
 
 const ReceptionistInvoice = () => {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [meta, setMeta] = useState<InvoiceMeta | null>(null);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // table query state
     const [page, setPage] = useState(1);
@@ -33,6 +35,20 @@ const ReceptionistInvoice = () => {
 
     const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
     const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+
+    // Xử lý khi quay về từ VNPay
+    useEffect(() => {
+        const status = searchParams.get('vnp_ResponseCode');
+        if (status) {
+            if (status === '00') {
+                message.success('Thanh toán VNPay thành công!');
+            } else {
+                message.error('Thanh toán VNPay thất bại!');
+            }
+            // Xóa query params sau khi hiển thị message
+            setSearchParams({});
+        }
+    }, [searchParams, setSearchParams]);
 
     useEffect(() => {
         fetchInvoices();
@@ -54,26 +70,36 @@ const ReceptionistInvoice = () => {
         }
     }
 
+    const getStatusText = (status: InvoiceStatus): string => {
+        switch (status) {
+            case 'Paid':
+                return 'Đã thanh toán';
+            case 'Cancelled':
+                return 'Đã hủy';
+            case 'Refunded':
+                return 'Đã hoàn tiền';
+            case 'Pending':
+            default:
+                return 'Chờ thanh toán';
+        }
+    };
+
     const getStatusTag = (status: InvoiceStatus) => {
         let color;
-        let statusText;
+        const statusText = getStatusText(status);
         switch (status) {
             case 'Paid':
                 color = 'green';
-                statusText = 'Đã thanh toán';
                 break;
             case 'Cancelled':
                 color = 'red';
-                statusText = 'Đã hủy';
                 break;
             case 'Refunded':
                 color = 'volcano';
-                statusText = 'Đã hoàn tiền';
                 break;
             case 'Pending':
             default:
                 color = 'gold';
-                statusText = 'Chờ thanh toán';
                 break;
         }
         return <Tag color={color}>{statusText}</Tag>;
@@ -178,8 +204,8 @@ const ReceptionistInvoice = () => {
         },
         {
             title: 'Ngày tạo',
-            dataIndex: 'created_at',
-            key: 'created_at',
+            dataIndex: 'issued_at',
+            key: 'issued_at',
             sorter: true,
             width: 120,
             render: (value: string) => formatDateDDMMYYYY(value)
@@ -187,25 +213,31 @@ const ReceptionistInvoice = () => {
         {
             title: 'Hành động',
             key: 'actions',
-            width: 140,
+            width: 280,
             render: (_: any, record: Invoice) => (
-                <div className="flex gap-2 justify-end">
-                    <ButtonPrimary
-                        type="primary"
-                        icon={<FaRegEdit />}
-                        disabled={record.status === 'Cancelled' || record.status === 'Refunded'}
-                        onClick={() => openStatusModal(record)}
-                    >
-                        Sửa trạng thái
-                    </ButtonPrimary>
+                <div className="flex flex-col gap-1.5">
+                    <div className="flex gap-1.5">
+                        <ButtonPrimary
+                            type="primary"
+                            icon={<FaRegEdit />}
+                            disabled={record.status === 'Cancelled' || record.status === 'Refunded'}
+                            onClick={() => openStatusModal(record)}
+                            size="small"
+                            style={{ flex: 1 }}
+                        >
+                            Sửa trạng thái
+                        </ButtonPrimary>
 
-                    <Button
-                        type="default"
-                        onClick={() => handlePrintInvoice(record._id)}
-                        icon={<FaInfoCircle />}
-                    >
-                        Xem chi tiết
-                    </Button>
+                        <Button
+                            type="default"
+                            onClick={() => handlePrintInvoice(record._id)}
+                            icon={<FaInfoCircle />}
+                            size="small"
+                            style={{ flex: 1 }}
+                        >
+                            Chi tiết
+                        </Button>
+                    </div>
                 </div>
             )
         }
@@ -265,25 +297,27 @@ const ReceptionistInvoice = () => {
                     <div>
                         <span className="text-sm text-gray-600">Trạng thái hiện tại:</span>
                         <div className="mt-1">{currentStatus && (<> {getStatusTag(currentStatus)} </>)}</div>
-                    </div>
-                    <div>
+                    </div>                    <div>
                         <span className="text-sm text-gray-600">Chọn trạng thái mới:</span>
                         <Select
                             className="w-full mt-1"
                             value={selectedStatus}
                             onChange={(val: InvoiceStatus) => setSelectedStatus(val)}
-                            options={allowedStatuses.map(s => ({ label: s, value: s }))}
+                            options={allowedStatuses.map(s => ({ label: getStatusText(s), value: s }))}
                         />
                     </div>
                 </div>
-            </Modal>
-
+            </Modal>            
             <InvoiceDetailModal
                 open={invoiceDetailOpen}
                 invoiceId={selectedInvoiceId}
                 onClose={() => {
                     setInvoiceDetailOpen(false);
                     setSelectedInvoiceId(null);
+                }}
+                onSuccess={() => {
+                    // Reload table sau khi thanh toán thành công
+                    fetchInvoices();
                 }}
             />
         </div>

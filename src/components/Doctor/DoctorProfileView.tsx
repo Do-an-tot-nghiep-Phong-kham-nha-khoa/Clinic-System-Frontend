@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar } from 'antd';
-import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined } from '@ant-design/icons';
+import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
-import { getDoctorById, type Doctor } from "../../services/DoctorService";
+import { getDoctorById, type Doctor} from "../../services/DoctorService";
 import { getAccountById } from '../../services/AccountService';
 import NavbarDark from '../General/NavbarDark';
 import Footer from '../General/Footer';
@@ -87,6 +87,7 @@ const DoctorProfileView: React.FC = () => {
     const specialtyName = doctor.specialtyId?.name || 'Chưa xác định';
     const experience = doctor.experience;
     const phone = doctor.phone || 'N/A';
+    const bio = doctor.bio || 'Chưa có thông tin tiểu sử.';
 
     return (
         <div className=''>
@@ -98,27 +99,23 @@ const DoctorProfileView: React.FC = () => {
                         title={
                             <div className="flex items-center space-x-3 text-2xl font-bold text-gray-800">
                                 <ExperimentOutlined className="text-cyan-600" />
-                                <span>Hồ Sơ Bác Sĩ</span>
+                                <span>Hồ Sơ Bác Sĩ {doctor.name}</span>
                             </div>
                         }
                     >
-                        <div className="flex flex-col md:flex-row items-start md:items-center mb-6 border-b pb-4">
-                            <Avatar
-                                size={96}
-                                src={(doctor as any).avatar || (doctor.accountId as any)?.avatar}
-                                icon={<UserOutlined />}
-                                className="bg-cyan-100 text-cyan-600 text-5xl font-bold shadow-lg mr-6 flex-shrink-0 !object-contain"
-                            >
-                                {(!((doctor as any).avatar) && !(doctor.accountId as any)?.avatar) && doctor.name.charAt(0)}
-                            </Avatar>
+                        <div className="relative mb-14">
+                            <div className="h-80 w-full bg-cover bg-center bg-[url('https://png.pngtree.com/background/20210711/original/pngtree-blue-flat-medical-banner-background-picture-image_1101136.jpg')] rounded-xl"></div>
 
-                            <div className="mt-4 md:mt-0 mx-4">
-                                <h3 className="text-3xl font-extrabold text-gray-900 leading-tight">{doctor.name}</h3>
-                                <div className="mt-1 space-x-2">
-                                    <Tag color="processing" icon={<ExperimentOutlined />} className="text-base px-3 py-1 font-semibold">
-                                        {specialtyName}
-                                    </Tag>
-                                </div>
+
+                            <div className="absolute left-6 bottom-[-48px]">
+                                <Avatar
+                                    size={144}
+                                    src={(doctor as any).avatar || (doctor.accountId as any)?.avatar}
+                                    icon={<UserOutlined />}
+                                    className="bg-cyan-100 text-cyan-600 text-5xl font-bold shadow-lg !object-contain"
+                                >
+                                    {(!((doctor as any).avatar) && !(doctor.accountId as any)?.avatar) && doctor.name.charAt(0)}
+                                </Avatar>
                             </div>
                         </div>
 
@@ -153,6 +150,16 @@ const DoctorProfileView: React.FC = () => {
                             >
                                 {specialtyName}
                             </Descriptions.Item>
+                            <Descriptions.Item
+                                label={<span className="font-medium flex items-center"><InfoCircleOutlined className="mr-2" /> Tiểu Sử</span>}
+                            >
+                                <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                        <span className="text-gray-700">{bio}</span>
+                                    </div>
+                                </div>
+                            </Descriptions.Item>
+
                         </Descriptions>
                     </Card>
                 </div>

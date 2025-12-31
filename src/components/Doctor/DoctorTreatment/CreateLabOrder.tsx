@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getServices, type Service } from "../../../services/ServiceService";
-import { DatePicker, Input, InputNumber, Button, Card, Space, Typography, List, message } from "antd";
+import { DatePicker, Input, InputNumber, Button, Card, Space, Typography, List, message, Pagination } from "antd";
 import { ExperimentOutlined, RollbackOutlined, PlusOutlined, DeleteOutlined, SaveOutlined, SearchOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import { createLabOrder } from "../../../services/LabOrderService";
@@ -11,7 +11,7 @@ const { Text, Title } = Typography;
 
 type Props = {
     healthProfileId: string;
-    onCreated: (labOrderId: string) => void;
+    onCreated: (labOrderId: string, labOrderData: any) => void;
     onBack: () => void;
 }
 
@@ -21,17 +21,27 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
     const [testTime, setTestTime] = useState<Dayjs | null>(dayjs());
     const [loading, setLoading] = useState(false);
     const [searchValue, setSearchValue] = useState<string>("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         fetchServices();
-    }, []);
+    }, [currentPage, pageSize]);
 
-    // Lấy danh sách dịch vụ từ API
+    /** Lấy danh sách dịch vụ từ API */
     const fetchServices = async (query?: string) => {
         setLoading(true);
         try {
-            const { items: fetchedServices } = await getServices({ q: query || undefined });
+            const { items: fetchedServices, meta } = await getServices({ 
+                q: query || undefined,
+                page: currentPage,
+                limit: pageSize
+            });
             setServices(fetchedServices);
+            if (meta) {
+                setTotal(meta.total);
+            }
         } catch (error) {
             message.error("Lỗi khi tải danh sách dịch vụ.");
         } finally {
@@ -39,9 +49,16 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
         }
     }
 
-    // Hàm xử lý khi người dùng bấm nút tìm kiếm hoặc nhấn Enter
+    /** Xử lý khi người dùng bấm nút tìm kiếm hoặc nhấn Enter */
     const handleSearch = (value: string) => {
+        setCurrentPage(1);
         fetchServices(value);
+    }
+
+    /** Xử lý khi thay đổi trang */
+    const handlePageChange = (page: number, size: number) => {
+        setCurrentPage(page);
+        setPageSize(size);
     }
 
     const toggleSelect = (service: Service) => {
@@ -84,14 +101,12 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
                 quantity: item.quantity,
                 description: item.description,
             }))
-        };
-
-        try {
+        };        try {
             setLoading(true);
             const result = await createLabOrder(payload);
 
             message.success("Tạo chỉ định Cận Lâm Sàng thành công!");
-            onCreated(result._id);
+            onCreated(result._id, result);
 
         } catch (error) {
             message.error("Tạo chỉ định thất bại. Vui lòng thử lại.");
@@ -139,9 +154,7 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
                             onSearch={handleSearch}
                             loading={loading}
                         />
-                    </div>
-
-                    <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
+                    </div>                    <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
                         {services.map(s => {
                             const isSelected = selectedServiceIds.includes(s._id);
                             return (
@@ -170,6 +183,19 @@ const CreateLabOrder = ({ healthProfileId, onCreated, onBack }: Props) => {
                                 </div>
                             );
                         })}
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="mt-4 flex justify-center">
+                        <Pagination
+                            current={currentPage}
+                            pageSize={pageSize}
+                            total={total}
+                            onChange={handlePageChange}
+                            showSizeChanger
+                            showTotal={(total) => `Tổng ${total} dịch vụ`}
+                            pageSizeOptions={['5', '10', '20', '50']}
+                        />
                     </div>
                 </Card>
 

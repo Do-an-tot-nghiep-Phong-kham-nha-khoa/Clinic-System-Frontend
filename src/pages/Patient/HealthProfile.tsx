@@ -26,7 +26,6 @@ const CardHoverProfile: React.FC<{
         <Card
             hoverable
             style={{ borderRadius: 16, boxShadow: '0 6px 20px rgba(0,0,0,0.08)', minHeight: 220 }}
-            bodyStyle={{ padding: 16 }}
             title={
                 <Space align="center">
                     <FaUser style={{ fontSize: 24, color: '#4f46e5' }} />
@@ -53,19 +52,34 @@ const CardHoverProfile: React.FC<{
             }
         >
             <Descriptions column={1} size="small" bordered style={{ borderRadius: 8, overflow: 'hidden' }}>
-                <Descriptions.Item label={<Space><CalendarOutlined /> Chiều cao</Space>}>
+                <Descriptions.Item
+                    label={<Space><CalendarOutlined /> Chiều cao</Space>}
+                    styles={{ label: { width: '40%' } }}
+                >
                     {profile.height ?? '-'} cm
                 </Descriptions.Item>
-                <Descriptions.Item label={<Space><CalendarOutlined /> Cân nặng</Space>}>
+                <Descriptions.Item
+                    label={<Space><CalendarOutlined /> Cân nặng</Space>}
+                    styles={{ label: { width: '40%' } }}
+                >
                     {profile.weight ?? '-'} kg
                 </Descriptions.Item>
-                <Descriptions.Item label={<Space><HeartOutlined /> Nhóm máu</Space>}>
+                <Descriptions.Item
+                    label={<Space><HeartOutlined /> Nhóm máu</Space>}
+                    styles={{ label: { width: '40%' } }}
+                >
                     {profile.bloodType ?? '---'}
                 </Descriptions.Item>
-                <Descriptions.Item label={<Space><MedicineBoxOutlined /> Dị ứng</Space>}>
+                <Descriptions.Item
+                    label={<Space><MedicineBoxOutlined /> Dị ứng</Space>}
+                    styles={{ label: { width: '40%' } }}
+                >
                     {(profile.allergies || []).slice(0, 3).join(', ') || '---'}
                 </Descriptions.Item>
-                <Descriptions.Item label={<Space><MedicineBoxOutlined /> Thuốc đang dùng</Space>}>
+                <Descriptions.Item
+                    label={<Space><MedicineBoxOutlined /> Thuốc đang dùng</Space>}
+                    styles={{ label: { width: '40%' } }}
+                >
                     {(profile.medications || []).slice(0, 3).join(', ') || '---'}
                 </Descriptions.Item>
             </Descriptions>
@@ -238,7 +252,7 @@ const HealthProfilePage: React.FC = () => {
     const family = profiles.filter(p => p.type === "FamilyMember");
 
     return (
-        <div style={{ padding: 24 }}>
+        <div className='container p-6'>
             <Space direction="vertical" style={{ width: '100%' }} size={24}>
                 <Space style={{ justifyContent: "space-between", width: '100%' }}>
                     <h2 className="text-2xl font-bold">Hồ sơ sức khỏe</h2>

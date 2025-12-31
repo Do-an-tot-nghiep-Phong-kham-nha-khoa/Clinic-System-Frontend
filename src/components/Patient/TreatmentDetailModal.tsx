@@ -200,48 +200,47 @@ const TreatmentDetailModal: React.FC<Props> = ({ visible, treatmentId, onClose }
 
                     <Descriptions bordered column={2} size="small">
 
-                        <Descriptions.Item label="Tên bệnh nhân">
+                        <Descriptions.Item label="Tên bệnh nhân" styles={{ label: { width: '20%' } }}>
                             {treatment.healthProfile?.owner_detail?.name || "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Ngày sinh">
+                        <Descriptions.Item label="Ngày sinh" styles={{ label: { width: '20%' } }}>
                             {treatment.healthProfile?.owner_detail?.dob
                                 ? dayjs.utc(treatment.healthProfile.owner_detail.dob).format("DD/MM/YYYY")
                                 : "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Số điện thoại">
+                        <Descriptions.Item label="Số điện thoại" styles={{ label: { width: '20%' } }}>
                             {treatment.healthProfile?.owner_detail?.phone || "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Quan hệ (ownerModel)">
-
+                        <Descriptions.Item label="Quan hệ (ownerModel)" styles={{ label: { width: '20%' } }}>
                             {treatment.healthProfile?.ownerModel || "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Bác sĩ">
+                        <Descriptions.Item label="Bác sĩ" styles={{ label: { width: '20%' } }}>
                             {treatment.doctor?.name || "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Chuyên khoa">
+                        <Descriptions.Item label="Chuyên khoa" styles={{ label: { width: '20%' } }}>
                             {treatment.doctor?.specialtyId?.name || "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Ngày hẹn">
+                        <Descriptions.Item label="Ngày hẹn" styles={{ label: { width: '20%' } }}>
                             {treatment.appointment?.appointmentDate
                                 ? dayjs.utc(treatment.appointment.appointmentDate).format("DD/MM/YYYY")
                                 : "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Khung giờ">
+                        <Descriptions.Item label="Khung giờ" styles={{ label: { width: '20%' } }}>
                             {treatment.appointment?.timeSlot || "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Ngày khám">
+                        <Descriptions.Item label="Ngày khám" styles={{ label: { width: '20%' } }}>
                             {treatment.treatmentDate ? dayjs(treatment.treatmentDate).format("DD/MM/YYYY") : "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Tổng chi phí" className="font-semibold text-red-600">
+                        <Descriptions.Item label="Tổng chi phí" className="font-semibold text-red-600" styles={{ label: { width: '20%' } }}>
                             {formatCurrency(treatment.totalCost)}
                         </Descriptions.Item>
 

@@ -39,6 +39,7 @@ export interface DoctorProfile {
   specialtyName: string;
   phone: string;
   experience: number; // Số năm kinh nghiệm
+  bio?: string;
 }
 
 export interface DoctorProfileNew {
@@ -48,6 +49,7 @@ export interface DoctorProfileNew {
   specialtyId: Specialty;
   phone: string;
   experience: number; // Số năm kinh nghiệm
+  bio?: string;
 }
 
 export interface Specialty {
@@ -75,6 +77,7 @@ export interface UpdateDoctorPayload {
   name?: string;
   phone?: string;
   experience?: number;
+  bio?: string;
 }
 
 export async function getDoctorsWithPaging(params: { page?: number; limit?: number; q?: string; specialty?: string; specialtyId?: string; name?: string } = {}): Promise<{ items: Doctor[]; total: number; page: number; limit: number }> {
@@ -247,6 +250,16 @@ export async function updateDoctorById(
     return res.data.data;
   } catch (error) {
     throw new Error('Lỗi không xác định khi cập nhật hồ sơ bác sĩ.');
+  }
+}
+export async function updateDoctorBio(doctorId:string, bio: string): Promise<DoctorProfile> {
+  const url = `/doctors/${doctorId}/bio`;
+  try {
+    const res = await api.patch<DoctorResponse>(url, { bio }, { withCredentials: true });
+    return res.data.data;
+  }
+  catch (error) {
+    throw new Error('Lỗi không xác định khi thêm tiểu sử bác sĩ.');
   }
 }
 export default {} as const;

@@ -9,6 +9,37 @@ const NavbarDark = () => {
     const [isTop, setIsTop] = useState(true);
     const navigate = useNavigate();
     const { user, logout } = useAuth();
+    const getDashboardLink = () => {
+        if (!user) return '/patient/appointments-specialty';
+        
+        switch (user.role) {
+            case 'doctor':
+                return '/doctor';
+            case 'admin':
+                return '/admin';
+            case 'receptionist':
+                return '/receptionist';
+            case 'patient':
+            default:
+                return '/patient/appointments-specialty';
+        }
+    };
+
+    const getDashboardText = () => {
+        if (!user) return 'ĐẶT LỊCH';
+        
+        switch (user.role) {
+            case 'doctor':
+                return 'TRANG BÁC SĨ';
+            case 'admin':
+                return 'QUẢN TRỊ';
+            case 'receptionist':
+                return 'LỄ TÂN';
+            case 'patient':
+            default:
+                return 'ĐẶT LỊCH';
+        }
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -49,7 +80,7 @@ const NavbarDark = () => {
                             }`}
                     >
                         <>
-                            <Link to="/patient" className="text-base font-semibold">ĐẶT LỊCH</Link>
+                            <Link to={getDashboardLink()} className='text-base font-semibold'>{getDashboardText()}</Link>
                             <Link to="/doctors" className='text-base font-semibold'>BÁC SĨ</Link>
                             <Link to="/about" className='text-base font-semibold'>GIỚI THIỆU</Link>
                             <Link to="/contact" className='text-base font-semibold'>LIÊN HỆ</Link>

@@ -1,36 +1,81 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getAppointmentsByBooker, type BookerAppointmentModel, cancelAppointment } from "../../services/AppointmentService";
+import { getMonthAppointmentByBooker, type BookerAppointmentModel, cancelAppointment } from "../../services/AppointmentService";
 import { Badge, Calendar, Modal, type CalendarProps, Button, message } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { MdCancel } from "react-icons/md";
+import timezone from "dayjs/plugin/timezone";
+import { MdCancel, MdChevronLeft, MdChevronRight } from "react-icons/md";
+
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const PatientAppointment = () => {
     const { user } = useAuth();
     const [appointments, setAppointments] = useState<BookerAppointmentModel[]>([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+    
+    // State for month/year navigation
+    const [currentYear, setCurrentYear] = useState(dayjs().year());
+    const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1); // 1-12
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         loadAppointments();
-    }, [user?.id]);
+    }, [user?.id, currentYear, currentMonth]);
 
     const loadAppointments = async () => {
+        if (!user?.id) return;
+        
         try {
-            const res = await getAppointmentsByBooker(user?.id || "");
+            setLoading(true);
+            const res = await getMonthAppointmentByBooker(
+                user.id,
+                currentYear,
+                currentMonth
+            );
             setAppointments(res.appointments);
         } catch (err) {
             console.error("Lỗi khi tải danh sách cuộc hẹn:", err);
+            message.error("Không thể tải lịch hẹn");
+        } finally {
+            setLoading(false);
         }
     };
 
-    const getAppointmentsForDate = (date: Dayjs) => {
-        return appointments.filter((a) =>
-            dayjs.utc(a.appointmentDate).isSame(date, "day")
-        );
+    const handlePreviousMonth = () => {
+        if (currentMonth === 1) {
+            setCurrentMonth(12);
+            setCurrentYear(currentYear - 1);
+        } else {
+            setCurrentMonth(currentMonth - 1);
+        }
+    };
+
+    const handleNextMonth = () => {
+        if (currentMonth === 12) {
+            setCurrentMonth(1);
+            setCurrentYear(currentYear + 1);
+        } else {
+            setCurrentMonth(currentMonth + 1);
+        }
+    };
+
+    const handleToday = () => {
+        const now = dayjs();
+        setCurrentYear(now.year());
+        setCurrentMonth(now.month() + 1);
+    };    const getAppointmentsForDate = (date: Dayjs) => {
+        return appointments.filter((a) => {
+            // Parse appointmentDate as UTC - chỉ lấy date string (không có time)
+            const appointmentDateStr = a.appointmentDate.split('T')[0]; 
+            const calendarDateStr = date.format('YYYY-MM-DD'); 
+            
+            // So sánh trực tiếp string để tránh mọi vấn đề timezone
+            return appointmentDateStr === calendarDateStr;
+        });
     };
 
     const statusToBadge = (status: string) => {
@@ -42,9 +87,7 @@ const PatientAppointment = () => {
             case "cancelled": return "error";
             default: return "default";
         }
-    };
-
-    const statusToVietnamese = (status: string) => {
+    };    const statusToVietnamese = (status: string) => {
         switch (status) {
             case "waiting_assigned": return "Chờ được phân công";
             case "pending": return "Chờ xác nhận";
@@ -53,9 +96,8 @@ const PatientAppointment = () => {
             case "completed": return "Đã hoàn thành";
             default: return status;
         }
-    };
-
-    const dateCellRender = (value: Dayjs) => {
+    };    const dateCellRender = (value: Dayjs) => {
+        
         const daily = getAppointmentsForDate(value)
             .sort((a, b) => {
                 const startA = a.timeSlot.split("-")[0];
@@ -111,17 +153,51 @@ const PatientAppointment = () => {
             );
         }
         return info.originNode;
-    };
-
-    if (!user?.id) return <div className="p-4">Loading user info...</div>;
+    };    if (!user?.id) return <div className="p-4">Loading user info...</div>;
 
     return (
         <div className="container mx-auto">
-            <h1 className="text-3xl font-bold mb-4">Lịch hẹn của tôi</h1>
-            <Calendar cellRender={cellRender} className="!p-2" />
-
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-3xl font-bold">Lịch hẹn của tôi</h1>
+                
+                {/* Month/Year Navigation */}
+                <div className="flex items-center gap-3">
+                    <Button
+                        type="default"
+                        icon={<MdChevronLeft />}
+                        onClick={handlePreviousMonth}
+                        disabled={loading}
+                    />
+                    <div className="font-semibold text-lg min-w-[150px] text-center">
+                        Tháng {currentMonth}/{currentYear}
+                    </div>
+                    <Button
+                        type="default"
+                        icon={<MdChevronRight />}
+                        onClick={handleNextMonth}
+                        disabled={loading}
+                    />
+                    <Button
+                        type="primary"
+                        onClick={handleToday}
+                        disabled={loading}
+                    >
+                        Hôm nay
+                    </Button>
+                </div>
+            </div>
+            
+            <Calendar 
+                cellRender={cellRender} 
+                className="!p-2"
+                value={dayjs(`${currentYear}-${String(currentMonth).padStart(2, '0')}-01`)}
+                onPanelChange={(value) => {
+                    setCurrentYear(value.year());
+                    setCurrentMonth(value.month() + 1);
+                }}
+            />            
             <Modal
-                title={`Lịch hẹn vào ngày ${selectedDate ? selectedDate.format("YYYY-MM-DD") : ""}`}
+                title={`Lịch hẹn vào ngày ${selectedDate ? selectedDate.format("DD/MM/YYYY") : ""}`}
                 open={isModalVisible}
                 onCancel={handleClose}
                 footer={null}
