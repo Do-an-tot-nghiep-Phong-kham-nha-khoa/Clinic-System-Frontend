@@ -24,7 +24,6 @@ import ScheduleManagement from './pages/Admin/ScheduleManagement'
 // Doctor Pages & Layouts
 import DoctorLayout from './layouts/DoctorLayout'
 import DoctorAppointment from './pages/Doctor/DoctorAppointment'
-import DoctorMedicalRecord from './pages/Doctor/DoctorMedicalRecord'
 import DoctorTreatment from './pages/Doctor/DoctorTreatment'
 // Patient Pages & Layouts
 import PatientLayout from './layouts/PatientLayout'
@@ -93,7 +92,6 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<DoctorProfile />} />
-          <Route path='medical-records' element={<DoctorMedicalRecord />} />
           <Route path='treatments' element={<DoctorTreatment />} />
           <Route path='appointments' element={<DoctorAppointment />} />
         </Route>

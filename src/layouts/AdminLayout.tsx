@@ -87,6 +87,7 @@ const AdminLayout = () => {
     else if (pathname.startsWith("/admin/services")) selectedKey = "services";
     else if (pathname.startsWith("/admin/invoices")) selectedKey = "invoices";
     else if (pathname.startsWith("/admin/roles")) selectedKey = "roles";
+    else if(pathname.startsWith("/admin/specialties")) selectedKey = "specialties";
     else if (pathname === "/admin" || pathname === "/admin/") selectedKey = "dashboard";
 
     return (
