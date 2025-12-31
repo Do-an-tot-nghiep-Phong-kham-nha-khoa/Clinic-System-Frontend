@@ -35,6 +35,7 @@ const UpdateProfileModal: React.FC<UpdateDoctorProfileModalProps> = ({ open, acc
                         name: profile.name,
                         phone: profile.phone,
                         experience: profile.experience,
+                        bio: profile.bio,
                     });
                 } catch (e) {
                     message.error('Không thể tải hồ sơ bác sĩ.');
@@ -118,6 +119,13 @@ const UpdateProfileModal: React.FC<UpdateDoctorProfileModalProps> = ({ open, acc
                             rules={[{ required: true, message: 'Vui lòng nhập số năm kinh nghiệm!' }]}
                         >
                             <InputNumber placeholder="Số năm kinh nghiệm" className="!w-full" />
+                        </Form.Item>
+                        <Form.Item
+                            name="bio"
+                            label="Giới thiệu"
+                            rules={[{ required: true, message: 'Vui lòng nhập giới thiệu!' }]}
+                        >
+                            <Input placeholder="Giới thiệu" className="!w-full" />
                         </Form.Item>
 
                         <Form.Item className="mt-6 mb-0">

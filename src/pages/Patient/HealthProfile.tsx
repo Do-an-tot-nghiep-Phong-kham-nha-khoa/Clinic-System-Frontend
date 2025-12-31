@@ -252,7 +252,7 @@ const HealthProfilePage: React.FC = () => {
     const family = profiles.filter(p => p.type === "FamilyMember");
 
     return (
-        <div style={{ padding: 24 }}>
+        <div className='container p-6'>
             <Space direction="vertical" style={{ width: '100%' }} size={24}>
                 <Space style={{ justifyContent: "space-between", width: '100%' }}>
                     <h2 className="text-2xl font-bold">Hồ sơ sức khỏe</h2>

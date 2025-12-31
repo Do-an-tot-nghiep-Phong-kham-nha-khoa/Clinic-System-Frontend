@@ -171,7 +171,8 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="flex flex-col h-full min-h-full bg-gray-50 font-sans">
+    <div className="container">
+      <div className="flex flex-col h-full min-h-full bg-gray-50 font-sans">
       <Card
         className="shadow-sm bg-white sticky top-0 z-10 w-full rounded-none border-b border-gray-200"
         title={<div className="flex items-center gap-2 text-lg font-bold text-blue-600">
@@ -222,6 +223,7 @@ export default function Chatbot() {
           </Space.Compact>
         </form>
       </div>
+    </div>
     </div>
   );
 }
