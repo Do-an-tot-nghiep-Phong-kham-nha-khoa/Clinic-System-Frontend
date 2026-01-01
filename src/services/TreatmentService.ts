@@ -21,77 +21,89 @@ export interface Doctor {
     _id: string;
     name: string;
     phone: string;
-    specialtyId: {
-        _id: string;
-        name: string;
-    };
+    specialtyId?: string;
+    specialtyName?: string;
 }
 
 export interface HealthProfile {
+    _id: string;
     ownerId: string;
     ownerModel: string;
-    owner_detail: {
-        _id: string;
-        name: string;
-        dob: string;
-        gender: string;
-        phone: string;
-    };
+    ownerName: string;
+    ownerDob: string;
+    ownerPhone: string;
+    ownerGender: string;
+    bloodType?: string;
+    allergies?: string[];
+    chronicConditions?: string[];
 }
 
 export interface Appointment {
     _id: string;
     appointmentDate: string;
     timeSlot: string;
+    reason?: string;
 }
 
 export interface LabOrder {
-    _id: string;
     testTime: string;
     totalPrice: number;
     items: {
-        serviceId: {
+        _id?: string;
+        serviceId: string | {
             _id: string;
             name: string;
             price: number;
         };
+        serviceName?: string;
         quantity: number;
         description: string;
+        price?: number;
     }[];
 }
 
 export interface Prescription {
-    _id: string;
+    created_at: string;
     totalPrice: number;
     items: {
-        medicineId: {
+        _id?: string;
+        medicineId: string | {
             _id: string;
             name: string;
             manufacturer: string;
             unit: string;
-            expiryDate: string;
+            expiryDate?: string;
             price: number;
         };
+        medicineName?: string;
         quantity: number;
         dosage: string;
         frequency: string;
         duration: string;
         instruction: string;
+        unit?: string;
+        manufacturer?: string;
+        price?: number;
     }[];
 }
 
 export interface Treatment {
     _id: string;
-    healthProfile: HealthProfile;
-    doctor: Doctor;
-    appointment: Appointment;
     treatmentDate: string;
     diagnosis: string;
-    bloodPressure: string;
-    heartRate: number;
-    temperature: number;
-    symptoms: string;
     totalCost: number;
+    // Dữ liệu từ snapshot cho bảng danh sách
+    patientName?: string;
+    doctorName?: string;
+    specialtyName?: string;
+    // Dữ liệu đầy đủ cho chi tiết (khi gọi getTreatmentById)
+    healthProfile?: HealthProfile;
+    doctor?: Doctor;
+    appointment?: Appointment;
+    bloodPressure?: string;
+    heartRate?: number;
+    temperature?: number;
+    symptoms?: string;
     laborder?: LabOrder | null;
     prescription?: Prescription | null;
 }

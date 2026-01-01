@@ -9,32 +9,25 @@ export type OwnerDetail = {
     gender: 'male' | 'female' | 'other';
 };
 
+// OPTIMIZED: Sử dụng flat data từ snapshot (không cần populate)
 export type MedicineItem = {
     _id: string;
-    medicineId: string;
-    medicine: {
-        _id: string;
-        name: string;
-        price: number;
-    };
+    medicineName: string;
+    quantity: number;
+    price: number;
 };
 
 export type PrescriptionInfo = {
     _id: string;
     totalPrice: number;
-    quantity: number;
     items: MedicineItem[];
 };
 
 export type ServiceItem = {
     _id: string;
+    serviceName: string;
     quantity: number;
-    serviceId: string;
-    service: {
-        _id: string;
-        name: string;
-        price: number;
-    };
+    price: number;
 };
 
 export type LabOrderInfo = {
@@ -49,17 +42,19 @@ export type Invoice = {
     totalPrice: number;
     status: InvoiceStatus;
 
-    // Thông tin bệnh nhân đã populate
-    healthProfile_id: string;
-    owner_detail: OwnerDetail;
+    // Thông tin bệnh nhân từ snapshot (flat data)
+    patient: {
+        name: string;
+        phone: string;
+        dob: string;
+        gender: 'male' | 'female' | 'other';
+    };
 
-    // Chi tiết đơn thuốc (có thể null)
+    // Chi tiết đơn thuốc từ snapshot (có thể null)
     prescription: PrescriptionInfo | null;
-    prescriptionId?: string; // ID gốc
 
-    // Chi tiết đơn xét nghiệm (có thể null)
+    // Chi tiết đơn xét nghiệm từ snapshot (có thể null)
     labOrder: LabOrderInfo | null;
-    labOrderId?: string; // ID gốc
 };
 
 export type InvoiceMeta = {
@@ -108,17 +103,6 @@ export async function getInvoiceById(id: string): Promise<Invoice> {
     const url = `/invoices/${id}`;
     const res = await api.get(url);
     return res?.data ?? res?.data?.data;
-}
-
-// Lấy danh sách hóa đơn của bệnh nhân đang đăng nhập
-export async function getInvoicesByPatient(params: InvoiceQuery = {}): Promise<{ data: Invoice[]; meta: InvoiceMeta | null }> {
-    const url = `/invoices/patient/${params.id}`;
-    const res = await api.get(url);
-    // Backend trả về { invoices: [...] }, cần format lại
-    return { 
-        data: res?.data?.invoices || [], 
-        meta: null 
-    };
 }
 
 // Câp nhật trạng thái của một hóa đơn
