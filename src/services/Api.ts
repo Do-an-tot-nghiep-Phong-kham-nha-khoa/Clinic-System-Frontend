@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.BACKEND_URL || 'https://clinic-system-backend-virid.vercel.app',
+  baseURL: import.meta.env.BACKEND_URL || 'http://localhost:3000',
   withCredentials: true,
   timeout: 30000,
   // ❌ KHÔNG set Content-Type mặc định ở đây

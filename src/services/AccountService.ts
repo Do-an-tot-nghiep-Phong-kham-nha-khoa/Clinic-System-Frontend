@@ -39,7 +39,7 @@ export type CreateAccountDto = {
 
 export type UpdateAccountDto = Partial<CreateAccountDto> & { deleted?: boolean };
 
-const BASE_URL = import.meta.env.BACKEND_URL || 'https://clinic-system-backend-virid.vercel.app';
+const BASE_URL = import.meta.env.BACKEND_URL || 'http://localhost:3000';
 const API = `${BASE_URL}/accounts`;
 
 
