@@ -175,15 +175,15 @@ const ReceptionistInvoice = () => {
             key: '_id',
             width: 120,
             render: (value: string) => value.slice(0, 8)
-        },
+        },        
         {
             title: 'Chủ Hồ sơ Sức khỏe',
-            dataIndex: ['owner_detail', 'name'],
+            dataIndex: ['patient', 'name'],
             key: 'ownerName',
             render: (_: any, record: Invoice) => (
                 <>
-                    <strong className="block">{record.owner_detail?.name}</strong>
-                    <small className="block">SĐT: {record.owner_detail?.phone}</small>
+                    <strong className="block">{record.patient?.name}</strong>
+                    <small className="block">SĐT: {record.patient?.phone}</small>
                 </>
             )
         },

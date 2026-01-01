@@ -168,13 +168,11 @@ export default function Chatbot() {
         </div>
       </div>
     );
-  };
-
-  return (
-    <div className="container">
-      <div className="flex flex-col h-full min-h-full bg-gray-50 font-sans">
+  };  return (
+    <div className="flex flex-col h-[calc(100vh-100px)] bg-gray-50 font-sans overflow-hidden">
+      {/* Header - fixed height */}
       <Card
-        className="shadow-sm bg-white sticky top-0 z-10 w-full rounded-none border-b border-gray-200"
+        className="shadow-sm bg-white rounded-none border-b border-gray-200 flex-shrink-0"
         title={<div className="flex items-center gap-2 text-lg font-bold text-blue-600">
           <span className="text-2xl"><BsRobot /></span> Trợ lý Y tế ảo
         </div>}
@@ -184,6 +182,7 @@ export default function Chatbot() {
         <p className="text-sm text-gray-500 m-0">Hỗ trợ thông tin sức khỏe và hướng dẫn đặt lịch khám bệnh.</p>
       </Card>
 
+      {/* Messages area - scrollable */}
       <div className="flex-grow overflow-y-auto p-4 space-y-2 custom-scrollbar">
         {messages.map((m, i) => (
           <MessageItem key={i} message={m} />
@@ -192,13 +191,15 @@ export default function Chatbot() {
         <div ref={bottomRef} />
       </div>
 
+      {/* Error message - fixed height if shown */}
       {errorMsg && (
-        <div className="mx-4 mt-2 p-2 text-red-500 bg-red-50 border border-red-200 rounded-md text-sm text-center">
+        <div className="flex-shrink-0 mx-4 mt-2 p-2 text-red-500 bg-red-50 border border-red-200 rounded-md text-sm text-center">
           {errorMsg}
         </div>
       )}
 
-      <div className="p-4 bg-white border-t border-gray-200 sticky bottom-0 z-20">
+      {/* Input + Button - fixed at bottom, never scrolls */}
+      <div className="flex-shrink-0 p-4 bg-white border-t border-gray-200 w-full">
         <form onSubmit={sendMessage}>
           <Space.Compact className="w-full">
             <Input
@@ -209,6 +210,7 @@ export default function Chatbot() {
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
               size="large"
+              placeholder="Nhập tin nhắn của bạn..."
             />
             <Button
               className="w-[80px]"
@@ -223,7 +225,6 @@ export default function Chatbot() {
           </Space.Compact>
         </form>
       </div>
-    </div>
     </div>
   );
 }
