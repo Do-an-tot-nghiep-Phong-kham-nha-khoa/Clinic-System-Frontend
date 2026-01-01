@@ -53,7 +53,7 @@ const AdminDashboard = () => {
     const [statusStats, setStatusStats] = useState<any[]>([]);
     const [revenueLast7Days, setRevenueLast7Days] = useState<number>(0);
     const [totalRevenue, setTotalRevenue] = useState<number>(0);
-    const [totalAppointments, setTotalAppointments] = useState<number>(0);
+    const [totalAppointments] = useState<number>(0);
 
     const [loading, setLoading] = useState(true);
 
