@@ -8,6 +8,7 @@ export type FamilyMember = {
     name: string;
     relationship: string;
     dob?: string; // ISO string
+    gender?: string; // "male" | "female" | "other"
     phone?: string;
 };
 

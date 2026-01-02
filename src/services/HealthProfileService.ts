@@ -16,6 +16,8 @@ export interface HealthProfile {
     };
     familyMemberName?: string;
     familyMemberPhone?: string;
+    familyMemberDob?: string;
+    familyMemberGender?: string;
     relationship?: string;
     type: 'Patient' | 'FamilyMember';
     createdAt: string;
