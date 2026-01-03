@@ -91,12 +91,12 @@ const PatientProfile: React.FC = () => {
     };
 
     return (
-        <div className="p-4 sm:p-8 ">
-            <div className=" mx-auto">
+        <div className="p-2 sm:p-4 md:p-8">
+            <div className="mx-auto max-w-4xl">
                 <Card
                     className="shadow-2xl rounded-2xl border-t-4 border-indigo-500"
                     title={
-                        <div className="flex items-center space-x-3 text-2xl font-bold text-gray-800">
+                        <div className="flex items-center space-x-2 sm:space-x-3 text-lg sm:text-2xl font-bold text-gray-800">
                             <UserOutlined className="text-indigo-600" />
                             <span>Hồ Sơ Bệnh Nhân</span>
                         </div>
@@ -105,63 +105,69 @@ const PatientProfile: React.FC = () => {
                         <Button
                             type="primary"
                             icon={<EditOutlined />}
-                            className="bg-indigo-600 hover:bg-indigo-700 rounded-lg"
-                            onClick={() => setIsEditModalVisible(true)} // Mở Modal
+                            className="bg-indigo-600 hover:bg-indigo-700 rounded-lg !text-xs sm:!text-sm"
+                            size="small"
+                            onClick={() => setIsEditModalVisible(true)}
                         >
-                            Chỉnh Sửa Hồ Sơ
+                            <span className="hidden sm:inline">Chỉnh Sửa Hồ Sơ</span>
+                            <span className="inline sm:hidden">Sửa</span>
                         </Button>
                     }
                 >
                     {/* Phần Thông tin Cơ bản */}
-                    <div className="flex items-center mb-6 border-b pb-4">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start mb-6 border-b pb-4 gap-4">
                         {/* Ảnh đại diện giả */}
-                        <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-3xl font-semibold mr-6 shadow-md">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-2xl sm:text-3xl font-semibold shadow-md flex-shrink-0">
                             {patient.name.charAt(0)}
                         </div>
-                        <div>
-                            <h3 className="text-3xl font-extrabold text-gray-900">{patient.name}</h3>
-                            <div className="mt-1 space-x-2">
-                                <Tag color="blue" icon={<IdcardOutlined />}>ID Tài Khoản: {patient.accountId}</Tag>
+                        <div className="text-center sm:text-left">
+                            <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900">{patient.name}</h3>
+                            <div className="mt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
+                                <Tag color="blue" icon={<IdcardOutlined />} className="text-xs sm:text-sm">
+                                    <span className="hidden sm:inline">ID Tài Khoản: </span>
+                                    {patient.accountId}
+                                </Tag>
                                 {age !== null && (
-                                    <Tag color="purple" icon={<CalendarOutlined />}>Tuổi: {age}</Tag>
+                                    <Tag color="purple" icon={<CalendarOutlined />} className="text-xs sm:text-sm">Tuổi: {age}</Tag>
                                 )}
                             </div>
                         </div>
                     </div>
 
                     {/* Phần Chi tiết Liên hệ và Cá nhân */}
-                    <h4 className="text-xl font-semibold text-gray-700 mb-3 border-l-4 border-yellow-500 pl-2">Chi Tiết Cá Nhân</h4>
+                    <h4 className="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 border-l-4 border-yellow-500 pl-2">Chi Tiết Cá Nhân</h4>
                     <Descriptions
-                        column={1}
+                        column={{ xs: 1, sm: 1, md: 1 }}
                         bordered
                         layout="horizontal"
-                        className="rounded-lg overflow-hidden"
+                        className="rounded-lg overflow-hidden [&_.ant-descriptions-item-label]:!text-xs [&_.ant-descriptions-item-label]:sm:!text-sm [&_.ant-descriptions-item-content]:!text-xs [&_.ant-descriptions-item-content]:sm:!text-sm"
+                        labelStyle={{ width: '40%' }}
                     >
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><CalendarOutlined className="mr-2" /> Ngày Sinh</span>}
+                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><CalendarOutlined /> <span className="hidden xs:inline">Ngày Sinh</span><span className="inline xs:hidden">Sinh</span></span>}
                         >
                             <span className="font-semibold text-gray-700">{formattedDob}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><PhoneOutlined className="mr-2" /> Số Điện Thoại</span>}
+                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><PhoneOutlined /> <span className="hidden xs:inline">Số Điện Thoại</span><span className="inline xs:hidden">SĐT</span></span>}
                         >
-                            <span className="font-semibold">{patient.phone}</span>
+                            <span className="font-semibold break-all">{patient.phone}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><MdEmail className="mr-2" /> Email</span>}
+                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><MdEmail /> Email</span>}
                         >
-                            <span className="font-semibold">{user?.email}</span>
+                            <span className="font-semibold break-all">{user?.email}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><UserOutlined className="mr-2" /> Giới Tính</span>}
+                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><UserOutlined /> <span className="hidden xs:inline">Giới Tính</span><span className="inline xs:hidden">GT</span></span>}
                         >
                             <span className="font-semibold text-gray-700">{gender}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center"><EnvironmentOutlined className="mr-2" /> Địa Chỉ</span>}
+                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><EnvironmentOutlined /> <span className="hidden xs:inline">Địa Chỉ</span><span className="inline xs:hidden">ĐC</span></span>}
                             span={2}
                         >
-                            {address}
+                            <span className="break-words">{address}</span>
                         </Descriptions.Item>
                     </Descriptions>
                 </Card>

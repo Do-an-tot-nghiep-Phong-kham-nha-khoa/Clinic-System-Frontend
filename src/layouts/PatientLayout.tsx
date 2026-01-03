@@ -1,177 +1,230 @@
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-} from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { Layout, Menu, Avatar, Button, Grid } from "antd";
 import { CgProfile } from "react-icons/cg";
 import { ImProfile } from "react-icons/im";
-import { FaHome } from 'react-icons/fa';
-import { Button, Layout, Menu, Avatar } from "antd";
-import {
-    MdLogout,
-} from "react-icons/md";
-import { useState } from "react";
-import { FaListCheck } from "react-icons/fa6";
-import { FaFileMedical, FaRegCalendarPlus, FaRobot } from "react-icons/fa";
-import { MdOutlineReceiptLong } from "react-icons/md";
+import { FaHome, FaFileMedical } from "react-icons/fa";
+import { FaListCheck, FaRegCalendarPlus, FaRobot } from "react-icons/fa6";
+import { MdOutlineReceiptLong, MdLogout } from "react-icons/md";
 import { useAuth } from "../contexts/AuthContext";
 
 const { Header, Sider, Content } = Layout;
+const { useBreakpoint } = Grid;
 
+/* ================= ICON FIX ================= */
+const IconBox = ({ children }: { children: React.ReactNode }) => (
+  <span
+    style={{
+      width: 24,
+      height: 24,
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    {children}
+  </span>
+);
 
 const PatientLayout = () => {
-    const [collapsed, setCollapsed] = useState(false);
-    const navigate = useNavigate();
-    const { user, logout } = useAuth();
+  const screens = useBreakpoint();
+  const isMobile = !screens.lg;
 
-    const location = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, logout } = useAuth();
 
-    const menuItems = [
+  /* ================= COLLAPSE STATE ================= */
+  const [collapsed, setCollapsed] = useState(false);
 
-        {
-            key: "profile",
-            icon: <CgProfile size={20} />,
-            label: "Thông tin cá nhân",
-            onClick: () => navigate("/patient"),
-        },
-        {
-            key: "health-profile",
-            icon: <ImProfile size={20} />,
-            label: "Hồ sơ sức khỏe",
-            onClick: () => navigate("/patient/health-profile"),
-        },
-        {
-            key: "appointments",
-            icon: <FaRegCalendarPlus size={20} />,
-            label: "Xem lịch hẹn",
-            onClick: () => navigate("/patient/appointments"),
-        },
-        {
-            key: "appointments-specialty",
-            icon: <FaListCheck size={20} />,
-            label: "Đặt lịch chuyên khoa",
-            onClick: () => navigate("/patient/appointments-specialty"),
-        },
-        {
-            key: "appointments-doctor",
-            icon: <FaListCheck size={20} />,
-            label: "Đặt lịch hẹn theo bác sĩ",
-            onClick: () => navigate("/patient/appointments-doctor"),
-        },
-        {
-            key: "medical-records",
-            icon: <FaFileMedical size={20} />,
-            label: "Xem lịch sử khám",
-            onClick: () => navigate("/patient/medical-records"),
-        },
-        {
-            key: "invoices",
-            icon: <MdOutlineReceiptLong size={20} />,
-            label: "Hóa đơn của tôi",
-            onClick: () => navigate("/patient/invoices"),
-        },
-        {
-            key: "chatbot",
-            icon: <FaRobot size={20} />,
-            label: "Chatbot tư vấn",
-            onClick: () => navigate("/patient/chatbot"),
-        },
-    ];
+  // Mobile: luôn collapsed
+  useEffect(() => {
+    if (isMobile) setCollapsed(true);
+  }, [isMobile]);
 
-    const pathname = location.pathname || "";
-    let selectedKey = "profile";
-    if (pathname.startsWith("/patient/medical-records")) selectedKey = "medical-records";
-    else if (pathname.startsWith("/patient/invoices")) selectedKey = "invoices";
-    else if (pathname.startsWith("/patient/payment-result")) selectedKey = "invoices";
-    else if (pathname.startsWith("/patient/chatbot")) selectedKey = "chatbot";
-    else if (pathname.startsWith("/patient/health-profile")) selectedKey = "health-profile";
-    else if (pathname.startsWith("/patient/appointments-doctor")) selectedKey = "appointments-doctor";
-    else if (pathname.startsWith("/patient/appointments-specialty")) selectedKey = "appointments-specialty";
-    else if (pathname.startsWith("/patient/appointments")) selectedKey = "appointments";
-    else if (pathname === "/patient" || pathname === "/patient/") selectedKey = "profile";
+  /* ================= MENU ITEMS ================= */
+  const menuItems = useMemo(
+    () => [
+      {
+        key: "profile",
+        icon: (
+          <IconBox>
+            <CgProfile size={18} />
+          </IconBox>
+        ),
+        label: collapsed ? null : "Thông tin cá nhân",
+        onClick: () => navigate("/patient"),
+      },
+      {
+        key: "health-profile",
+        icon: (
+          <IconBox>
+            <ImProfile size={18} />
+          </IconBox>
+        ),
+        label: collapsed ? null : "Hồ sơ sức khỏe",
+        onClick: () => navigate("/patient/health-profile"),
+      },
+      {
+        key: "appointments",
+        icon: (
+          <IconBox>
+            <FaRegCalendarPlus size={16} />
+          </IconBox>
+        ),
+        label: collapsed ? null : "Xem lịch hẹn",
+        onClick: () => navigate("/patient/appointments"),
+      },
+      {
+        key: "appointments-specialty",
+        icon: (
+          <IconBox>
+            <FaListCheck size={16} />
+          </IconBox>
+        ),
+        label: collapsed ? null : "Đặt lịch chuyên khoa",
+        onClick: () => navigate("/patient/appointments-specialty"),
+      },
+      {
+        key: "appointments-doctor",
+        icon: (
+          <IconBox>
+            <FaListCheck size={16} />
+          </IconBox>
+        ),
+        label: collapsed ? null : "Đặt lịch theo bác sĩ",
+        onClick: () => navigate("/patient/appointments-doctor"),
+      },
+      {
+        key: "medical-records",
+        icon: (
+          <IconBox>
+            <FaFileMedical size={16} />
+          </IconBox>
+        ),
+        label: collapsed ? null : "Lịch sử khám",
+        onClick: () => navigate("/patient/medical-records"),
+      },
+      {
+        key: "invoices",
+        icon: (
+          <IconBox>
+            <MdOutlineReceiptLong size={18} />
+          </IconBox>
+        ),
+        label: collapsed ? null : "Hóa đơn",
+        onClick: () => navigate("/patient/invoices"),
+      },
+      {
+        key: "chatbot",
+        icon: (
+          <IconBox>
+            <FaRobot size={16} />
+          </IconBox>
+        ),
+        label: collapsed ? null : "Chatbot tư vấn",
+        onClick: () => navigate("/patient/chatbot"),
+      },
+    ],
+    [navigate, collapsed]
+  );
 
-    return (
-        <Layout className="h-screen">
-            <Sider
-                trigger={null}
-                collapsible
-                collapsed={collapsed}
-                width={300}
-                className="!flex !flex-col !h-full"
-            >
-                <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-slate-800 text-white">
-                    <div className="px-4 py-6">
-                        <div className="text-white text-xl font-bold text-center pb-4 align-middle justify-center flex items-center">
-                            <Link to="/" className="!text-white">{!collapsed ? "Khung bệnh nhân" : "Bệnh nhân"}</Link>
-                        </div>
+  // Find the longest matching key to handle nested routes like appointments-specialty
+  const selectedKey =
+    menuItems
+      .filter((i) => location.pathname.includes(i.key))
+      .sort((a, b) => b.key.length - a.key.length)[0]?.key || "profile";
 
-                        <div className="!flex-1 !overflow-auto">
-                            <Menu className="!bg-slate-800 !text-base flex flex-col items-center justify-center gap-4" theme="dark" mode="inline" items={menuItems} selectedKeys={[selectedKey]} />
-                        </div>
-                    </div>
+  return (
+    <Layout className="fixed inset-0">
+      {/* ================= SIDER ================= */}
+      <Sider
+        collapsible={!isMobile}
+        collapsed={collapsed}
+        trigger={null}
+        width={260}
+        collapsedWidth={80}
+        className="!bg-slate-800"
+      >
+        <div className="flex h-full flex-col">
+          <div className="flex-1">
+            <div className="h-[76px] flex items-center justify-center px-4 overflow-hidden">
+              {!collapsed && (
+                <Link to="/" className="text-white text-xl font-bold whitespace-nowrap">
+                  Khung bệnh nhân
+                </Link>
+              )}
+            </div>
 
-                    <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
-                        <div>
-                            <div className="p-4 flex items-center gap-3">
-                                <Avatar size={40} className="!bg-[var(--color-primary)] !text-white !uppercase !font-bold">
-                                    {user?.email?.charAt(0).toUpperCase() || "A"}
-                                </Avatar>
-                                {!collapsed && (
-                                    <div className="flex flex-col text-white text-sm gap-1">
-                                        <span className="font-semibold">{user?.email}</span>
-                                    </div>
-                                )}
-                            </div>
+            <Menu
+              theme="dark"
+              mode="inline"
+              selectedKeys={[selectedKey]}
+              items={menuItems}
+              className={`!bg-slate-800 ${
+                collapsed
+                  ? "[&_.ant-menu-item]:!flex [&_.ant-menu-item]:!justify-center [&_.ant-menu-item]:!items-center [&_.ant-menu-item]:!px-0 [&_.ant-menu-item-icon]:!mr-0"
+                  : ""
+              }`}
+            />
+          </div>
 
-                            {!collapsed && (
-                                <div className="flex items-center justify-center pb-4">
-                                    <Button
-                                        type="link"
-                                        icon={<MdLogout />}
-                                        className="!bg-white !text-black hover:!bg-black hover:!text-white !border-none"
-                                        onClick={() => {
-                                            logout();
-                                            navigate("/");
-                                        }}
-                                    >
-                                        Đăng xuất
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </Sider>
-            <Layout>
-                <Header
-                    className="px-4 flex items-center !bg-slate-800 text-white"
+          <div className="border-t border-slate-700 p-4">
+            <div className="flex items-center gap-3">
+              <Avatar className="!bg-[var(--color-primary)]">
+                {user?.email?.charAt(0).toUpperCase()}
+              </Avatar>
+              {!collapsed && (
+                <span className="text-white text-sm truncate">
+                  {user?.email}
+                </span>
+              )}
+            </div>
 
-                >
-                    <Button
-                        type="text"
-                        icon={
-                            collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
-                        }
-                        onClick={() => setCollapsed(!collapsed)}
-                        className="!w-[48px] !h-[48px] !text-base !text-white"
-                    />
-                    {/* Home button to return to patient home/dashboard */}
-                    <Button
-                        type="text"
-                        icon={<FaHome />}
-                        onClick={() => navigate('/')}
-                        className="!ml-2 !text-white"
-                    >
-                        {!collapsed && <span>Trang chủ</span>}
-                    </Button>
-                </Header>
+            {!collapsed && (
+              <Button
+                type="text"
+                icon={<MdLogout />}
+                className="mt-3 w-full !bg-white !text-black"
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+              >
+                Đăng xuất
+              </Button>
+            )}
+          </div>
+        </div>
+      </Sider>
 
-                <Content className="p-4 bg-[#f5f5f5] flex-grow overflow-y-auto">
-                    <Outlet />
-                </Content>
-            </Layout>
-        </Layout>
-    );
-}
+      {/* ================= MAIN ================= */}
+      <Layout>
+        <Header className="px-4 flex items-center gap-2 !bg-slate-800 text-white">
+          {!isMobile && (
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed((v) => !v)}
+              className="!text-white"
+            />
+          )}
+
+          <Button
+            type="text"
+            icon={<FaHome />}
+            onClick={() => navigate("/")}
+            className="!text-white"
+          />
+        </Header>
+
+        <Content className="bg-[#f5f5f5] overflow-y-auto p-4">
+          <Outlet />
+        </Content>
+      </Layout>
+    </Layout>
+  );
+};
 
 export default PatientLayout;

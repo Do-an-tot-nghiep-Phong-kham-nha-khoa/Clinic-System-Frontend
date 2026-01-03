@@ -74,18 +74,22 @@ const PatientTreatmentHistory = () => {
             dataIndex: ["healthProfile", "owner_detail", "name"],
             key: "ownerName",
             render: (_, record) => record.healthProfile?.owner_detail?.name || "—",
+            ellipsis: true,
         },
         {
             title: "Bác sĩ",
             dataIndex: ["doctor", "name"],
             key: "doctorName",
             render: (_, record) => record.doctor?.name || "—",
+            ellipsis: true,
         },
         {
             title: "Chuyên khoa",
             dataIndex: ["doctor", "specialtyId", "name"],
             key: "specialty",
             render: (_, record) => record.doctor?.specialtyId?.name || "—",
+            ellipsis: true,
+            responsive: ['md'] as any,
         },
         {
             title: "Ngày khám",
@@ -94,25 +98,32 @@ const PatientTreatmentHistory = () => {
             render: (text) => dayjs.utc(text).format("DD/MM/YYYY"),
             sorter: true,
             defaultSortOrder: "descend",
+            width: 110,
         },
         {
             title: "Chuẩn đoán",
             dataIndex: "diagnosis",
             key: "diagnosis",
             ellipsis: true,
-            width: "35%",
+            responsive: ['lg'] as any,
         },
         {
             title: "Thao tác",
             key: "action",
             align: "center",
+            width: 100,
             render: (_, record) => (
-                <ButtonPrimary type="link" shape="round" icon={<FaInfoCircle />}
+                <ButtonPrimary 
+                    type="link" 
+                    shape="round" 
+                    icon={<FaInfoCircle />}
+                    size="small"
+                    className="text-xs sm:text-sm"
                     onClick={() => {
                         setSelectedTreatmentId(record._id);
                         setModalVisible(true);
                     }}>
-                    Xem chi tiết
+                    <span className="hidden sm:inline">Xem</span>
                 </ButtonPrimary>
             ),
         },

@@ -152,22 +152,30 @@ const PatientInvoices = () => {
             dataIndex: "invoiceNumber",
             key: "invoiceNumber",
             render: (text) => text || "—",
+            ellipsis: true,
+            width: 120,
         },
         {
             title: "Tổng tiền",
             dataIndex: "totalPrice",
             key: "totalPrice",
-            render: (price) => `${price?.toLocaleString() || 0} VNĐ`,
+            render: (price) => (
+                <span className="break-words">
+                    {price?.toLocaleString() || 0} <span className="hidden sm:inline">VNĐ</span>
+                </span>
+            ),
             align: "right",
+            width: 110,
         },
         {
             title: "Trạng thái",
             dataIndex: "status",
             key: "status",
             render: (status) => (
-                <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
+                <Tag color={getStatusColor(status)} className="text-xs sm:text-sm">{getStatusText(status)}</Tag>
             ),
             align: "center",
+            width: 110,
         },
         {
             title: "Phương thức",
@@ -178,12 +186,14 @@ const PatientInvoices = () => {
                 return payment.method === "cash" ? "Tiền mặt" : payment.method === "vnpay" ? "VNPay" : payment.method;
             },
             align: "center",
+            responsive: ['md'] as any,
         },
         {
             title: "Ngày tạo",
             dataIndex: "issued_at",
             key: "issued_at",
             render: (text) => text ? dayjs.utc(text).format("DD/MM/YYYY HH:mm") : "—",
+            responsive: ['lg'] as any,
         },
         {
             title: "Ngày thanh toán",
@@ -192,28 +202,33 @@ const PatientInvoices = () => {
                 const payment = record.payments?.[0];
                 return payment?.paid_at ? dayjs.utc(payment.paid_at).format("DD/MM/YYYY HH:mm") : "—";
             },
+            responsive: ['lg'] as any,
         },
         {
             title: "Thao tác",
             key: "action",
             align: "center",
+            fixed: 'right' as any,
+            width: 180,
             render: (_, record) => {
                 if (record.status === "Pending") {
                     return (
-                        <Space>
+                        <Space size="small" direction="vertical" className="sm:flex-row sm:space-x-1">
                             <Button
                                 type="default"
                                 icon={<FaMoneyBillWave />}
                                 onClick={() => handleCashPayment()}
                                 size="small"
+                                className="text-xs w-full sm:w-auto"
                             >
-                                Tiền mặt
+                                <span className="hidden xs:inline">Tiền mặt</span>
                             </Button>
                             <ButtonPrimary
                                 icon={<FaCreditCard />}
                                 onClick={() => handleVNPayPayment(record._id)}
                                 loading={paymentLoading === record._id}
                                 size="small"
+                                className="text-xs w-full sm:w-auto"
                             >
                                 VNPay
                             </ButtonPrimary>
@@ -226,15 +241,15 @@ const PatientInvoices = () => {
     ];
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-semibold mb-4 text-gray-800">Hóa đơn của tôi</h1>
+        <div className="p-2 sm:p-4 md:p-6">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4 text-gray-800">Hóa đơn của tôi</h1>
 
             {!loading && invoices.length === 0 ? (
                 <Card className="bg-white shadow-md rounded-lg">
-                    <div className="text-center py-12">
-                        <MdOutlineReceiptLong style={{ fontSize: '64px', color: '#d9d9d9', marginBottom: '16px' }} />
-                        <Title level={3} type="secondary">Chưa có hóa đơn nào</Title>
-                        <Text type="secondary" className="text-base">
+                    <div className="text-center py-8 sm:py-12">
+                        <MdOutlineReceiptLong style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} className="sm:text-[64px]" />
+                        <Title level={3} type="secondary" className="text-base sm:text-lg md:text-xl">Chưa có hóa đơn nào</Title>
+                        <Text type="secondary" className="text-sm sm:text-base">
                             Bạn chưa có hóa đơn nào. Hóa đơn sẽ được tạo sau khi khám bệnh.
                         </Text>
                     </div>
@@ -246,6 +261,7 @@ const PatientInvoices = () => {
                     dataSource={invoices}
                     loading={loading}
                     bordered
+                    scroll={{ x: 1000 }}
                     pagination={{
                         current: page,
                         pageSize: limit,
@@ -253,9 +269,11 @@ const PatientInvoices = () => {
                         showSizeChanger: true,
                         pageSizeOptions: ["5", "10", "20", "50"],
                         showTotal: (total) => `Tổng ${total} hóa đơn`,
+                        size: 'small',
                     }}
                     onChange={handleTableChange}
                     className="bg-white shadow-md rounded-lg"
+                    size="small"
                 />
             )}
         </div>

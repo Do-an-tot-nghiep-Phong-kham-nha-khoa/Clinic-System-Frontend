@@ -26,18 +26,19 @@ const CardHoverProfile: React.FC<{
         <Card
             hoverable
             style={{ borderRadius: 16, boxShadow: '0 6px 20px rgba(0,0,0,0.08)', minHeight: 220 }}
+            className="[&_.ant-card-head]:!p-3 sm:[&_.ant-card-head]:!p-4 [&_.ant-card-body]:!p-3 sm:[&_.ant-card-body]:!p-4"
             title={
-                <Space align="center">
-                    <FaUser style={{ fontSize: 24, color: '#4f46e5' }} />
-                    <span style={{ fontWeight: 'bold', fontSize: 18 }}>{title}</span>
+                <Space align="center" size="small" className="flex-wrap">
+                    <FaUser className="text-lg sm:text-2xl" style={{ color: '#4f46e5' }} />
+                    <span className="font-bold text-sm sm:text-lg">{title}</span>
                     {profile.type === 'Patient'
-                        ? <Tag color="blue">Bạn</Tag>
-                        : <Tag color="purple">{profile.relationship}</Tag>}
+                        ? <Tag color="blue" className="text-xs">Bạn</Tag>
+                        : <Tag color="purple" className="text-xs">{profile.relationship}</Tag>}
                 </Space>
             }
             extra={
-                <Space>
-                    <Button type="text" icon={<EditOutlined />} onClick={onEdit} />
+                <Space size="small">
+                    <Button type="text" icon={<EditOutlined />} onClick={onEdit} size="small" />
                     {profile.type === 'FamilyMember' && (
                         <Popconfirm
                             title="Bạn có chắc muốn xóa hồ sơ này không?"
@@ -45,42 +46,48 @@ const CardHoverProfile: React.FC<{
                             okText="Có"
                             cancelText="Không"
                         >
-                            <Button type="text" danger icon={<DeleteOutlined />} />
+                            <Button type="text" danger icon={<DeleteOutlined />} size="small" />
                         </Popconfirm>
                     )}
                 </Space>
             }
         >
-            <Descriptions column={1} size="small" bordered style={{ borderRadius: 8, overflow: 'hidden' }}>
+            <Descriptions 
+                column={1} 
+                size="small" 
+                bordered 
+                style={{ borderRadius: 8, overflow: 'hidden' }}
+                className="[&_.ant-descriptions-item-label]:!text-xs sm:[&_.ant-descriptions-item-label]:!text-sm [&_.ant-descriptions-item-content]:!text-xs sm:[&_.ant-descriptions-item-content]:!text-sm"
+            >
                 <Descriptions.Item
-                    label={<Space><CalendarOutlined /> Chiều cao</Space>}
+                    label={<Space size="small"><CalendarOutlined /> <span className="hidden xs:inline">Chiều cao</span><span className="inline xs:hidden">Cao</span></Space>}
                     styles={{ label: { width: '40%' } }}
                 >
                     {profile.height ?? '-'} cm
                 </Descriptions.Item>
                 <Descriptions.Item
-                    label={<Space><CalendarOutlined /> Cân nặng</Space>}
+                    label={<Space size="small"><CalendarOutlined /> <span className="hidden xs:inline">Cân nặng</span><span className="inline xs:hidden">Nặng</span></Space>}
                     styles={{ label: { width: '40%' } }}
                 >
                     {profile.weight ?? '-'} kg
                 </Descriptions.Item>
                 <Descriptions.Item
-                    label={<Space><HeartOutlined /> Nhóm máu</Space>}
+                    label={<Space size="small"><HeartOutlined /> Nhóm máu</Space>}
                     styles={{ label: { width: '40%' } }}
                 >
                     {profile.bloodType ?? '---'}
                 </Descriptions.Item>
                 <Descriptions.Item
-                    label={<Space><MedicineBoxOutlined /> Dị ứng</Space>}
+                    label={<Space size="small"><MedicineBoxOutlined /> Dị ứng</Space>}
                     styles={{ label: { width: '40%' } }}
                 >
-                    {(profile.allergies || []).slice(0, 3).join(', ') || '---'}
+                    <span className="break-words">{(profile.allergies || []).slice(0, 3).join(', ') || '---'}</span>
                 </Descriptions.Item>
                 <Descriptions.Item
-                    label={<Space><MedicineBoxOutlined /> Thuốc đang dùng</Space>}
+                    label={<Space size="small"><MedicineBoxOutlined /> <span className="hidden xs:inline">Thuốc đang dùng</span><span className="inline xs:hidden">Thuốc</span></Space>}
                     styles={{ label: { width: '40%' } }}
                 >
-                    {(profile.medications || []).slice(0, 3).join(', ') || '---'}
+                    <span className="break-words">{(profile.medications || []).slice(0, 3).join(', ') || '---'}</span>
                 </Descriptions.Item>
             </Descriptions>
         </Card>
@@ -252,20 +259,20 @@ const HealthProfilePage: React.FC = () => {
     const family = profiles.filter(p => p.type === "FamilyMember");
 
     return (
-        <div style={{ padding: 24 }}>
+        <div className="p-3 sm:p-4 md:p-6">
             <Space direction="vertical" style={{ width: '100%' }} size={24}>
-                <Space style={{ justifyContent: "space-between", width: '100%' }}>
-                    <h2 className="text-2xl font-bold">Hồ sơ sức khỏe</h2>
-                    <Space>
-                        {!owner && <Button type="primary" onClick={() => openNew('Patient')}>Thêm hồ sơ chủ sở hữu</Button>}
-                        <Button type="primary" onClick={() => openNew('FamilyMember')}>Thêm hồ sơ thành viên</Button>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+                    <h2 className="text-xl sm:text-2xl font-bold">Hồ sơ sức khỏe</h2>
+                    <Space size="small" className="flex-wrap">
+                        {!owner && <Button type="primary" onClick={() => openNew('Patient')} size="small" className="text-xs sm:text-sm">Thêm hồ sơ chủ</Button>}
+                        <Button type="primary" onClick={() => openNew('FamilyMember')} size="small" className="text-xs sm:text-sm">Thêm thành viên</Button>
                     </Space>
-                </Space>
+                </div>
 
                 <div>
-                    <h3 className="text-xl font-semibold mb-4">Chủ sở hữu</h3>
+                    <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Chủ sở hữu</h3>
                     {owner ? (
-                        <List grid={{ gutter: 16, column: 1 }}>
+                        <List grid={{ gutter: 12, column: 1, xs: 1 }}>
                             <List.Item>
                                 <CardHoverProfile
                                     profile={owner}
@@ -274,14 +281,14 @@ const HealthProfilePage: React.FC = () => {
                                 />
                             </List.Item>
                         </List>
-                    ) : <Empty description="Chưa có hồ sơ chủ" />}
+                    ) : <Empty description="Chưa có hồ sơ chủ" className="text-sm" />}
                 </div>
 
                 <div>
-                    <h3 className="text-xl font-semibold mt-8 mb-4">Thành viên gia đình</h3>
+                    <h3 className="text-lg sm:text-xl font-semibold mt-6 sm:mt-8 mb-3 sm:mb-4">Thành viên gia đình</h3>
                     {family.length ? (
                         <List
-                            grid={{ gutter: 16, column: 3, xs: 1, sm: 2, md: 3, lg: 3 }}
+                            grid={{ gutter: 12, column: 3, xs: 1, sm: 2, md: 2, lg: 3 }}
                             dataSource={family}
                             renderItem={item => (
                                 <List.Item>
@@ -299,14 +306,15 @@ const HealthProfilePage: React.FC = () => {
 
             <Drawer
                 title={selected ? "Chỉnh sửa hồ sơ" : "Tạo hồ sơ mới"}
-                width={550}
+                width="100%"
+                style={{ maxWidth: 550 }}
                 open={drawerOpen}
                 onClose={() => setDrawerOpen(false)}
                 bodyStyle={{ paddingBottom: 24 }}
                 footer={
                     <div style={{ textAlign: "right" }}>
-                        <Button onClick={() => setDrawerOpen(false)} style={{ marginRight: 8 }}>Hủy</Button>
-                        <Button type="primary" onClick={onSave} loading={loading}>Lưu</Button>
+                        <Button onClick={() => setDrawerOpen(false)} style={{ marginRight: 8 }} size="small" className="text-xs sm:text-sm">Hủy</Button>
+                        <Button type="primary" onClick={onSave} loading={loading} size="small" className="text-xs sm:text-sm">Lưu</Button>
                     </div>
                 }
             >
@@ -354,15 +362,15 @@ const HealthProfilePage: React.FC = () => {
                         </Space>
                     )}
 
-                    <Row gutter={16}>
-                        <Col span={12}>
+                    <Row gutter={[8, 0]}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name="height" label="Chiều cao (cm)">
-                                <Input type="number" placeholder="Ví dụ: 170" />
+                                <Input type="number" placeholder="Ví dụ: 170" size="small" className="sm:!h-8" />
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name="weight" label="Cân nặng (kg)">
-                                <Input type="number" placeholder="Ví dụ: 60" />
+                                <Input type="number" placeholder="Ví dụ: 60" size="small" className="sm:!h-8" />
                             </Form.Item>
                         </Col>
                     </Row>

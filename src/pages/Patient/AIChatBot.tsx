@@ -126,18 +126,18 @@ export default function Chatbot() {
 
   // Thành phần hiển thị bong bóng "Đang suy nghĩ..."
   const ThinkingBubble = () => (
-    <div className="flex justify-start mb-4">
-      <div className="bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-[75%] shadow-md">
+    <div className="flex justify-start mb-2 sm:mb-4">
+      <div className="bg-gray-200 p-2 sm:p-3 rounded-xl rounded-tl-none max-w-[90%] sm:max-w-[75%] shadow-md">
 
         <div className="flex items-center">
 
           <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-150"></div>
-            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-300"></div>
-            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-700"></div>
+            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-500 rounded-full animate-bounce delay-150"></div>
+            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-500 rounded-full animate-bounce delay-300"></div>
+            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-500 rounded-full animate-bounce delay-700"></div>
           </div>
 
-          <span className="ml-2 text-sm text-gray-700 italic">Đang suy nghĩ...</span>
+          <span className="ml-2 text-xs sm:text-sm text-gray-700 italic">Đang suy nghĩ...</span>
         </div>
 
       </div>
@@ -149,10 +149,10 @@ export default function Chatbot() {
     const content = isUser ? message.content : formatAssistantContent(message.content);
 
     return (
-      <div className={`flex mb-3 ${isUser ? "justify-end" : "justify-start"}`}>
-        <div className={`flex flex-col max-w-[85%] ${isUser ? "items-end" : "items-start"}`}>
+      <div className={`flex mb-2 sm:mb-3 ${isUser ? "justify-end" : "justify-start"}`}>
+        <div className={`flex flex-col max-w-[90%] sm:max-w-[85%] md:max-w-[75%] ${isUser ? "items-end" : "items-start"}`}>
           <div
-            className={`px-4 py-3 rounded-2xl shadow-sm text-[15px] ${isUser
+            className={`px-3 sm:px-4 py-2 sm:py-3 rounded-2xl shadow-sm text-xs sm:text-sm md:text-[15px] break-words ${isUser
               ? "bg-blue-600 text-white rounded-br-none"
               : "bg-white text-gray-800 rounded-tl-none border border-gray-100"
               }`}
@@ -162,7 +162,7 @@ export default function Chatbot() {
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </div>
-          <span className={`text-[11px] mt-1 text-gray-400 ${isUser ? "mr-1" : "ml-1"}`}>
+          <span className={`text-[10px] sm:text-[11px] mt-1 text-gray-400 ${isUser ? "mr-1" : "ml-1"}`}>
             {formatTime(message.timestamp)}
           </span>
         </div>
@@ -174,16 +174,16 @@ export default function Chatbot() {
     <div className="flex flex-col h-full min-h-full bg-gray-50 font-sans">
       <Card
         className="shadow-sm bg-white sticky top-0 z-10 w-full rounded-none border-b border-gray-200"
-        title={<div className="flex items-center gap-2 text-lg font-bold text-blue-600">
-          <span className="text-2xl"><BsRobot /></span> Trợ lý Y tế ảo
+        title={<div className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base md:text-lg font-bold text-blue-600">
+          <span className="text-lg sm:text-xl md:text-2xl"><BsRobot /></span> Trợ lý Y tế ảo
         </div>}
-        bodyStyle={{ padding: '12px 24px' }}
+        bodyStyle={{ padding: '8px 12px', '@media (min-width: 640px)': { padding: '12px 24px' } }}
         bordered={false}
       >
-        <p className="text-sm text-gray-500 m-0">Hỗ trợ thông tin sức khỏe và hướng dẫn đặt lịch khám bệnh.</p>
+        <p className="text-xs sm:text-sm text-gray-500 m-0">Hỗ trợ thông tin sức khỏe và hướng dẫn đặt lịch khám bệnh.</p>
       </Card>
 
-      <div className="flex-grow overflow-y-auto p-4 space-y-2 custom-scrollbar">
+      <div className="flex-grow overflow-y-auto p-2 sm:p-3 md:p-4 space-y-2 custom-scrollbar">
         {messages.map((m, i) => (
           <MessageItem key={i} message={m} />
         ))}
@@ -192,32 +192,33 @@ export default function Chatbot() {
       </div>
 
       {errorMsg && (
-        <div className="mx-4 mt-2 p-2 text-red-500 bg-red-50 border border-red-200 rounded-md text-sm text-center">
+        <div className="mx-2 sm:mx-4 mt-2 p-2 text-red-500 bg-red-50 border border-red-200 rounded-md text-xs sm:text-sm text-center">
           {errorMsg}
         </div>
       )}
 
-      <div className="p-4 bg-white border-t border-gray-200 sticky bottom-0 z-20">
+      <div className="p-2 sm:p-3 md:p-4 bg-white border-t border-gray-200 sticky bottom-0 z-20">
         <form onSubmit={sendMessage}>
-          <Space.Compact className="w-full">
+          <Space.Compact className="w-full" size="small">
             <Input
               onPressEnter={handlePressEnter}
               ref={inputRef as any}
-              className="text-base py-2"
+              className="text-sm sm:text-base py-1 sm:py-2"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
-              size="large"
+              size="middle"
+              placeholder="Nhập tin nhắn..."
             />
             <Button
-              className="w-[80px]"
+              className="w-[60px] sm:w-[80px] text-xs sm:text-sm"
               type="primary"
               onClick={sendMessage}
               disabled={loading || !input.trim()}
               icon={<SendOutlined />}
-              size="large"
+              size="middle"
             >
-              Gửi
+              <span className="hidden sm:inline">Gửi</span>
             </Button>
           </Space.Compact>
         </form>

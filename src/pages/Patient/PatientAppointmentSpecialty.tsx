@@ -204,16 +204,20 @@ const PatientAppointmentSpecialty = () => {
     };
 
     return (
-        <div className="container mx-auto p-4 max-w-6xl">
-            <Title level={2} className="text-center !mb-6 !font-bold">Đặt Lịch Khám Theo Chuyên Khoa</Title>
+        <div className="container mx-auto p-2 sm:p-4 md:p-6 max-w-6xl">
+            <Title level={2} className="text-center !mb-3 sm:!mb-4 md:!mb-6 !font-bold text-lg sm:text-xl md:text-2xl">Đặt Lịch Khám Theo Chuyên Khoa</Title>
 
             {/* Steps Component: Hiển thị tiến trình */}
-            <div className="mb-8">
-                <Steps current={currentStep} items={APPOINTMENT_STEPS} />
+            <div className="mb-4 sm:mb-6 md:mb-8">
+                <Steps 
+                    current={currentStep} 
+                    items={APPOINTMENT_STEPS}
+                    className="text-xs sm:text-sm"
+                />
             </div>
 
             {/* Nội dung của bước hiện tại */}
-            <div className="bg-white p-6 shadow-md rounded-lg">
+            <div className="bg-white p-3 sm:p-4 md:p-6 shadow-md rounded-lg">
                 {renderStepContent()}
             </div>
         </div>
