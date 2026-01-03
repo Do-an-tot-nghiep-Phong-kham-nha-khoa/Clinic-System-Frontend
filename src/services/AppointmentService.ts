@@ -64,17 +64,45 @@ export interface HealthProfile {
     owner_detail: HealthProfileOwner;
 }
 
+// Snapshot interfaces cho optimized queries
+export interface PatientSnapshot {
+    name: string;
+    dob?: string;
+    phone?: string;
+    gender?: string;
+    ownerModel?: string;
+}
+
+export interface DoctorSnapshot {
+    name: string;
+    phone?: string;
+    experience?: number;
+    avatar?: string;
+}
+
+export interface SpecialtySnapshot {
+    name: string;
+    description?: string;
+}
+
 export interface AppointmentModel {
     _id: string;
     booker_id: string;
     doctor_id: string;
-    healthProfile_id: HealthProfile;
+    healthProfile_id?: string | HealthProfile; // Có thể là ID hoặc populated object
     specialty_id: string;
     appointmentDate: string;
     timeSlot: string;
     reason: string;
     status: string;
     createdAt: string;
+    // Snapshot fields - được trả về từ optimized queries
+    patient?: PatientSnapshot;
+    patientSnapshot?: PatientSnapshot;
+    doctor?: DoctorSnapshot;
+    doctorSnapshot?: DoctorSnapshot;
+    specialty?: SpecialtySnapshot;
+    specialtySnapshot?: SpecialtySnapshot;
 }
 
 export interface ListAppointmentByDoctorResponse {
@@ -99,8 +127,6 @@ export interface SpecialtyDetail {
 
 export interface BookerAppointmentModel {
     _id: string;
-    doctor_id: DoctorDetail;
-    specialty_id: SpecialtyDetail;
     booker_id: string;
     healthProfile_id: HealthProfile;
     appointmentDate: string;
@@ -108,6 +134,13 @@ export interface BookerAppointmentModel {
     reason: string;
     status: string;
     createdAt: string;
+    // Snapshot fields from backend
+    doctor?: DoctorSnapshot;
+    doctorSnapshot?: DoctorSnapshot;
+    specialty?: SpecialtySnapshot;
+    specialtySnapshot?: SpecialtySnapshot;
+    patient?: PatientSnapshot;
+    patientSnapshot?: PatientSnapshot;
 }
 
 export interface ListAppointmentByBookerResponse {
@@ -199,7 +232,7 @@ export async function getAppointmentsByBooker(bookerId: string): Promise<ListApp
 }
 
 export async function deleteAppointment(appointmentId: string): Promise<{ success: boolean; message: string }> {
-    const url = `/${appointmentId}`;
+    const url = `/appointments/${appointmentId}`;
     const res = await api.delete(url, { withCredentials: true });
     return res?.data ?? { success: false, message: 'Xoá thất bại' };
 }

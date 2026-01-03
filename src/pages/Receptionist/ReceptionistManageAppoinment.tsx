@@ -3,14 +3,14 @@ import { useEffect, useState } from "react";
 import { FaSearch, FaTrash } from "react-icons/fa";
 import { formatDateDDMMYYYY } from "../../utils/date";
 import * as AppointmentService from "../../services/AppointmentService";
-import type { AppointmentPayload, AppointmentMeta } from "../../services/AppointmentService";
+import type { AppointmentModel, AppointmentMeta } from "../../services/AppointmentService";
 import ButtonPrimary from "../../utils/ButtonPrimary";
 import { AiFillEdit } from "react-icons/ai";
 import { ClockCircleOutlined, CheckCircleOutlined, SolutionOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import ModalEditAppointment from "../../components/Admin/ModalEditAppointment";
 
 const ReceptionistManageAppointment = () => {
-    const [appointments, setAppointments] = useState<AppointmentPayload[]>([]);
+    const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
     const [meta, setMeta] = useState<AppointmentMeta | null>(null);
 
     // table query state
@@ -52,7 +52,7 @@ const ReceptionistManageAppointment = () => {
             const hasSearchOrFilter = q || specialtyFilter || statusFilter;
 
             let result: any;
-            let items: AppointmentPayload[];
+            let items: AppointmentModel[];
             let metaObj: AppointmentMeta | null;
 
             if (hasSearchOrFilter) {
@@ -82,9 +82,15 @@ const ReceptionistManageAppointment = () => {
                 if (specialtyFilter) {
                     filtered = filtered.filter(
                         (a) => {
-                            const specialtyName = typeof a?.specialty_id === 'object'
-                                ? (a.specialty_id as any)?.name
-                                : (a?.specialty_id ?? "");
+                            const specialtyData = a?.specialty || a?.specialtySnapshot;
+                            let specialtyName = "";
+                            
+                            if (specialtyData && typeof specialtyData === 'object') {
+                                specialtyName = (specialtyData as any)?.name || "";
+                            } else if (typeof a?.specialty_id === 'object') {
+                                specialtyName = (a.specialty_id as any)?.name || "";
+                            }
+                            
                             return specialtyName.toLowerCase().includes(specialtyFilter.toLowerCase());
                         }
                     );
@@ -261,7 +267,7 @@ const ReceptionistManageAppointment = () => {
         }
     };
 
-    const openEditModal = (record: AppointmentPayload) => {
+    const openEditModal = (record: AppointmentModel) => {
         const id = String((record as any)._id);
         setEditingId(id);
         setEditOpen(true);
@@ -295,23 +301,37 @@ const ReceptionistManageAppointment = () => {
     // Helpers adapted to your JSON shape
     const getPatientName = (record: any): string => {
         if (!record) return "-";
-        // prefer booker_id.name (your sample)
-        if (record.booker_id) {
-            const booker = record.booker_id;
-            if (typeof booker === "string") return booker;
-            return String(booker.name ?? booker.fullName ?? booker.username ?? booker.email ?? "-");
+        
+        // Ưu tiên snapshot từ backend
+        const patientData = record.patient || record.patientSnapshot;
+        if (patientData && typeof patientData === 'object') {
+            return String(patientData.name ?? patientData.fullName ?? patientData.username ?? patientData.email ?? "-");
         }
-        // fallback: check some common fields
+        
+        // Fallback: check some common fields
         const primitive = record.patientName ?? record.name ?? record.username ?? record.email;
         return primitive ? String(primitive) : "-";
     };
 
     const getDoctorName = (record: any): string => {
         if (!record) return "-";
+        
+        // Ưu tiên snapshot từ backend
+        const doctorData = record.doctor || record.doctorSnapshot;
+        if (doctorData && typeof doctorData === 'object') {
+            return String(doctorData.name ?? doctorData.fullName ?? doctorData.username ?? doctorData.email ?? "-");
+        }
+        
+        // Fallback: nếu có doctor_id dạng object (populate cũ)
         const doc = record.doctor_id;
-        if (!doc) return "-";
-        if (typeof doc === "string") return doc;
-        return String(doc.name ?? doc.fullName ?? doc.username ?? doc.email ?? "-");
+        if (doc) {
+            if (typeof doc === "string") return doc;
+            if (typeof doc === "object") {
+                return String(doc.name ?? doc.fullName ?? doc.username ?? doc.email ?? "-");
+            }
+        }
+        
+        return "-";
     };
     const columns = [
         {
@@ -358,7 +378,13 @@ const ReceptionistManageAppointment = () => {
             title: "Chuyên khoa",
             key: "specialty",
             sorter: true,
-            render: (_: any, record: any) => record?.specialty_id?.name ?? record?.specialty?.name ?? "-",
+            render: (_: any, record: any) => {
+                const specialtyData = record?.specialty || record?.specialtySnapshot;
+                if (specialtyData && typeof specialtyData === 'object') {
+                    return specialtyData.name || "-";
+                }
+                return record?.specialty_id?.name || "-";
+            },
         },
         {
             title: "Trạng thái",
@@ -377,7 +403,7 @@ const ReceptionistManageAppointment = () => {
             title: "Actions",
             key: "actions",
             width: 120,
-            render: (record: AppointmentPayload) => (
+            render: (record: AppointmentModel) => (
                 <span className="flex gap-2">
                     <ButtonPrimary
                         type="link"
@@ -439,6 +465,10 @@ const ReceptionistManageAppointment = () => {
                         <Select.Option value="Tim mạch">Tim mạch</Select.Option>
                         <Select.Option value="Tai mũi họng">Tai mũi họng</Select.Option>
                         <Select.Option value="Da liễu">Da liễu</Select.Option>
+                        <Select.Option value="Thần kinh">Thần kinh</Select.Option>
+                        <Select.Option value="Y học tổng quát">Y học tổng quát</Select.Option>
+                        <Select.Option value="Mắt">Mắt</Select.Option>
+                        <Select.Option value="Tâm thần">Tâm thần</Select.Option>
                     </Select>
                     <Select
                         placeholder="Lọc theo trạng thái"

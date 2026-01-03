@@ -10,6 +10,7 @@ import * as HealthProfileService from '../../services/HealthProfileService';
 import * as FamilyMemberService from '../../services/FamilyMemberService';
 import type { HealthProfile } from '../../services/HealthProfileService';
 import { getPatientByAccountId } from "../../services/PatientService";
+import dayjs from 'dayjs';
 const { Option } = Select;
 
 // ✨ Card hiển thị hồ sơ với nút xóa
@@ -138,6 +139,9 @@ const HealthProfilePage: React.FC = () => {
         form.setFieldsValue({
             familyMemberName: p.familyMemberName,
             relationship: p.relationship,
+            dob: p.familyMemberDob ? dayjs(p.familyMemberDob) : undefined,
+            gender: p.familyMemberGender,
+            familyMemberPhone: p.familyMemberPhone,
             height: p.height,
             weight: p.weight,
             bloodType: p.bloodType,
@@ -181,6 +185,7 @@ const HealthProfilePage: React.FC = () => {
                     name: values.familyMemberName,
                     relationship: values.relationship,
                     dob: values.dob?.toISOString(),
+                    gender: values.gender,
                     phone: values.familyMemberPhone
                 });
                 ownerId = fm._id || '';
@@ -209,6 +214,7 @@ const HealthProfilePage: React.FC = () => {
                         relationship: values.relationship,
                         name: values.familyMemberName,
                         dob: values.dob?.toISOString(),
+                        gender: values.gender,
                         phone: values.familyMemberPhone
                     });
                 }
@@ -346,6 +352,14 @@ const HealthProfilePage: React.FC = () => {
 
                             <Form.Item name="dob" label="Ngày sinh">
                                 <DatePicker style={{ width: "100%" }} />
+                            </Form.Item>
+
+                            <Form.Item name="gender" label="Giới tính">
+                                <Select placeholder="Chọn giới tính">
+                                    <Option value="male">Nam</Option>
+                                    <Option value="female">Nữ</Option>
+                                    <Option value="other">Khác</Option>
+                                </Select>
                             </Form.Item>
 
                             <Form.Item name="familyMemberPhone" label="SĐT">

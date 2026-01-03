@@ -218,10 +218,10 @@ const PatientAppointment = () => {
                                             <div className="text-sm">Lý do: {a.reason}</div>
                                             <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
                                             <div className="text-sm">
-                                                Bác sĩ: {a.doctor_id?.name || "Chưa phân công"}
+                                                Bác sĩ: {a.doctorSnapshot?.name || "Chưa phân công"}
                                             </div>
                                             <div className="text-sm">
-                                                Chuyên khoa: {a.specialty_id?.name || "Không rõ"}
+                                                Chuyên khoa: {a.specialtySnapshot?.name || "Không rõ"}
                                             </div>
                                         </div>
                                         {(a.status === "pending" || a.status === "waiting_assigned" || a.status === "confirmed") && (

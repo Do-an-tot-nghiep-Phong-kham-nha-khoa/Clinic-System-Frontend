@@ -227,7 +227,7 @@ const DoctorAppointment = () => {
                                             <div className="text-sm">Lý do: {a.reason}</div>
                                             <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
                                             <div className="text-sm">
-                                                Bệnh nhân: {a.healthProfile_id.owner_detail.name}
+                                                Bệnh nhân: {a.patient?.name || a.patientSnapshot?.name || 'N/A'}
                                             </div>
                                         </div>
                                         {(a.status === "pending" || a.status === "waiting_assigned") && (

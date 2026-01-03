@@ -98,7 +98,14 @@ export default function AssignDoctorModal({ open, appointment, onClose, onAssign
       setLoading(true);
       await AppointmentService.assignDoctor(String(appointment._id), doctorId);
       message.success("Gán bác sĩ thành công");
-      onAssigned?.();
+      
+      // Gọi callback để reload data TRƯỚC khi đóng modal
+      if (onAssigned) {
+        await onAssigned();
+      }
+      
+      // Reset state và đóng modal
+      setDoctorId(undefined);
       onClose();
     } catch {
       message.error("Gán thất bại");
