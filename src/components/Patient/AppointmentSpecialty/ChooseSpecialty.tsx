@@ -2,6 +2,7 @@ import { Card, Col, Row, message, Skeleton, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { FaUserMd } from "react-icons/fa";
 import { getSpecialties, type Specialty } from "../../../services/SpecialtyService";
+import { CacheService } from "../../../services/CacheService";
 
 const { Title, Paragraph } = Typography;
 
@@ -23,8 +24,18 @@ const ChooseSpecialty: React.FC<ChooseSpecialtyProps> = ({ onNext, selectedSpeci
     const fetchSpecialties = async () => {
         try {
             setLoading(true);
-            const data = await getSpecialties();
-            setSpecialties(data.items);
+            
+            const cacheKey = 'specialties_list';
+            
+            // Check cache first
+            let cachedData = CacheService.get<{ items: Specialty[] }>(cacheKey);
+            if (cachedData) {
+                setSpecialties(cachedData.items);
+            } else {
+                const data = await getSpecialties();
+                setSpecialties(data.items);
+                CacheService.set(cacheKey, data);
+            }
         } catch (error) {
             message.error("Lỗi khi lấy danh sách chuyên khoa.");
         } finally {

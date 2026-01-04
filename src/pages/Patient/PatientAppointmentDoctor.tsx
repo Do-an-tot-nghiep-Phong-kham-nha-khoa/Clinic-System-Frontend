@@ -10,6 +10,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { type Patient, getPatientByAccountId } from "../../services/PatientService";
 import { getDoctorById } from "../../services/DoctorService";
 import type { HealthProfile } from "../../services/HealthProfileService";
+import { CacheService } from "../../services/CacheService";
 
 const { Title } = Typography;
 
@@ -66,7 +67,16 @@ const PatientAppointmentDoctor = () => {
             return null;
         }
         try {
-            const data = await getPatientByAccountId(accountId);
+            const cacheKey = `patient_${accountId}`;
+            
+            // Check cache first
+            let data = CacheService.get<Patient>(cacheKey);
+            if (!data) {
+                data = await getPatientByAccountId(accountId);
+                if (data) {
+                    CacheService.set(cacheKey, data);
+                }
+            }
             setPatient(data || null);
             return data;
         } catch (err) {
@@ -85,7 +95,16 @@ const PatientAppointmentDoctor = () => {
     const handleDoctorSelected = async (doctorId: string) => {
         setLoading(true);
         try {
-            const doctorData = await getDoctorById(doctorId);
+            const cacheKey = `doctor_${doctorId}`;
+            
+            // Check cache first
+            let doctorData = CacheService.get<any>(cacheKey);
+            if (!doctorData) {
+                doctorData = await getDoctorById(doctorId);
+                if (doctorData) {
+                    CacheService.set(cacheKey, doctorData);
+                }
+            }
 
             if (doctorData) {
                 setSelectedDoctor({

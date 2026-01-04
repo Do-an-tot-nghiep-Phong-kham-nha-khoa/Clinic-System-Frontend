@@ -10,6 +10,7 @@ import * as HealthProfileService from '../../services/HealthProfileService';
 import * as FamilyMemberService from '../../services/FamilyMemberService';
 import type { HealthProfile } from '../../services/HealthProfileService';
 import { getPatientByAccountId } from "../../services/PatientService";
+import { CacheService } from '../../services/CacheService';
 const { Option } = Select;
 
 // Define the Label component
@@ -121,12 +122,24 @@ const HealthProfilePage: React.FC = () => {
 
     const [form] = Form.useForm();
 
-    // Load patient + health profiles
-    const load = async () => {
+    // Load patient + health profiles with caching
+    const load = async (forceRefresh = false) => {
         if (!user) return;
         try {
             setLoading(true);
-            const patient = await getPatientByAccountId(user.id);
+            
+            const patientCacheKey = `patient_${user.id}`;
+            const profilesCacheKey = `health_profiles_${user.id}`;
+            
+            // Check cache for patient data
+            let patient = forceRefresh ? null : CacheService.get<any>(patientCacheKey);
+            if (!patient) {
+                patient = await getPatientByAccountId(user.id);
+                if (patient) {
+                    CacheService.set(patientCacheKey, patient);
+                }
+            }
+            
             if (!patient) {
                 message.error("Không tìm thấy thông tin bệnh nhân");
                 setProfiles([]);
@@ -135,9 +148,16 @@ const HealthProfilePage: React.FC = () => {
             }
             setPatientId(patient?._id || null);
 
-            const data = await HealthProfileService.getAllHealthProfiles(patient?._id || '');
-            const profilesArray = Array.isArray(data) ? data : [];
-            setProfiles(profilesArray);
+            // Check cache for health profiles
+            let data = forceRefresh ? null : CacheService.get<HealthProfile[]>(profilesCacheKey);
+            if (!data) {
+                data = await HealthProfileService.getAllHealthProfiles(patient?._id || '');
+                const profilesArray = Array.isArray(data) ? data : [];
+                CacheService.set(profilesCacheKey, profilesArray);
+                setProfiles(profilesArray);
+            } else {
+                setProfiles(data);
+            }
         } catch (err) {
             console.error(err);
             message.error("Không thể tải hồ sơ");
@@ -181,7 +201,12 @@ const HealthProfilePage: React.FC = () => {
             }
             await HealthProfileService.deleteHealthProfileById(profile._id);
             message.success('Xóa hồ sơ thành công');
-            load();
+            
+            // Clear cache and force refresh
+            if (user) {
+                CacheService.set(`health_profiles_${user.id}`, null);
+            }
+            load(true);
         } catch (err: any) {
             console.error(err);
             message.error(err?.message || 'Lỗi khi xóa hồ sơ');
@@ -260,7 +285,12 @@ const HealthProfilePage: React.FC = () => {
             }
 
             setDrawerOpen(false);
-            load();
+            
+            // Clear cache and force refresh
+            if (user) {
+                CacheService.set(`health_profiles_${user.id}`, null);
+            }
+            load(true);
 
         } catch (err: any) {
             console.error("Error saving profile:", err);

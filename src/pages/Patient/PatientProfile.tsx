@@ -6,6 +6,7 @@ import { getPatientByAccountId, type Patient } from "../../services/PatientServi
 import { useAuth } from '../../contexts/AuthContext';
 import { MdEmail } from 'react-icons/md';
 import UpdateInfoModal from '../../components/Patient/UpdateInfoModal';
+import { CacheService } from '../../services/CacheService';
 
 // Hàm tính tuổi
 const calculateAge = (dob?: string | null): number | null => {
@@ -25,7 +26,17 @@ const PatientProfile: React.FC = () => {
         const fetchPatientData = async () => {
             try {
                 setLoading(true);
-                const data = await getPatientByAccountId(currentAccountId);
+                
+                const cacheKey = `patient_${currentAccountId}`;
+                
+                // Check cache first
+                let data = CacheService.get<Patient>(cacheKey);
+                if (!data) {
+                    data = await getPatientByAccountId(currentAccountId);
+                    if (data) {
+                        CacheService.set(cacheKey, data);
+                    }
+                }
                 setPatient(data);
             } catch (err) {
                 console.error("Lỗi khi tải dữ liệu bệnh nhân:", err);
@@ -87,7 +98,9 @@ const PatientProfile: React.FC = () => {
 
     const handlePatientUpdate = (updatedPatient: Patient) => {
         setPatient(updatedPatient);
-        // Có thể gọi lại fetchPatientData() nếu cần đảm bảo dữ liệu mới nhất từ server
+        // Clear cache to ensure fresh data on next load
+        const cacheKey = `patient_${currentAccountId}`;
+        CacheService.set(cacheKey, updatedPatient);
     };
 
     return (

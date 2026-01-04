@@ -10,6 +10,7 @@ import { getSpecialtyById } from "../../services/SpecialtyService";
 import SuccessScreen from "../../components/Patient/AppointmentSpecialty/SucessScreen";
 import { useAuth } from "../../contexts/AuthContext";
 import type { HealthProfile } from "../../services/HealthProfileService";
+import { CacheService } from "../../services/CacheService";
 
 const { Title } = Typography;
 
@@ -58,13 +59,23 @@ const PatientAppointmentSpecialty = () => {
 
     // Hàm lấy patient theo account id (account id = user.id)
     const fetchPatientByAccountId = async (): Promise<Patient | null> => {
+
         const accountId = user?.id;
         if (!accountId) {
             message.error("Không tìm thấy tài khoản hiện tại.");
             return null;
         }
         try {
-            const data = await getPatientByAccountId(accountId);
+            const cacheKey = `patient_${accountId}`;
+            
+            // Check cache first
+            let data = CacheService.get<Patient>(cacheKey);
+            if (!data) {
+                data = await getPatientByAccountId(accountId);
+                if (data) {
+                    CacheService.set(cacheKey, data);
+                }
+            }
             setPatient(data || null);
             return data;
         } catch (err) {
@@ -77,13 +88,23 @@ const PatientAppointmentSpecialty = () => {
     // Gọi để đảm bảo hàm được sử dụng và có thể tận dụng dữ liệu sau này
     useEffect(() => {
         void fetchPatientByAccountId();
+
     }, [user?.id]);
 
     // Hàm xử lý khi người dùng chọn chuyên khoa và chuyển sang bước tiếp theo
     const handleSpecialtySelected = async (specialtyId: string) => {
         setLoading(true);
         try {
-            const specialtyData = await getSpecialtyById(specialtyId);
+            const cacheKey = `specialty_${specialtyId}`;
+            
+            // Check cache first
+            let specialtyData = CacheService.get<any>(cacheKey);
+            if (!specialtyData) {
+                specialtyData = await getSpecialtyById(specialtyId);
+                if (specialtyData) {
+                    CacheService.set(cacheKey, specialtyData);
+                }
+            }
 
             if (specialtyData && specialtyData.name) {
                 setSelectedSpecialty({

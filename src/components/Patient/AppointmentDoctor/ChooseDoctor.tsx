@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { List, Avatar, Button, Select, message, Skeleton } from 'antd';
 import { getDoctors, type Doctor } from '../../../services/DoctorService';
 import { getSpecialties, type Specialty } from '../../../services/SpecialtyService';
+import { CacheService } from '../../../services/CacheService';
 
 interface ChooseDoctorProps {
   onNext: (doctorId: string) => void;
@@ -19,8 +20,17 @@ const ChooseDoctor: React.FC<ChooseDoctorProps> = ({ onNext, selectedDoctorId, d
   useEffect(() => {
     (async () => {
       try {
-        const sp = await getSpecialties();
-        setSpecialties(sp.items);
+        const cacheKey = 'specialties_list';
+        
+        // Check cache first
+        let cachedData = CacheService.get<{ items: Specialty[] }>(cacheKey);
+        if (cachedData) {
+          setSpecialties(cachedData.items);
+        } else {
+          const sp = await getSpecialties();
+          setSpecialties(sp.items);
+          CacheService.set(cacheKey, sp);
+        }
       } catch (err) {
         message.error('Lỗi tải danh sách chuyên khoa');
       }
@@ -31,8 +41,20 @@ const ChooseDoctor: React.FC<ChooseDoctorProps> = ({ onNext, selectedDoctorId, d
     (async () => {
       try {
         setLoading(true);
-        const docs = await getDoctors(filterSpecialty);
-        setDoctors(docs);
+        
+        const cacheKey = filterSpecialty 
+          ? `doctors_by_specialty_${filterSpecialty}` 
+          : 'doctors_all';
+        
+        // Check cache first
+        let cachedDoctors = CacheService.get<Doctor[]>(cacheKey);
+        if (cachedDoctors) {
+          setDoctors(cachedDoctors);
+        } else {
+          const docs = await getDoctors(filterSpecialty);
+          setDoctors(docs);
+          CacheService.set(cacheKey, docs);
+        }
       } catch (err) {
         message.error('Lỗi tải danh sách bác sĩ');
       } finally {
