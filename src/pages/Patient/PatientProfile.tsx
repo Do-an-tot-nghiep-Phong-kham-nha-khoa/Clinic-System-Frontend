@@ -92,7 +92,7 @@ const PatientProfile: React.FC = () => {
 
     return (
         <div className="p-2 sm:p-4 md:p-8">
-            <div className="mx-auto max-w-4xl">
+            <div className="mx-auto w-full">
                 <Card
                     className="shadow-2xl rounded-2xl border-t-4 border-indigo-500"
                     title={
@@ -137,31 +137,40 @@ const PatientProfile: React.FC = () => {
                     {/* Phần Chi tiết Liên hệ và Cá nhân */}
                     <h4 className="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 border-l-4 border-yellow-500 pl-2">Chi Tiết Cá Nhân</h4>
                     <Descriptions
-                        column={{ xs: 1, sm: 1, md: 1 }}
                         bordered
+                        column={{ xs: 1, sm: 1, md: 2 }}
                         layout="horizontal"
-                        className="rounded-lg overflow-hidden [&_.ant-descriptions-item-label]:!text-xs [&_.ant-descriptions-item-label]:sm:!text-sm [&_.ant-descriptions-item-content]:!text-xs [&_.ant-descriptions-item-content]:sm:!text-sm"
-                        labelStyle={{ width: '40%' }}
+                        className="
+                        rounded-lg overflow-hidden
+                        [&_.ant-descriptions-item-label]:!font-medium
+                        [&_.ant-descriptions-item-label]:!whitespace-normal
+                        [&_.ant-descriptions-item-label]:!align-top
+                        [&_.ant-descriptions-item-content]:!whitespace-normal
+                        [&_.ant-descriptions-item-content]:break-words
+                        [&_.ant-descriptions-item]:flex
+                        [&_.ant-descriptions-item]:flex-col
+                        md:[&_.ant-descriptions-item]:flex-row
+                        "
                     >
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><CalendarOutlined /> <span className="hidden xs:inline">Ngày Sinh</span><span className="inline xs:hidden">Sinh</span></span>}
+                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><CalendarOutlined /> <span className="hidden xs:inline">Ngày Sinh</span><span className="inline xs:hidden">Ngày Sinh</span></span>}
                         >
                             <span className="font-semibold text-gray-700">{formattedDob}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><PhoneOutlined /> <span className="hidden xs:inline">Số Điện Thoại</span><span className="inline xs:hidden">SĐT</span></span>}
+                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><PhoneOutlined /> <span className="hidden xs:inline">Số Điện Thoại</span><span className="inline xs:hidden">Số Điện Thoại</span></span>}
                         >
-                            <span className="font-semibold break-all">{patient.phone}</span>
+                            <span className="font-semibold">{patient.phone}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
                             label={<span className="font-medium flex items-center gap-1 sm:gap-2"><MdEmail /> Email</span>}
                         >
-                            <span className="font-semibold break-all">{user?.email}</span>
+                            <span className="font-semibold break-words">{user?.email}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><UserOutlined /> <span className="hidden xs:inline">Giới Tính</span><span className="inline xs:hidden">GT</span></span>}
+                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><UserOutlined /> <span className="hidden xs:inline">Giới Tính</span><span className="inline xs:hidden">Giới tính</span></span>}
                         >
-                            <span className="font-semibold text-gray-700">{gender}</span>
+                            <span className="font-semibold text-gray-700">{gender === "male" ? "Nam" : "Nữ"}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
                             label={<span className="font-medium flex items-center gap-1 sm:gap-2"><EnvironmentOutlined /> <span className="hidden xs:inline">Địa Chỉ</span><span className="inline xs:hidden">ĐC</span></span>}

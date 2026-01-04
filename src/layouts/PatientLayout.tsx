@@ -151,8 +151,8 @@ const PatientLayout = () => {
           <div className="flex-1">
             <div className="h-[76px] flex items-center justify-center px-4 overflow-hidden">
               {!collapsed && (
-                <Link to="/" className="text-white text-xl font-bold whitespace-nowrap">
-                  Khung bệnh nhân
+                <Link to="/" className="!text-white text-xl font-bold whitespace-nowrap hover:!text-gray-200 no-underline">
+                  Trang chủ Phòng Khám
                 </Link>
               )}
             </div>

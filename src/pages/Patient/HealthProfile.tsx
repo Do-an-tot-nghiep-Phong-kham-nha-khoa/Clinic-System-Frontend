@@ -12,6 +12,14 @@ import type { HealthProfile } from '../../services/HealthProfileService';
 import { getPatientByAccountId } from "../../services/PatientService";
 const { Option } = Select;
 
+// Define the Label component
+const Label: React.FC<{ icon: React.ReactNode; text: string }> = ({ icon, text }) => (
+    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {icon}
+        {text}
+    </span>
+);
+
 // ✨ Card hiển thị hồ sơ với nút xóa
 const CardHoverProfile: React.FC<{
     profile: HealthProfile;
@@ -52,42 +60,50 @@ const CardHoverProfile: React.FC<{
                 </Space>
             }
         >
-            <Descriptions 
-                column={1} 
-                size="small" 
-                bordered 
+            <Descriptions
+                column={1}
+                size="small"
+                bordered
                 style={{ borderRadius: 8, overflow: 'hidden' }}
                 className="[&_.ant-descriptions-item-label]:!text-xs sm:[&_.ant-descriptions-item-label]:!text-sm [&_.ant-descriptions-item-content]:!text-xs sm:[&_.ant-descriptions-item-content]:!text-sm"
             >
                 <Descriptions.Item
-                    label={<Space size="small"><CalendarOutlined /> <span className="hidden xs:inline">Chiều cao</span><span className="inline xs:hidden">Cao</span></Space>}
+                    label={<Label icon={<CalendarOutlined />} text="Chiều cao" />}
                     styles={{ label: { width: '40%' } }}
                 >
                     {profile.height ?? '-'} cm
                 </Descriptions.Item>
+
                 <Descriptions.Item
-                    label={<Space size="small"><CalendarOutlined /> <span className="hidden xs:inline">Cân nặng</span><span className="inline xs:hidden">Nặng</span></Space>}
+                    label={<Label icon={<CalendarOutlined />} text="Cân nặng" />}
                     styles={{ label: { width: '40%' } }}
                 >
                     {profile.weight ?? '-'} kg
                 </Descriptions.Item>
+
                 <Descriptions.Item
-                    label={<Space size="small"><HeartOutlined /> Nhóm máu</Space>}
+                    label={<Label icon={<HeartOutlined />} text="Nhóm máu" />}
                     styles={{ label: { width: '40%' } }}
                 >
                     {profile.bloodType ?? '---'}
                 </Descriptions.Item>
+
                 <Descriptions.Item
-                    label={<Space size="small"><MedicineBoxOutlined /> Dị ứng</Space>}
+                    label={<Label icon={<MedicineBoxOutlined />} text="Dị ứng" />}
                     styles={{ label: { width: '40%' } }}
                 >
-                    <span className="break-words">{(profile.allergies || []).slice(0, 3).join(', ') || '---'}</span>
+                    <span className="break-words">
+                        {(profile.allergies || []).slice(0, 3).join(', ') || '---'}
+                    </span>
                 </Descriptions.Item>
+
                 <Descriptions.Item
-                    label={<Space size="small"><MedicineBoxOutlined /> <span className="hidden xs:inline">Thuốc đang dùng</span><span className="inline xs:hidden">Thuốc</span></Space>}
+                    label={<Label icon={<MedicineBoxOutlined />} text="Thuốc đang dùng" />}
                     styles={{ label: { width: '40%' } }}
                 >
-                    <span className="break-words">{(profile.medications || []).slice(0, 3).join(', ') || '---'}</span>
+                    <span className="break-words">
+                        {(profile.medications || []).slice(0, 3).join(', ') || '---'}
+                    </span>
                 </Descriptions.Item>
             </Descriptions>
         </Card>
