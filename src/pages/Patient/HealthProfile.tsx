@@ -10,8 +10,17 @@ import * as HealthProfileService from '../../services/HealthProfileService';
 import * as FamilyMemberService from '../../services/FamilyMemberService';
 import type { HealthProfile } from '../../services/HealthProfileService';
 import { getPatientByAccountId } from "../../services/PatientService";
+import { CacheService } from '../../services/CacheService';
 import dayjs from 'dayjs';
 const { Option } = Select;
+
+// Define the Label component
+const Label: React.FC<{ icon: React.ReactNode; text: string }> = ({ icon, text }) => (
+    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {icon}
+        {text}
+    </span>
+);
 
 // ✨ Card hiển thị hồ sơ với nút xóa
 const CardHoverProfile: React.FC<{
@@ -27,18 +36,19 @@ const CardHoverProfile: React.FC<{
         <Card
             hoverable
             style={{ borderRadius: 16, boxShadow: '0 6px 20px rgba(0,0,0,0.08)', minHeight: 220 }}
+            className="[&_.ant-card-head]:!p-3 sm:[&_.ant-card-head]:!p-4 [&_.ant-card-body]:!p-3 sm:[&_.ant-card-body]:!p-4"
             title={
-                <Space align="center">
-                    <FaUser style={{ fontSize: 24, color: '#4f46e5' }} />
-                    <span style={{ fontWeight: 'bold', fontSize: 18 }}>{title}</span>
+                <Space align="center" size="small" className="flex-wrap">
+                    <FaUser className="text-lg sm:text-2xl" style={{ color: '#4f46e5' }} />
+                    <span className="font-bold text-sm sm:text-lg">{title}</span>
                     {profile.type === 'Patient'
-                        ? <Tag color="blue">Bạn</Tag>
-                        : <Tag color="purple">{profile.relationship}</Tag>}
+                        ? <Tag color="blue" className="text-xs">Bạn</Tag>
+                        : <Tag color="purple" className="text-xs">{profile.relationship}</Tag>}
                 </Space>
             }
             extra={
-                <Space>
-                    <Button type="text" icon={<EditOutlined />} onClick={onEdit} />
+                <Space size="small">
+                    <Button type="text" icon={<EditOutlined />} onClick={onEdit} size="small" />
                     {profile.type === 'FamilyMember' && (
                         <Popconfirm
                             title="Bạn có chắc muốn xóa hồ sơ này không?"
@@ -46,42 +56,56 @@ const CardHoverProfile: React.FC<{
                             okText="Có"
                             cancelText="Không"
                         >
-                            <Button type="text" danger icon={<DeleteOutlined />} />
+                            <Button type="text" danger icon={<DeleteOutlined />} size="small" />
                         </Popconfirm>
                     )}
                 </Space>
             }
         >
-            <Descriptions column={1} size="small" bordered style={{ borderRadius: 8, overflow: 'hidden' }}>
+            <Descriptions
+                column={1}
+                size="small"
+                bordered
+                style={{ borderRadius: 8, overflow: 'hidden' }}
+                className="[&_.ant-descriptions-item-label]:!text-xs sm:[&_.ant-descriptions-item-label]:!text-sm [&_.ant-descriptions-item-content]:!text-xs sm:[&_.ant-descriptions-item-content]:!text-sm"
+            >
                 <Descriptions.Item
-                    label={<Space><CalendarOutlined /> Chiều cao</Space>}
+                    label={<Label icon={<CalendarOutlined />} text="Chiều cao" />}
                     styles={{ label: { width: '40%' } }}
                 >
                     {profile.height ?? '-'} cm
                 </Descriptions.Item>
+
                 <Descriptions.Item
-                    label={<Space><CalendarOutlined /> Cân nặng</Space>}
+                    label={<Label icon={<CalendarOutlined />} text="Cân nặng" />}
                     styles={{ label: { width: '40%' } }}
                 >
                     {profile.weight ?? '-'} kg
                 </Descriptions.Item>
+
                 <Descriptions.Item
-                    label={<Space><HeartOutlined /> Nhóm máu</Space>}
+                    label={<Label icon={<HeartOutlined />} text="Nhóm máu" />}
                     styles={{ label: { width: '40%' } }}
                 >
                     {profile.bloodType ?? '---'}
                 </Descriptions.Item>
+
                 <Descriptions.Item
-                    label={<Space><MedicineBoxOutlined /> Dị ứng</Space>}
+                    label={<Label icon={<MedicineBoxOutlined />} text="Dị ứng" />}
                     styles={{ label: { width: '40%' } }}
                 >
-                    {(profile.allergies || []).slice(0, 3).join(', ') || '---'}
+                    <span className="break-words">
+                        {(profile.allergies || []).slice(0, 3).join(', ') || '---'}
+                    </span>
                 </Descriptions.Item>
+
                 <Descriptions.Item
-                    label={<Space><MedicineBoxOutlined /> Thuốc đang dùng</Space>}
+                    label={<Label icon={<MedicineBoxOutlined />} text="Thuốc đang dùng" />}
                     styles={{ label: { width: '40%' } }}
                 >
-                    {(profile.medications || []).slice(0, 3).join(', ') || '---'}
+                    <span className="break-words">
+                        {(profile.medications || []).slice(0, 3).join(', ') || '---'}
+                    </span>
                 </Descriptions.Item>
             </Descriptions>
         </Card>
@@ -99,12 +123,24 @@ const HealthProfilePage: React.FC = () => {
 
     const [form] = Form.useForm();
 
-    // Load patient + health profiles
-    const load = async () => {
+    // Load patient + health profiles with caching
+    const load = async (forceRefresh = false) => {
         if (!user) return;
         try {
             setLoading(true);
-            const patient = await getPatientByAccountId(user.id);
+            
+            const patientCacheKey = `patient_${user.id}`;
+            const profilesCacheKey = `health_profiles_${user.id}`;
+            
+            // Check cache for patient data
+            let patient = forceRefresh ? null : CacheService.get<any>(patientCacheKey);
+            if (!patient) {
+                patient = await getPatientByAccountId(user.id);
+                if (patient) {
+                    CacheService.set(patientCacheKey, patient);
+                }
+            }
+            
             if (!patient) {
                 message.error("Không tìm thấy thông tin bệnh nhân");
                 setProfiles([]);
@@ -113,9 +149,16 @@ const HealthProfilePage: React.FC = () => {
             }
             setPatientId(patient?._id || null);
 
-            const data = await HealthProfileService.getAllHealthProfiles(patient?._id || '');
-            const profilesArray = Array.isArray(data) ? data : [];
-            setProfiles(profilesArray);
+            // Check cache for health profiles
+            let data = forceRefresh ? null : CacheService.get<HealthProfile[]>(profilesCacheKey);
+            if (!data) {
+                data = await HealthProfileService.getAllHealthProfiles(patient?._id || '');
+                const profilesArray = Array.isArray(data) ? data : [];
+                CacheService.set(profilesCacheKey, profilesArray);
+                setProfiles(profilesArray);
+            } else {
+                setProfiles(data);
+            }
         } catch (err) {
             console.error(err);
             message.error("Không thể tải hồ sơ");
@@ -162,7 +205,12 @@ const HealthProfilePage: React.FC = () => {
             }
             await HealthProfileService.deleteHealthProfileById(profile._id);
             message.success('Xóa hồ sơ thành công');
-            load();
+            
+            // Clear cache and force refresh
+            if (user) {
+                CacheService.set(`health_profiles_${user.id}`, null);
+            }
+            load(true);
         } catch (err: any) {
             console.error(err);
             message.error(err?.message || 'Lỗi khi xóa hồ sơ');
@@ -243,7 +291,12 @@ const HealthProfilePage: React.FC = () => {
             }
 
             setDrawerOpen(false);
-            load();
+            
+            // Clear cache and force refresh
+            if (user) {
+                CacheService.set(`health_profiles_${user.id}`, null);
+            }
+            load(true);
 
         } catch (err: any) {
             console.error("Error saving profile:", err);
@@ -258,20 +311,20 @@ const HealthProfilePage: React.FC = () => {
     const family = profiles.filter(p => p.type === "FamilyMember");
 
     return (
-        <div className='container p-6'>
+        <div className="container p-3 sm:p-4 md:p-6">
             <Space direction="vertical" style={{ width: '100%' }} size={24}>
-                <Space style={{ justifyContent: "space-between", width: '100%' }}>
-                    <h2 className="text-2xl font-bold">Hồ sơ sức khỏe</h2>
-                    <Space>
-                        {!owner && <Button type="primary" onClick={() => openNew('Patient')}>Thêm hồ sơ chủ sở hữu</Button>}
-                        <Button type="primary" onClick={() => openNew('FamilyMember')}>Thêm hồ sơ thành viên</Button>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+                    <h2 className="text-xl sm:text-2xl font-bold">Hồ sơ sức khỏe</h2>
+                    <Space size="small" className="flex-wrap">
+                        {!owner && <Button type="primary" onClick={() => openNew('Patient')} size="small" className="text-xs sm:text-sm">Thêm hồ sơ chủ</Button>}
+                        <Button type="primary" onClick={() => openNew('FamilyMember')} size="small" className="text-xs sm:text-sm">Thêm thành viên</Button>
                     </Space>
-                </Space>
+                </div>
 
                 <div>
-                    <h3 className="text-xl font-semibold mb-4">Chủ sở hữu</h3>
+                    <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Chủ sở hữu</h3>
                     {owner ? (
-                        <List grid={{ gutter: 16, column: 1 }}>
+                        <List grid={{ gutter: 12, column: 1, xs: 1 }}>
                             <List.Item>
                                 <CardHoverProfile
                                     profile={owner}
@@ -280,14 +333,14 @@ const HealthProfilePage: React.FC = () => {
                                 />
                             </List.Item>
                         </List>
-                    ) : <Empty description="Chưa có hồ sơ chủ" />}
+                    ) : <Empty description="Chưa có hồ sơ chủ" className="text-sm" />}
                 </div>
 
                 <div>
-                    <h3 className="text-xl font-semibold mt-8 mb-4">Thành viên gia đình</h3>
+                    <h3 className="text-lg sm:text-xl font-semibold mt-6 sm:mt-8 mb-3 sm:mb-4">Thành viên gia đình</h3>
                     {family.length ? (
                         <List
-                            grid={{ gutter: 16, column: 3, xs: 1, sm: 2, md: 3, lg: 3 }}
+                            grid={{ gutter: 12, column: 3, xs: 1, sm: 2, md: 2, lg: 3 }}
                             dataSource={family}
                             renderItem={item => (
                                 <List.Item>
@@ -305,14 +358,15 @@ const HealthProfilePage: React.FC = () => {
 
             <Drawer
                 title={selected ? "Chỉnh sửa hồ sơ" : "Tạo hồ sơ mới"}
-                width={550}
+                width="100%"
+                style={{ maxWidth: 550 }}
                 open={drawerOpen}
                 onClose={() => setDrawerOpen(false)}
                 bodyStyle={{ paddingBottom: 24 }}
                 footer={
                     <div style={{ textAlign: "right" }}>
-                        <Button onClick={() => setDrawerOpen(false)} style={{ marginRight: 8 }}>Hủy</Button>
-                        <Button type="primary" onClick={onSave} loading={loading}>Lưu</Button>
+                        <Button onClick={() => setDrawerOpen(false)} style={{ marginRight: 8 }} size="small" className="text-xs sm:text-sm">Hủy</Button>
+                        <Button type="primary" onClick={onSave} loading={loading} size="small" className="text-xs sm:text-sm">Lưu</Button>
                     </div>
                 }
             >
@@ -368,15 +422,15 @@ const HealthProfilePage: React.FC = () => {
                         </Space>
                     )}
 
-                    <Row gutter={16}>
-                        <Col span={12}>
+                    <Row gutter={[8, 0]}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name="height" label="Chiều cao (cm)">
-                                <Input type="number" placeholder="Ví dụ: 170" />
+                                <Input type="number" placeholder="Ví dụ: 170" size="small" className="sm:!h-8" />
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name="weight" label="Cân nặng (kg)">
-                                <Input type="number" placeholder="Ví dụ: 60" />
+                                <Input type="number" placeholder="Ví dụ: 60" size="small" className="sm:!h-8" />
                             </Form.Item>
                         </Col>
                     </Row>

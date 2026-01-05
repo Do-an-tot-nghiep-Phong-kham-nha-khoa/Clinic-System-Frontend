@@ -10,6 +10,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { type Patient, getPatientByAccountId } from "../../services/PatientService";
 import { getDoctorById } from "../../services/DoctorService";
 import type { HealthProfile } from "../../services/HealthProfileService";
+import { CacheService } from "../../services/CacheService";
 
 const { Title } = Typography;
 
@@ -66,7 +67,16 @@ const PatientAppointmentDoctor = () => {
             return null;
         }
         try {
-            const data = await getPatientByAccountId(accountId);
+            const cacheKey = `patient_${accountId}`;
+            
+            // Check cache first
+            let data = CacheService.get<Patient>(cacheKey);
+            if (!data) {
+                data = await getPatientByAccountId(accountId);
+                if (data) {
+                    CacheService.set(cacheKey, data);
+                }
+            }
             setPatient(data || null);
             return data;
         } catch (err) {
@@ -85,7 +95,16 @@ const PatientAppointmentDoctor = () => {
     const handleDoctorSelected = async (doctorId: string) => {
         setLoading(true);
         try {
-            const doctorData = await getDoctorById(doctorId);
+            const cacheKey = `doctor_${doctorId}`;
+            
+            // Check cache first
+            let doctorData = CacheService.get<any>(cacheKey);
+            if (!doctorData) {
+                doctorData = await getDoctorById(doctorId);
+                if (doctorData) {
+                    CacheService.set(cacheKey, doctorData);
+                }
+            }
 
             if (doctorData) {
                 setSelectedDoctor({
@@ -205,22 +224,22 @@ const PatientAppointmentDoctor = () => {
     };
 
     return (
-        <div className="container mx-auto p-4 max-w-6xl">
-            <Title level={2} className="text-center !mb-6 !font-bold">
+        <div className="container mx-auto p-2 sm:p-4 md:p-6 max-w-6xl">
+            <Title level={2} className="text-center !mb-3 sm:!mb-4 md:!mb-6 !font-bold text-lg sm:text-xl md:text-2xl">
                 Đặt Lịch Khám Theo Bác Sĩ
             </Title>            {/* Steps hiển thị tiến trình */}
-            <div className="mb-8">
+            <div className="mb-4 sm:mb-6 md:mb-8">
                 <Steps
                     current={currentStep}
                     items={APPOINTMENT_STEPS}
-                    className={loading ? 'opacity-60 pointer-events-none' : ''}
+                    className={`text-xs sm:text-sm ${loading ? 'opacity-60 pointer-events-none' : ''}`}
                 />
             </div>
 
             {/* Nội dung của bước hiện tại */}
-            <div className="bg-white p-6 shadow-md rounded-lg">
+            <div className="bg-white p-3 sm:p-4 md:p-6 shadow-md rounded-lg">
                 {loading && currentStep === 0 ? (
-                    <div className="flex justify-center items-center py-20">
+                    <div className="flex justify-center items-center py-10 sm:py-20">
                         <Spin size="large" tip="Đang xử lý thông tin bác sĩ..." />
                     </div>
                 ) : (

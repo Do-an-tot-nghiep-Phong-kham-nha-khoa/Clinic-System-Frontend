@@ -197,13 +197,16 @@ const PatientAppointment = () => {
                 }}
             />            
             <Modal
-                title={`Lịch hẹn vào ngày ${selectedDate ? selectedDate.format("DD/MM/YYYY") : ""}`}
+                title={<span className="text-sm sm:text-base">{`Lịch hẹn vào ngày ${selectedDate ? selectedDate.format("DD/MM/YYYY") : ""}`}</span>}
                 open={isModalVisible}
                 onCancel={handleClose}
                 footer={null}
+                className="[&_.ant-modal-content]:!p-3 sm:[&_.ant-modal-content]:!p-6"
+                width="90%"
+                style={{ maxWidth: 600, top: 20 }}
             >
                 {selectedDate && (
-                    <ul className="p-3">
+                    <ul className="p-2 sm:p-3">
                         {getAppointmentsForDate(selectedDate)
                             .sort((a, b) => {
                                 const startA = a.timeSlot.split("-")[0];
@@ -211,16 +214,16 @@ const PatientAppointment = () => {
                                 return startA.localeCompare(startB);
                             })
                             .map((a) => (
-                                <li key={a._id} className="mb-3 p-3 shadow rounded-md bg-blue-50 relative">
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex-1">
-                                            <div className="font-semibold">{a.timeSlot}</div>
-                                            <div className="text-sm">Lý do: {a.reason}</div>
-                                            <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
-                                            <div className="text-sm">
+                                <li key={a._id} className="mb-2 sm:mb-3 p-2 sm:p-3 shadow rounded-md bg-blue-50 relative">
+                                    <div className="flex justify-between items-start gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="font-semibold text-sm sm:text-base">{a.timeSlot}</div>
+                                            <div className="text-xs sm:text-sm break-words">Lý do: {a.reason}</div>
+                                            <div className="text-xs sm:text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
+                                            <div className="text-xs sm:text-sm">
                                                 Bác sĩ: {a.doctorSnapshot?.name || "Chưa phân công"}
                                             </div>
-                                            <div className="text-sm">
+                                            <div className="text-xs sm:text-sm">
                                                 Chuyên khoa: {a.specialtySnapshot?.name || "Không rõ"}
                                             </div>
                                         </div>
@@ -228,17 +231,18 @@ const PatientAppointment = () => {
                                             <Button
                                                 type="text"
                                                 danger
-                                                icon={<MdCancel size={20} />}
+                                                icon={<MdCancel className="text-base sm:text-xl" />}
                                                 onClick={() => handleCancelAppointment(a._id)}
                                                 title="Hủy lịch hẹn"
-                                                className="flex items-center justify-center"
+                                                className="flex items-center justify-center flex-shrink-0"
+                                                size="small"
                                             />
                                         )}
                                     </div>
                                 </li>
                             ))}
                         {getAppointmentsForDate(selectedDate).length === 0 && (
-                            <p>Không có cuộc hẹn trong ngày này.</p>
+                            <p className="text-sm sm:text-base">Không có cuộc hẹn trong ngày này.</p>
                         )}
                     </ul>
                 )}

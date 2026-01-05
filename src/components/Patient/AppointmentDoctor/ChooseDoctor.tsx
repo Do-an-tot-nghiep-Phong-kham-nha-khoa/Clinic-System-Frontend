@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { List, Avatar, Button, Select, message, Skeleton, Pagination, Input } from 'antd';
 import { getDoctorsWithPaging, type Doctor } from '../../../services/DoctorService';
 import { getSpecialties, type Specialty } from '../../../services/SpecialtyService';
+import { CacheService } from '../../../services/CacheService';
 import { FaSearch, FaUserMd } from 'react-icons/fa';
 
 interface ChooseDoctorProps {
@@ -28,8 +29,17 @@ const ChooseDoctor: React.FC<ChooseDoctorProps> = ({ onNext, selectedDoctorId, d
   useEffect(() => {
     (async () => {
       try {
-        const sp = await getSpecialties();
-        setSpecialties(sp.items);
+        const cacheKey = 'specialties_list';
+        
+        // Check cache first
+        let cachedData = CacheService.get<{ items: Specialty[] }>(cacheKey);
+        if (cachedData) {
+          setSpecialties(cachedData.items);
+        } else {
+          const sp = await getSpecialties();
+          setSpecialties(sp.items);
+          CacheService.set(cacheKey, sp);
+        }
       } catch (err) {
         message.error('Lỗi tải danh sách chuyên khoa');
       }
@@ -41,14 +51,26 @@ const ChooseDoctor: React.FC<ChooseDoctorProps> = ({ onNext, selectedDoctorId, d
     (async () => {
       try {
         setLoading(true);
-        const result = await getDoctorsWithPaging({ 
+        
+        const cacheKey = filterSpecialty 
+          ? `doctors_by_specialty_${filterSpecialty}` 
+          : 'doctors_all';
+        
+        // Check cache first
+        let cachedDoctors = CacheService.get<Doctor[]>(cacheKey);
+        if (cachedDoctors) {
+          setDoctors(cachedDoctors);
+        } else {
+          const result = await getDoctorsWithPaging({ 
           page, 
           limit: pageSize, 
           q: q || undefined,
           specialtyId: filterSpecialty 
         });
-        setDoctors(result.items);
-        setTotal(result.total);
+          setDoctors(result.items);
+          CacheService.set(cacheKey, result.items);
+          setTotal(result.total);
+        }
       } catch (err) {
         message.error('Lỗi tải danh sách bác sĩ');
       } finally {

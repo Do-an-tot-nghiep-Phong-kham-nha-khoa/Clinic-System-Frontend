@@ -72,18 +72,22 @@ const PatientTreatmentHistory = () => {
             dataIndex: "patientName",
             key: "patientName",
             render: (text) => text || "—",
+            ellipsis: true,
         },
         {
             title: "Bác sĩ",
             dataIndex: "doctorName",
             key: "doctorName",
             render: (text) => text || "—",
+            ellipsis: true,
         },
         {
             title: "Chuyên khoa",
             dataIndex: "specialtyName",
             key: "specialtyName",
             render: (text) => text || "—",
+            ellipsis: true,
+            responsive: ['md'] as any,
         },
         {
             title: "Ngày khám",
@@ -92,25 +96,32 @@ const PatientTreatmentHistory = () => {
             render: (text) => dayjs.utc(text).format("DD/MM/YYYY"),
             sorter: true,
             defaultSortOrder: "descend",
+            width: 110,
         },
         {
             title: "Chuẩn đoán",
             dataIndex: "diagnosis",
             key: "diagnosis",
             ellipsis: true,
-            width: "35%",
+            responsive: ['lg'] as any,
         },
         {
             title: "Thao tác",
             key: "action",
             align: "center",
+            width: 100,
             render: (_, record) => (
-                <ButtonPrimary type="link" shape="round" icon={<FaInfoCircle />}
+                <ButtonPrimary 
+                    type="link" 
+                    shape="round" 
+                    icon={<FaInfoCircle />}
+                    size="small"
+                    className="text-xs sm:text-sm"
                     onClick={() => {
                         setSelectedTreatmentId(record._id);
                         setModalVisible(true);
                     }}>
-                    Xem chi tiết
+                    <span className="hidden sm:inline">Xem</span>
                 </ButtonPrimary>
             ),
         },
