@@ -21,7 +21,7 @@ const DoctorCard: React.FC<Props> = ({ doctor, onClick, selected, className, hei
             className={`bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-transform duration-300 cursor-pointer mx-auto w-full max-w-[360px] ${selected ? 'ring-4 ring-blue-500' : ''} ${className ?? ''}`}
             style={{ height: height ?? 420 }}
         >
-            <div className="h-1/2 w-full flex items-center justify-center bg-gray-50">
+            <div className="h-1/2 w-full flex items-center justify-center bg-blue-50">
                 <img
                     src={imgSrc}
                     alt={doctor.name}

@@ -43,7 +43,22 @@ const PatientPreCheck = ({
     currentLabOrderData,
     currentPrescriptionId,
     currentPrescriptionData,
-}: Props) => {const hp = appointment.healthProfile_id;    const owner = hp?.owner_detail;    const [labOrder, setLabOrder] = useState<any>(null);
+}: Props) => {
+    // Kiểm tra appointment trước khi sử dụng
+    if (!appointment) {
+        return <div className="p-4">Không tìm thấy thông tin cuộc hẹn</div>;
+    }
+
+    // Sử dụng snapshot từ backend đã tối ưu
+    const patientData = appointment?.patient || appointment?.patientSnapshot;
+    
+    // HealthProfile vẫn cần populate để lấy thông tin y tế chi tiết
+    // Kiểm tra xem healthProfile_id đã được populate hay chỉ là string ID
+    const hp = typeof appointment?.healthProfile_id === 'object' 
+        ? appointment.healthProfile_id 
+        : null;
+    
+    const [labOrder, setLabOrder] = useState<any>(null);
     const [prescription, setPrescription] = useState<any>(null);
     const [labOrderModalOpen, setLabOrderModalOpen] = useState(false);
     const [prescriptionModalOpen, setPrescriptionModalOpen] = useState(false);
@@ -93,10 +108,10 @@ const PatientPreCheck = ({
                 <div className="lg:col-span-1 space-y-4">
                     <Card title={<><UserOutlined /> Thông tin Bệnh nhân</>} variant="outlined" className="shadow-md">
                         <div className="space-y-2 text-sm">
-                            <div><b>Họ tên:</b> {owner?.name}</div>
-                            <div><b>Ngày sinh:</b> {owner?.dob ? new Date(owner.dob).toLocaleDateString() : ""}</div>
-                            <div><b>Giới tính:</b> {owner?.gender}</div>
-                            <div><b>Số điện thoại:</b> {owner?.phone}</div>
+                            <div><b>Họ tên:</b> {patientData?.name || "N/A"}</div>
+                            <div><b>Ngày sinh:</b> {patientData?.dob ? new Date(patientData.dob).toLocaleDateString() : "N/A"}</div>
+                            <div><b>Giới tính:</b> {patientData?.gender == 'female' ? "Nữ" : patientData?.gender == 'male' ? "Nam" : "N/A"}</div>
+                            <div><b>Số điện thoại:</b> {patientData?.phone || "N/A"}</div>
                         </div>
                         <Divider dashed />
                         <div className="text-base font-semibold mb-2">Hồ sơ Sức khoẻ</div>
@@ -303,7 +318,7 @@ const PatientPreCheck = ({
             <LabOrderDetailModal
                 open={labOrderModalOpen}
                 labOrderData={labOrder}
-                patientInfo={owner}
+                patientInfo={patientData}
                 onClose={() => setLabOrderModalOpen(false)}
             />
 
@@ -311,7 +326,7 @@ const PatientPreCheck = ({
             <PrescriptionDetailModal
                 open={prescriptionModalOpen}
                 prescriptionData={prescription}
-                patientInfo={owner}
+                patientInfo={patientData}
                 onClose={() => setPrescriptionModalOpen(false)}
             />
         </div>

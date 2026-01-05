@@ -1,17 +1,20 @@
-import { Button, Input, message, Table, Tag } from "antd";
+import { Button, Input, message, Table, Tag,  } from "antd";
 import { useEffect, useState } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaInfoCircle } from "react-icons/fa";
 import { formatDateDDMMYYYY } from "../../utils/date";
 import {
     getInvoices,
     type Invoice,
     type InvoiceMeta,
-    type InvoiceStatus
+    type InvoiceStatus,
 } from "../../services/InvoiceService";
+import { useSearchParams } from "react-router-dom";
+import ModalDetailInvoice from "../../components/Admin/ModalDetailInvoice";
 
-const InvoiceManagement = () => {
+const ReceptionistInvoice = () => {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [meta, setMeta] = useState<InvoiceMeta | null>(null);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // table query state
     const [page, setPage] = useState(1);
@@ -21,11 +24,27 @@ const InvoiceManagement = () => {
     const [searchInput, setSearchInput] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [invoiceDetailOpen, setInvoiceDetailOpen] = useState(false);
+    const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+
+    // Xử lý khi quay về từ VNPay
+    useEffect(() => {
+        const status = searchParams.get('vnp_ResponseCode');
+        if (status) {
+            if (status === '00') {
+                message.success('Thanh toán VNPay thành công!');
+            } else {
+                message.error('Thanh toán VNPay thất bại!');
+            }
+            // Xóa query params sau khi hiển thị message
+            setSearchParams({});
+        }
+    }, [searchParams, setSearchParams]);
+
     useEffect(() => {
         fetchInvoices();
     }, [page, pageSize, sort, q]);
 
-    // Hàm lấy danh sách hóa đơn từ API
     const fetchInvoices = async () => {
         try {
             setLoading(true);
@@ -42,43 +61,49 @@ const InvoiceManagement = () => {
         }
     }
 
-    // Hàm ánh xạ status sang màu sắc hiển thị
+    const getStatusText = (status: InvoiceStatus): string => {
+        switch (status) {
+            case 'Paid':
+                return 'Đã thanh toán';
+            case 'Cancelled':
+                return 'Đã hủy';
+            case 'Refunded':
+                return 'Đã hoàn tiền';
+            case 'Pending':
+            default:
+                return 'Chờ thanh toán';
+        }
+    };
+
     const getStatusTag = (status: InvoiceStatus) => {
         let color;
-        let statusText;
+        const statusText = getStatusText(status);
         switch (status) {
             case 'Paid':
                 color = 'green';
-                statusText = 'Đã thanh toán';
                 break;
             case 'Cancelled':
                 color = 'red';
-                statusText = 'Đã hủy';
                 break;
             case 'Refunded':
                 color = 'volcano';
-                statusText = 'Đã hoàn tiền';
                 break;
             case 'Pending':
             default:
                 color = 'gold';
-                statusText = 'Chờ thanh toán';
                 break;
         }
         return <Tag color={color}>{statusText}</Tag>;
     };
 
-    // Hàm xử lý thay đổi của Table (phân trang, sắp xếp)
     const handleTableChange = (
         pagination: { current?: number; pageSize?: number },
         _filters: any,
         sorter: any
     ) => {
-        // pagination
         if (pagination.current) setPage(pagination.current);
         if (pagination.pageSize) setPageSize(pagination.pageSize);
 
-        // sorting logic 
         if (Array.isArray(sorter)) {
             sorter = sorter[0];
         }
@@ -98,7 +123,11 @@ const InvoiceManagement = () => {
         setQ(searchInput.trim());
     };
 
-    // Định nghĩa các cột cho Table Quản lý Hóa đơn
+    const handlePrintInvoice = async (invoiceId: string) => {
+        setSelectedInvoiceId(invoiceId);
+        setInvoiceDetailOpen(true);
+    };
+
     const columns = [
         {
             title: 'Mã HĐ',
@@ -106,15 +135,15 @@ const InvoiceManagement = () => {
             key: '_id',
             width: 120,
             render: (value: string) => value.slice(0, 8)
-        },
+        },        
         {
             title: 'Chủ Hồ sơ Sức khỏe',
-            dataIndex: ['owner_detail', 'name'],
+            dataIndex: ['patient', 'name'],
             key: 'ownerName',
             render: (_: any, record: Invoice) => (
                 <>
-                    <strong className="block">{record.owner_detail?.name}</strong>
-                    <small className="block">SĐT: {record.owner_detail?.phone}</small>
+                    <strong className="block">{record.patient?.name}</strong>
+                    <small className="block">SĐT: {record.patient?.phone}</small>
                 </>
             )
         },
@@ -135,12 +164,33 @@ const InvoiceManagement = () => {
         },
         {
             title: 'Ngày tạo',
-            dataIndex: 'created_at',
-            key: 'created_at',
+            dataIndex: 'issued_at',
+            key: 'issued_at',
             sorter: true,
             width: 120,
             render: (value: string) => formatDateDDMMYYYY(value)
         },
+        {
+            title: 'Hành động',
+            key: 'actions',
+            width: 50,
+            render: (_: any, record: Invoice) => (
+                <div className="flex flex-col gap-1.5">
+                    <div className="flex gap-1.5">
+
+                        <Button
+                            type="default"
+                            onClick={() => handlePrintInvoice(record._id)}
+                            icon={<FaInfoCircle />}
+                            size="small"
+                            style={{ flex: 1 }}
+                        >
+                            Chi tiết
+                        </Button>
+                    </div>
+                </div>
+            )
+        }
     ];
 
     return (
@@ -151,7 +201,7 @@ const InvoiceManagement = () => {
                     <Input.Search
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
-                        placeholder="Tìm kiếm ..."
+                        placeholder="Tìm kiếm theo tên bệnh nhân ..."
                         allowClear
                         enterButton={
                             <Button icon={<FaSearch />}
@@ -181,10 +231,22 @@ const InvoiceManagement = () => {
                     showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} hóa đơn`,
                 }}
                 onChange={handleTableChange}
-                scroll={{ x: 800 }} // Cho phép cuộn ngang nếu màn hình nhỏ
+                scroll={{ x: 800 }}
+            />    
+            <ModalDetailInvoice
+                open={invoiceDetailOpen}
+                invoiceId={selectedInvoiceId}
+                onClose={() => {
+                    setInvoiceDetailOpen(false);
+                    setSelectedInvoiceId(null);
+                }}
+                onSuccess={() => {
+                    // Reload table sau khi thanh toán thành công
+                    fetchInvoices();
+                }}
             />
         </div>
     )
 }
 
-export default InvoiceManagement;
+export default ReceptionistInvoice;

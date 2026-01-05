@@ -64,17 +64,45 @@ export interface HealthProfile {
     owner_detail: HealthProfileOwner;
 }
 
+// Snapshot interfaces cho optimized queries
+export interface PatientSnapshot {
+    name: string;
+    dob?: string;
+    phone?: string;
+    gender?: string;
+    ownerModel?: string;
+}
+
+export interface DoctorSnapshot {
+    name: string;
+    phone?: string;
+    experience?: number;
+    avatar?: string;
+}
+
+export interface SpecialtySnapshot {
+    name: string;
+    description?: string;
+}
+
 export interface AppointmentModel {
     _id: string;
     booker_id: string;
     doctor_id: string;
-    healthProfile_id: HealthProfile;
+    healthProfile_id?: string | HealthProfile; // Có thể là ID hoặc populated object
     specialty_id: string;
     appointmentDate: string;
     timeSlot: string;
     reason: string;
     status: string;
     createdAt: string;
+    // Snapshot fields - được trả về từ optimized queries
+    patient?: PatientSnapshot;
+    patientSnapshot?: PatientSnapshot;
+    doctor?: DoctorSnapshot;
+    doctorSnapshot?: DoctorSnapshot;
+    specialty?: SpecialtySnapshot;
+    specialtySnapshot?: SpecialtySnapshot;
 }
 
 export interface ListAppointmentByDoctorResponse {
@@ -99,8 +127,6 @@ export interface SpecialtyDetail {
 
 export interface BookerAppointmentModel {
     _id: string;
-    doctor_id: DoctorDetail;
-    specialty_id: SpecialtyDetail;
     booker_id: string;
     healthProfile_id: HealthProfile;
     appointmentDate: string;
@@ -108,6 +134,13 @@ export interface BookerAppointmentModel {
     reason: string;
     status: string;
     createdAt: string;
+    // Snapshot fields from backend
+    doctor?: DoctorSnapshot;
+    doctorSnapshot?: DoctorSnapshot;
+    specialty?: SpecialtySnapshot;
+    specialtySnapshot?: SpecialtySnapshot;
+    patient?: PatientSnapshot;
+    patientSnapshot?: PatientSnapshot;
 }
 
 export interface ListAppointmentByBookerResponse {
@@ -199,7 +232,7 @@ export async function getAppointmentsByBooker(bookerId: string): Promise<ListApp
 }
 
 export async function deleteAppointment(appointmentId: string): Promise<{ success: boolean; message: string }> {
-    const url = `/${appointmentId}`;
+    const url = `/appointments/${appointmentId}`;
     const res = await api.delete(url, { withCredentials: true });
     return res?.data ?? { success: false, message: 'Xoá thất bại' };
 }
@@ -238,6 +271,82 @@ export async function confirmAppointment(appointmentId: string): Promise<Appoint
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
             throw new Error(error.response.data.message || "Lỗi xác nhận lịch hẹn.");
+        }
+        throw new Error("Lỗi kết nối server");
+    }
+}
+
+export interface MonthAppointmentResponse {
+    count: number;
+    appointments: BookerAppointmentModel[];
+    month: number;
+    year: number;
+}
+
+export interface MonthAppointmentByDoctorResponse {
+    count: number;
+    appointments: AppointmentModel[];
+    month: number;
+    year: number;
+}
+
+export async function getMonthAppointmentByBooker(
+    bookerId: string,
+    year?: number,
+    month?: number,
+    status?: string
+): Promise<MonthAppointmentResponse> {
+    const url = `/appointments/booker/${bookerId}/month`;
+    
+    try {
+        const params: any = {};
+        
+        // Nếu có year và month, tạo date string
+        if (year && month) {
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
+            params.date = dateStr;
+        }
+        
+        if (status) {
+            params.status = status;
+        }
+        
+        const res = await api.get(url, { params });
+        return res.data;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn tháng.");
+        }
+        throw new Error("Lỗi kết nối server");
+    }
+}
+
+export async function getMonthAppointmentByDoctor(
+    doctorId: string,
+    year?: number,
+    month?: number,
+    status?: string
+): Promise<MonthAppointmentByDoctorResponse> {
+    const url = `/appointments/doctor/${doctorId}/month`;
+    
+    try {
+        const params: any = {};
+        
+        // Nếu có year và month, tạo date string
+        if (year && month) {
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
+            params.date = dateStr;
+        }
+        
+        if (status) {
+            params.status = status;
+        }
+        
+        const res = await api.get(url, { params });
+        return res.data;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.message || "Lỗi lấy lịch hẹn tháng của bác sĩ.");
         }
         throw new Error("Lỗi kết nối server");
     }

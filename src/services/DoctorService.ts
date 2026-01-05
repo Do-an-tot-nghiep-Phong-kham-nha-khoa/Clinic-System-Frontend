@@ -49,6 +49,7 @@ export interface DoctorProfileNew {
   specialtyId: Specialty;
   phone: string;
   experience: number; // Số năm kinh nghiệm
+  bio?: string;
 }
 
 export interface Specialty {
@@ -76,6 +77,7 @@ export interface UpdateDoctorPayload {
   name?: string;
   phone?: string;
   experience?: number;
+  bio?: string;
 }
 
 export async function getDoctorsWithPaging(params: { page?: number; limit?: number; q?: string; specialty?: string; specialtyId?: string; name?: string } = {}): Promise<{ items: Doctor[]; total: number; page: number; limit: number }> {

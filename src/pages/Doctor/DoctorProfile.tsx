@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getDoctorByAccountId, type DoctorProfileNew } from "../../services/DoctorService";
 import UpdateProfileModal from '../../components/Doctor/UpdateProfileModal';
 import ButtonPrimary from '../../utils/ButtonPrimary';
+import { FaUser } from 'react-icons/fa';
 
 const DoctorProfileComponent: React.FC = () => {
     const [doctor, setDoctor] = useState<DoctorProfileNew | null>(null);
@@ -164,6 +165,12 @@ const DoctorProfileComponent: React.FC = () => {
                             label={<span className="font-medium flex items-center"><ExperimentOutlined className="mr-2" /> Tên Chuyên Khoa</span>}
                         >
                             {specialtyName}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item
+                            label={<span className="font-medium flex items-center"><FaUser className="mr-2" /> Giới thiệu</span>}
+                        >
+                            {doctor.bio || 'Chưa cập nhật tiểu sử.'}
                         </Descriptions.Item>
                     </Descriptions>
                 </Card>

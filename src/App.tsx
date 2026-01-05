@@ -24,7 +24,6 @@ import ScheduleManagement from './pages/Admin/ScheduleManagement'
 // Doctor Pages & Layouts
 import DoctorLayout from './layouts/DoctorLayout'
 import DoctorAppointment from './pages/Doctor/DoctorAppointment'
-import DoctorMedicalRecord from './pages/Doctor/DoctorMedicalRecord'
 import DoctorTreatment from './pages/Doctor/DoctorTreatment'
 // Patient Pages & Layouts
 import PatientLayout from './layouts/PatientLayout'
@@ -33,8 +32,7 @@ import PatientAppointmentDoctor from './pages/Patient/PatientAppointmentDoctor'
 import PatientAppointment from './pages/Patient/PatientAppointment'
 import PatientTreatmentHistory from './pages/Patient/PatientTreatmentHistory'
 import PatientAppointmentSpecialty from './pages/Patient/PatientAppointmentSpecialty'
-import PatientInvoices from './pages/Patient/PatientInvoices'
-import PaymentResult from './pages/Patient/PaymentResult'
+import PaymentResult from './components/Receptionist/PaymentResult'
 import Chat from './pages/Patient/AIChatBot'
 // Receptionist Pages & Layouts
 import ReceptionistLayout from './layouts/ReceptionistLayout'
@@ -93,7 +91,6 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<DoctorProfile />} />
-          <Route path='medical-records' element={<DoctorMedicalRecord />} />
           <Route path='treatments' element={<DoctorTreatment />} />
           <Route path='appointments' element={<DoctorAppointment />} />
         </Route>
@@ -108,8 +105,7 @@ function App() {
           <Route path='appointments-specialty' element={<PatientAppointmentSpecialty />} />
           <Route path='appointments-doctor' element={<PatientAppointmentDoctor />} />
           <Route path='medical-records' element={<PatientTreatmentHistory />} />
-          <Route path='invoices' element={<PatientInvoices />} />
-          <Route path='payment-result' element={<PaymentResult />} />
+          
           <Route path='chatbot' element={<Chat />} />
           <Route path='health-profile' element={<HealthProfile />} />
         </Route>
@@ -122,8 +118,8 @@ function App() {
           <Route index element={<ReceptionistProfile />} />
           <Route path='assignments' element={<ReceptionistAppointment />} />
           <Route path='appointments' element={<ReceptionistManageAppointment />} />
-          {/* <Route path='treatments' element={<ReceptionistTreatment />} /> */}
           <Route path='invoices' element={<ReceptionistInvoice />} />
+          <Route path='payment-result' element={<PaymentResult />} />
         </Route>
       </Routes>
     </AuthProvider>
