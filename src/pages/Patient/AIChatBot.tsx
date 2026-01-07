@@ -177,7 +177,8 @@ export default function Chatbot() {
         title={<div className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base md:text-lg font-bold text-blue-600">
           <span className="text-lg sm:text-xl md:text-2xl"><BsRobot /></span> Trợ lý Y tế ảo
         </div>}
-        bodyStyle={{ padding: '8px 12px', '@media (min-width: 640px)': { padding: '12px 24px' } }}
+        bodyStyle={{ padding: '8px 12px' }}
+        className="responsive-card-body"
         bordered={false}
       >
         <p className="text-xs sm:text-sm text-gray-500 m-0">Hỗ trợ thông tin sức khỏe và hướng dẫn đặt lịch khám bệnh.</p>
