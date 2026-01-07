@@ -66,7 +66,7 @@ const PatientTreatmentHistory = () => {
         }
         if (pagination.current) setPage(pagination.current);
         if (pagination.pageSize) setLimit(pagination.pageSize);
-    };    const columns: ColumnsType<Treatment> = [
+    }; const columns: ColumnsType<Treatment> = [
         {
             title: "Tên bệnh nhân",
             dataIndex: "patientName",
@@ -111,9 +111,9 @@ const PatientTreatmentHistory = () => {
             align: "center",
             width: 100,
             render: (_, record) => (
-                <ButtonPrimary 
-                    type="link" 
-                    shape="round" 
+                <ButtonPrimary
+                    type="link"
+                    shape="round"
                     icon={<FaInfoCircle />}
                     size="small"
                     className="text-xs sm:text-sm"
@@ -125,8 +125,8 @@ const PatientTreatmentHistory = () => {
                 </ButtonPrimary>
             ),
         },
-    ];return (
-        <div className="p-6 container">
+    ]; return (
+        <div className="p-6 container mx-auto">
             <h1 className="text-2xl font-semibold mb-4 text-gray-800">Lịch sử ca khám</h1>
 
             {!loading && treatments.length === 0 ? (

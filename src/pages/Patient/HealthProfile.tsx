@@ -128,10 +128,10 @@ const HealthProfilePage: React.FC = () => {
         if (!user) return;
         try {
             setLoading(true);
-            
+
             const patientCacheKey = `patient_${user.id}`;
             const profilesCacheKey = `health_profiles_${user.id}`;
-            
+
             // Check cache for patient data
             let patient = forceRefresh ? null : CacheService.get<any>(patientCacheKey);
             if (!patient) {
@@ -140,7 +140,7 @@ const HealthProfilePage: React.FC = () => {
                     CacheService.set(patientCacheKey, patient);
                 }
             }
-            
+
             if (!patient) {
                 message.error("Không tìm thấy thông tin bệnh nhân");
                 setProfiles([]);
@@ -205,7 +205,7 @@ const HealthProfilePage: React.FC = () => {
             }
             await HealthProfileService.deleteHealthProfileById(profile._id);
             message.success('Xóa hồ sơ thành công');
-            
+
             // Clear cache and force refresh
             if (user) {
                 CacheService.set(`health_profiles_${user.id}`, null);
@@ -291,7 +291,7 @@ const HealthProfilePage: React.FC = () => {
             }
 
             setDrawerOpen(false);
-            
+
             // Clear cache and force refresh
             if (user) {
                 CacheService.set(`health_profiles_${user.id}`, null);
@@ -311,7 +311,7 @@ const HealthProfilePage: React.FC = () => {
     const family = profiles.filter(p => p.type === "FamilyMember");
 
     return (
-        <div className="container p-3 sm:p-4 md:p-6">
+        <div className="container p-3 sm:p-4 md:p-6 mx-auto">
             <Space direction="vertical" style={{ width: '100%' }} size={24}>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
                     <h2 className="text-xl sm:text-2xl font-bold">Hồ sơ sức khỏe</h2>
