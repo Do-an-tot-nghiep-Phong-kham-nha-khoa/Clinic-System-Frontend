@@ -32,17 +32,18 @@ const ChooseSpecialty: React.FC<ChooseSpecialtyProps> = ({ onNext, selectedSpeci
         try {
             setLoading(true);
             
-            const cacheKey = 'specialties_list';
+            const cacheKey = `specialties_page_${page}_size_${pageSize}_q_${q || 'all'}`;
             
             // Check cache first
-            let cachedData = CacheService.get<{ items: Specialty[] }>(cacheKey);
+            let cachedData = CacheService.get<{ items: Specialty[]; meta: SpecialtyMeta }>(cacheKey);
             if (cachedData) {
                 setSpecialties(cachedData.items);
+                setMeta(cachedData.meta);
             } else {
                 const data = await getSpecialties({ page, limit: pageSize, q });
                 setSpecialties(data.items);
-                CacheService.set(cacheKey, data);
                 setMeta(data.meta);
+                CacheService.set(cacheKey, { items: data.items, meta: data.meta });
             }
         } catch (error) {
             message.error("Lỗi khi lấy danh sách chuyên khoa.");

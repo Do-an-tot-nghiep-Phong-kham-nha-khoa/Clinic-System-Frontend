@@ -52,24 +52,23 @@ const ChooseDoctor: React.FC<ChooseDoctorProps> = ({ onNext, selectedDoctorId, d
       try {
         setLoading(true);
         
-        const cacheKey = filterSpecialty 
-          ? `doctors_by_specialty_${filterSpecialty}` 
-          : 'doctors_all';
+        const cacheKey = `doctors_page_${page}_size_${pageSize}_q_${q}_specialty_${filterSpecialty || 'all'}`;
         
         // Check cache first
-        let cachedDoctors = CacheService.get<Doctor[]>(cacheKey);
-        if (cachedDoctors) {
-          setDoctors(cachedDoctors);
+        let cachedData = CacheService.get<{ items: Doctor[]; total: number }>(cacheKey);
+        if (cachedData) {
+          setDoctors(cachedData.items);
+          setTotal(cachedData.total);
         } else {
           const result = await getDoctorsWithPaging({ 
-          page, 
-          limit: pageSize, 
-          q: q || undefined,
-          specialtyId: filterSpecialty 
-        });
+            page, 
+            limit: pageSize, 
+            q: q || undefined,
+            specialtyId: filterSpecialty 
+          });
           setDoctors(result.items);
-          CacheService.set(cacheKey, result.items);
           setTotal(result.total);
+          CacheService.set(cacheKey, { items: result.items, total: result.total });
         }
       } catch (err) {
         message.error('Lỗi tải danh sách bác sĩ');
