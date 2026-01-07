@@ -8,6 +8,8 @@ import { FaHome, FaFileMedical } from "react-icons/fa";
 import { FaListCheck, FaRegCalendarPlus, FaRobot } from "react-icons/fa6";
 import { MdOutlineReceiptLong, MdLogout } from "react-icons/md";
 import { useAuth } from "../contexts/AuthContext";
+import logo from '../assets/logo.svg';
+import logoOnly from '../assets/logoOnly.svg';
 
 const { Header, Sider, Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -151,9 +153,7 @@ const PatientLayout = () => {
           <div className="flex-1">
             <div className="h-[76px] flex items-center justify-center px-4 overflow-hidden">
               {!collapsed && (
-                <Link to="/" className="!text-white text-xl font-bold whitespace-nowrap hover:!text-gray-200 no-underline">
-                  Trang chủ Phòng Khám
-                </Link>
+                <Link to="/" className="filter brightness-0 invert">{collapsed ? <img src={logoOnly} alt="logo" /> : <img src={logo} alt="logo" />}</Link>
               )}
             </div>
 
@@ -162,31 +162,38 @@ const PatientLayout = () => {
               mode="inline"
               selectedKeys={[selectedKey]}
               items={menuItems}
-              className={`!bg-slate-800 ${
-                collapsed
-                  ? "[&_.ant-menu-item]:!flex [&_.ant-menu-item]:!justify-center [&_.ant-menu-item]:!items-center [&_.ant-menu-item]:!px-0 [&_.ant-menu-item-icon]:!mr-0"
-                  : ""
-              }`}
+              className={`!bg-slate-800 ${collapsed
+                ? "[&_.ant-menu-item]:!flex [&_.ant-menu-item]:!justify-center [&_.ant-menu-item]:!items-center [&_.ant-menu-item]:!px-0 [&_.ant-menu-item-icon]:!mr-0"
+                : ""
+                }`}
             />
           </div>
 
           <div className="border-t border-slate-700 p-4">
             <div className="flex items-center gap-3">
-              <Avatar className="!bg-[var(--color-primary)]">
-                {user?.email?.charAt(0).toUpperCase()}
+              <Avatar
+                size={40}
+                className="!bg-blue-100 !text-blue-600 font-bold shrink-0 border border-blue-200"
+              >
+                {user?.email?.charAt(0).toUpperCase() || "A"}
               </Avatar>
               {!collapsed && (
-                <span className="text-white text-sm truncate">
-                  {user?.email}
-                </span>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="font-semibold !text-white-700 truncate text-sm">
+                    {user?.email?.split('@')[0]}
+                  </span>
+                  <span className="text-[11px] !text-white-500 truncate">
+                    {user?.email}
+                  </span>
+                </div>
               )}
             </div>
 
             {!collapsed && (
               <Button
-                type="text"
+                block
                 icon={<MdLogout />}
-                className="mt-3 w-full !bg-white !text-black"
+                className="mt-4 flex items-center justify-center gap-2 rounded-lg border-gray-200 text-gray-600 hover:!text-red-500 hover:!border-red-200 transition-all"
                 onClick={() => {
                   logout();
                   navigate("/");

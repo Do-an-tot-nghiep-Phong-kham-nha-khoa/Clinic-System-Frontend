@@ -62,7 +62,10 @@ const ReceptionistAppointment = () => {
     };
 
     const filterAppointments = () => {
-        if (!allAppointments.length) return;
+        if (!allAppointments.length) {
+            setAppointments([]);
+            return;
+        }
 
         let filtered = [...allAppointments];
 
@@ -107,7 +110,7 @@ const ReceptionistAppointment = () => {
             key: "patient",
             render: (_: any, r: any) => {
                 const getPatientName = (rec: any) => {
-                    const p = rec.patient ?? rec.booker ?? rec.healthProfile ?? rec.profile ?? rec.patient_data ?? rec.booker_data ?? rec.bookerInfo ?? rec.bookerId ?? rec.booker_id ?? rec.patientId ?? rec.patient_id;
+                    const p = rec.patientSnapshot;
                     if (!p) return '-';
                     if (typeof p === 'string' || typeof p === 'number') return String(p);
                     if (typeof p === 'object') return String(p.name ?? p.fullName ?? p.full_name ?? p.username ?? p.displayName ?? p.phone ?? '-');
@@ -192,8 +195,8 @@ const ReceptionistAppointment = () => {
                     setSelectedAppointment(null);
                 }}
                 onAssigned={async () => {
-                    setAssignModalOpen(false);
-                    setSelectedAppointment(null);
+                    // Chỉ fetch lại data, không đóng modal ở đây
+                    // AssignDoctorModal sẽ tự đóng sau khi callback này xong
                     await fetchAllAppointments();
                 }}
             />

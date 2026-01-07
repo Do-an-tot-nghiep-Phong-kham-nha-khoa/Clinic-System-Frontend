@@ -144,13 +144,11 @@ const ModalCreateSchedule: React.FC<ModalCreateScheduleProps> = ({
                     rules={[{ required: true, message: 'Vui lòng chọn ít nhất một khung giờ' }]}
                 >
                     <Checkbox.Group className="w-full">
-                        <div className="space-y-6">
+                        <div className="w-full grid grid-cols-2 gap-6">
                             {/* Buổi sáng */}
-                            <div>
-                                <Space className="mb-2">
-                                    <Text strong>Sáng (08:00 - 11:30)</Text>
-                                </Space>
-                                <Space direction="vertical" className="ml-4">
+                            <div >
+                                <Space direction="vertical" className="ml-4 mt-2">
+                                <Text strong>Sáng (08:00 - 11:30)</Text>
                                     {morningSlots.map(slot => (
                                         <Checkbox key={slot.start} value={slot.start}>
                                             {slot.start} - {slot.end}
@@ -161,10 +159,8 @@ const ModalCreateSchedule: React.FC<ModalCreateScheduleProps> = ({
 
                             {/* Buổi chiều */}
                             <div>
-                                <Space className="mb-2">
-                                    <Text strong>Chiều (13:00 - 16:30)</Text>
-                                </Space>
-                                <Space direction="vertical" className="ml-4">
+                                <Space direction="vertical" className="ml-4 mt-2">
+                                <Text strong>Chiều (13:00 - 16:30)</Text>
                                     {afternoonSlots.map(slot => (
                                         <Checkbox key={slot.start} value={slot.start}>
                                             {slot.start} - {slot.end}

@@ -60,14 +60,16 @@ const TreatmentDetailModal: React.FC<Props> = ({ visible, treatmentId, onClose }
         return () => {
             mounted = false;
         };
-    }, [visible, treatmentId]);
-
-    const labColumns: ColumnsType<LabOrder["items"][number]> = [
+    }, [visible, treatmentId]);    const labColumns: ColumnsType<LabOrder["items"][number]> = [
         {
             title: "Dịch vụ",
-            dataIndex: ["serviceId", "name"],
+            dataIndex: "serviceName",
             key: "serviceName",
-            render: (_, rec) => rec.serviceId?.name || "—",
+            render: (text, rec) => {
+                if (text) return text;
+                if (rec.serviceId && typeof rec.serviceId === 'object') return rec.serviceId.name;
+                return "—";
+            },
         },
         {
             title: "Số lượng",
@@ -84,44 +86,50 @@ const TreatmentDetailModal: React.FC<Props> = ({ visible, treatmentId, onClose }
         },
         {
             title: "Đơn giá",
-            dataIndex: ["serviceId", "price"],
+            dataIndex: "price",
             key: "price",
             align: "right",
             width: 150,
-            render: (text) => formatCurrency(text),
+            render: (text, rec) => {
+                if (text) return formatCurrency(text);
+                if (rec.serviceId && typeof rec.serviceId === 'object') return formatCurrency(rec.serviceId.price);
+                return "—";
+            },
         }
-    ];
-
-    const medicineColumns: ColumnsType<Prescription["items"][number]> = [
+    ];    const medicineColumns: ColumnsType<Prescription["items"][number]> = [
         {
             title: "Thuốc",
-            dataIndex: ["medicineId", "name"],
+            dataIndex: "medicineName",
             key: "name",
-            render: (_, rec) => rec.medicineId?.name || "—",
+            render: (text, rec) => {
+                if (text) return text;
+                if (rec.medicineId && typeof rec.medicineId === 'object') return rec.medicineId.name;
+                return "—";
+            },
             fixed: "left",
             width: 200,
         },
         {
             title: "Nhà sản xuất",
-            dataIndex: ["medicineId", "manufacturer"],
+            dataIndex: "manufacturer",
             key: "manufacturer",
-            render: (_, rec) => rec.medicineId?.manufacturer || "—",
+            render: (text, rec) => {
+                if (text) return text;
+                if (rec.medicineId && typeof rec.medicineId === 'object') return rec.medicineId.manufacturer;
+                return "—";
+            },
             width: 180,
         },
         {
             title: "Đơn vị",
-            dataIndex: ["medicineId", "unit"],
+            dataIndex: "unit",
             key: "unit",
-            render: (_, rec) => rec.medicineId?.unit || "—",
+            render: (text, rec) => {
+                if (text) return text;
+                if (rec.medicineId && typeof rec.medicineId === 'object') return rec.medicineId.unit;
+                return "—";
+            },
             width: 100,
-            align: "center",
-        },
-        {
-            title: "Hạn dùng",
-            dataIndex: ["medicineId", "expiryDate"],
-            key: "expiryDate",
-            render: (text) => (text ? dayjs(text).format("DD/MM/YYYY") : "—"),
-            width: 130,
             align: "center",
         },
         {
@@ -136,18 +144,21 @@ const TreatmentDetailModal: React.FC<Props> = ({ visible, treatmentId, onClose }
             dataIndex: "dosage",
             key: "dosage",
             width: 120,
+            render: (text) => text || "—",
         },
         {
             title: "Tần suất",
             dataIndex: "frequency",
             key: "frequency",
             width: 120,
+            render: (text) => text || "—",
         },
         {
             title: "Thời lượng",
             dataIndex: "duration",
             key: "duration",
             width: 120,
+            render: (text) => text || "—",
         },
         {
             title: "Hướng dẫn",
@@ -155,12 +166,17 @@ const TreatmentDetailModal: React.FC<Props> = ({ visible, treatmentId, onClose }
             key: "instruction",
             ellipsis: true,
             width: 200,
+            render: (text) => text || "—",
         },
         {
             title: "Đơn giá",
-            dataIndex: ["medicineId", "price"],
+            dataIndex: "price",
             key: "price",
-            render: (text) => formatCurrency(text),
+            render: (text, rec) => {
+                if (text) return formatCurrency(text);
+                if (rec.medicineId && typeof rec.medicineId === 'object') return formatCurrency(rec.medicineId.price);
+                return "—";
+            },
             fixed: "right",
             width: 130,
             align: "right",
@@ -196,26 +212,40 @@ const TreatmentDetailModal: React.FC<Props> = ({ visible, treatmentId, onClose }
             <div className="space-y-8">
                 <div>
 
-                    <Title level={5}>Thông tin bệnh nhân & buổi khám</Title>
-
-                    <Descriptions bordered column={2} size="small">
+                    <Title level={5}>Thông tin bệnh nhân & buổi khám</Title>                    <Descriptions bordered column={2} size="small">
 
                         <Descriptions.Item label="Tên bệnh nhân" styles={{ label: { width: '20%' } }}>
-                            {treatment.healthProfile?.owner_detail?.name || "—"}
+                            {treatment.healthProfile?.ownerName || "—"}
                         </Descriptions.Item>
 
                         <Descriptions.Item label="Ngày sinh" styles={{ label: { width: '20%' } }}>
-                            {treatment.healthProfile?.owner_detail?.dob
-                                ? dayjs.utc(treatment.healthProfile.owner_detail.dob).format("DD/MM/YYYY")
+                            {treatment.healthProfile?.ownerDob
+                                ? dayjs.utc(treatment.healthProfile.ownerDob).format("DD/MM/YYYY")
                                 : "—"}
                         </Descriptions.Item>
 
                         <Descriptions.Item label="Số điện thoại" styles={{ label: { width: '20%' } }}>
-                            {treatment.healthProfile?.owner_detail?.phone || "—"}
+                            {treatment.healthProfile?.ownerPhone || "—"}
                         </Descriptions.Item>
 
-                        <Descriptions.Item label="Quan hệ (ownerModel)" styles={{ label: { width: '20%' } }}>
-                            {treatment.healthProfile?.ownerModel || "—"}
+                        <Descriptions.Item label="Giới tính" styles={{ label: { width: '20%' } }}>
+                            {treatment.healthProfile?.ownerGender === "male" ? "Nam" : treatment.healthProfile?.ownerGender === "female" ? "Nữ" : "—"}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Nhóm máu" styles={{ label: { width: '20%' } }}>
+                            {treatment.healthProfile?.bloodType || "—"}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Dị ứng" styles={{ label: { width: '20%' } }}>
+                            {treatment.healthProfile?.allergies && treatment.healthProfile.allergies.length > 0
+                                ? treatment.healthProfile.allergies.join(", ")
+                                : "—"}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Bệnh mãn tính" span={2} styles={{ label: { width: '20%' } }}>
+                            {treatment.healthProfile?.chronicConditions && treatment.healthProfile.chronicConditions.length > 0
+                                ? treatment.healthProfile.chronicConditions.join(", ")
+                                : "—"}
                         </Descriptions.Item>
 
                         <Descriptions.Item label="Bác sĩ" styles={{ label: { width: '20%' } }}>
@@ -223,7 +253,7 @@ const TreatmentDetailModal: React.FC<Props> = ({ visible, treatmentId, onClose }
                         </Descriptions.Item>
 
                         <Descriptions.Item label="Chuyên khoa" styles={{ label: { width: '20%' } }}>
-                            {treatment.doctor?.specialtyId?.name || "—"}
+                            {treatment.doctor?.specialtyName || "—"}
                         </Descriptions.Item>
 
                         <Descriptions.Item label="Ngày hẹn" styles={{ label: { width: '20%' } }}>
@@ -234,6 +264,10 @@ const TreatmentDetailModal: React.FC<Props> = ({ visible, treatmentId, onClose }
 
                         <Descriptions.Item label="Khung giờ" styles={{ label: { width: '20%' } }}>
                             {treatment.appointment?.timeSlot || "—"}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Lý do khám" span={2} styles={{ label: { width: '20%' } }}>
+                            {treatment.appointment?.reason || "—"}
                         </Descriptions.Item>
 
                         <Descriptions.Item label="Ngày khám" styles={{ label: { width: '20%' } }}>

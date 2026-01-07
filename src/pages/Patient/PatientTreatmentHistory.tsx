@@ -66,28 +66,26 @@ const PatientTreatmentHistory = () => {
         }
         if (pagination.current) setPage(pagination.current);
         if (pagination.pageSize) setLimit(pagination.pageSize);
-    };
-
-    const columns: ColumnsType<Treatment> = [
+    };    const columns: ColumnsType<Treatment> = [
         {
             title: "Tên bệnh nhân",
-            dataIndex: ["healthProfile", "owner_detail", "name"],
-            key: "ownerName",
-            render: (_, record) => record.healthProfile?.owner_detail?.name || "—",
+            dataIndex: "patientName",
+            key: "patientName",
+            render: (text) => text || "—",
             ellipsis: true,
         },
         {
             title: "Bác sĩ",
-            dataIndex: ["doctor", "name"],
+            dataIndex: "doctorName",
             key: "doctorName",
-            render: (_, record) => record.doctor?.name || "—",
+            render: (text) => text || "—",
             ellipsis: true,
         },
         {
             title: "Chuyên khoa",
-            dataIndex: ["doctor", "specialtyId", "name"],
-            key: "specialty",
-            render: (_, record) => record.doctor?.specialtyId?.name || "—",
+            dataIndex: "specialtyName",
+            key: "specialtyName",
+            render: (text) => text || "—",
             ellipsis: true,
             responsive: ['md'] as any,
         },
@@ -127,8 +125,8 @@ const PatientTreatmentHistory = () => {
                 </ButtonPrimary>
             ),
         },
-    ]; return (
-        <div className="p-6">
+    ];return (
+        <div className="p-6 container">
             <h1 className="text-2xl font-semibold mb-4 text-gray-800">Lịch sử ca khám</h1>
 
             {!loading && treatments.length === 0 ? (

@@ -30,6 +30,22 @@ const DoctorTreatment = () => {
     };    
     const goPreCheck = (appointment: any) => {        
         setSelectedAppointment(appointment);
+        
+        // Lấy doctorId từ appointment
+        // Appointment có doctor_id field (ObjectId) và doctor/doctorSnapshot (snapshot data)
+        let docId = appointment.doctor_id; // Ưu tiên lấy ID thực
+        
+        // Nếu doctor_id là object, lấy _id
+        if (typeof docId === 'object' && docId?._id) {
+            docId = docId._id;
+        }
+        
+        console.log("Setting doctorId:", docId, "from appointment:", appointment);
+        
+        if (docId) {
+            setDoctorId(docId);
+        }
+        
         setCurrentLabOrderId(null);
         setCurrentLabOrderData(null);
         setCurrentPrescriptionId(null);
@@ -49,10 +65,12 @@ const DoctorTreatment = () => {
     }
 
     const goLabOrder = () => {
+        console.log("goLabOrder called", { selectedAppointment, doctorId });
         setScreen("createLabOrder");
     }
 
     const goPrescription = () => {
+        console.log("goPrescription called", { selectedAppointment, doctorId });
         setScreen("prescription");
     }
 
@@ -83,7 +101,10 @@ const DoctorTreatment = () => {
             return;
         }
 
-        const healthProfileId = selectedAppointment.healthProfile_id._id;
+        // Handle both string ID and populated object
+        const healthProfileId = typeof selectedAppointment.healthProfile_id === 'object'
+            ? selectedAppointment.healthProfile_id._id
+            : selectedAppointment.healthProfile_id;
         const appointmentId = selectedAppointment._id;
         const date = moment() as Moment;
 
@@ -150,17 +171,25 @@ const DoctorTreatment = () => {
                     currentPrescriptionData={currentPrescriptionData}
                 />
             )}
-            {screen === "createLabOrder" && selectedAppointment && doctorId && (
+            {screen === "createLabOrder" && selectedAppointment && (
                 <CreateLabOrder
-                    healthProfileId={selectedAppointment.healthProfile_id._id}
+                    healthProfileId={
+                        typeof selectedAppointment.healthProfile_id === 'object'
+                            ? selectedAppointment.healthProfile_id._id
+                            : selectedAppointment.healthProfile_id
+                    }
                     onCreated={handleLabOrderCreated}
                     onBack={goBackToPreCheck}
                 />
             )}
 
-            {screen === "prescription" && selectedAppointment && doctorId && (
+            {screen === "prescription" && selectedAppointment && (
                 <CreatePrescription
-                    healthProfileId={selectedAppointment.healthProfile_id._id}
+                    healthProfileId={
+                        typeof selectedAppointment.healthProfile_id === 'object'
+                            ? selectedAppointment.healthProfile_id._id
+                            : selectedAppointment.healthProfile_id
+                    }
                     onCreated={handlePrescriptionCreated}
                     onBack={goBackToPreCheck}
                 />

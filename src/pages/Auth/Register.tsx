@@ -1,44 +1,39 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/AuthService";
-import { Eye, EyeOff } from "lucide-react";
+import { 
+  Form, 
+  Input, 
+  Button, 
+  DatePicker, 
+  Select, 
+  Alert, 
+  Typography, 
+  ConfigProvider 
+} from "antd";
 import backgroundImage from "../../assets/login_photo.jpg";
+
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    fullName: "",
-    phone: "",
-    dob: "",
-    gender: "",
-    address: "",
-  });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Logic handle khi form submit thành công (đã qua validate của antd)
+  const onFinish = async (values: any) => {
     setErrorMsg("");
-
-    if (formData.password !== formData.confirmPassword) {
-      setErrorMsg("Mật khẩu nhập lại không khớp!");
-      return;
-    }
+    
+    // Format lại dữ liệu để khớp với API của bạn (nếu cần)
+    const payload = {
+      ...values,
+      dob: values.dob ? values.dob.format("YYYY-MM-DD") : "",
+    };
 
     try {
       setLoading(true);
-      const response = await registerUser(formData);
+      const response = await registerUser(payload);
       if (response.message === "Đăng ký thành công!") {
         navigate("/login");
       } else {
@@ -52,210 +47,164 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex justify-center items-center bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: "#4f46e5", // Màu Indigo-600 của bạn
+          borderRadius: 8,
+        },
       }}
     >
-      <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl w-full max-w-md p-8 animate-fadeIn">
-        <h2 className="text-3xl font-bold text-center mb-3 text-indigo-600 tracking-wide">
-          Đăng ký tài khoản
-        </h2>
-        <p className="text-gray-500 text-center mb-6">
-          Tạo tài khoản để truy cập vào hệ thống của chúng tôi.
-        </p>
-
-        {errorMsg && (
-          <div className="bg-red-100 text-red-600 text-center py-2 px-3 rounded-lg mb-4">
-            {errorMsg}
+      <div
+        className="min-h-screen flex justify-center items-center bg-cover bg-center bg-no-repeat p-4"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      >
+        <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl w-full max-w-md p-8">
+          <div className="text-center mb-6">
+            <Title level={2} style={{ color: "#4f46e5", margin: 0 }}>
+              Đăng ký tài khoản
+            </Title>
+            <Text type="secondary">
+              Tạo tài khoản để truy cập vào hệ thống của chúng tôi.
+            </Text>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Họ tên */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Họ và tên
-            </label>
-            <input
-              type="text"
+          {errorMsg && (
+            <Alert
+              message={errorMsg}
+              type="error"
+              showIcon
+              className="mb-4"
+              closable
+            />
+          )}
+
+          <Form
+            layout="vertical"
+            onFinish={onFinish}
+            autoComplete="off"
+            requiredMark={false}
+          >
+            {/* Họ tên */}
+            <Form.Item
+              label="Họ và tên"
               name="fullName"
-              placeholder="Phạm Minh Cường"
-              value={formData.fullName}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
-              required
-            />
-          </div>
+              rules={[{ required: true, message: "Vui lòng nhập họ tên!" }]}
+            >
+              <Input size="large" placeholder="Nhập họ tên" />
+            </Form.Item>
 
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
+            {/* Email */}
+            <Form.Item
+              label="Email"
               name="email"
-              placeholder="example@gmail.com"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
-              required
-            />
-          </div>
+              rules={[
+                { required: true, message: "Vui lòng nhập email!" },
+                { type: "email", message: "Email không đúng định dạng!" },
+              ]}
+            >
+              <Input size="large" placeholder="Nhập email" />
+            </Form.Item>
 
-          {/* Mật khẩu */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Mật khẩu
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
+            {/* Mật khẩu */}
+            <Form.Item
+              label="Mật khẩu"
               name="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none transition pr-10"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
-              tabIndex={-1}
+              rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
             >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          </div>
+              <Input.Password size="large" placeholder="••••••••" />
+            </Form.Item>
 
-          {/* Nhập lại mật khẩu */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nhập lại mật khẩu
-            </label>
-            <input
-              type={showConfirmPassword ? "text" : "password"}
+            {/* Nhập lại mật khẩu */}
+            <Form.Item
+              label="Nhập lại mật khẩu"
               name="confirmPassword"
-              placeholder="••••••••"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition pr-10 ${formData.confirmPassword &&
-                  formData.confirmPassword !== formData.password
-                  ? "border-red-400 focus:ring-red-400"
-                  : "focus:ring-indigo-400"
-                }`}
-              required
-            />
-            <button
-              type="button"
-              onClick={() =>
-                setShowConfirmPassword(!showConfirmPassword)
-              }
-              className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
-              tabIndex={-1}
+              dependencies={["password"]}
+              rules={[
+                { required: true, message: "Vui lòng xác nhận mật khẩu!" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue("password") === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error("Mật khẩu không khớp!"));
+                  },
+                }),
+              ]}
             >
-              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-            {formData.confirmPassword &&
-              formData.confirmPassword !== formData.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  Mật khẩu không khớp!
-                </p>
-              )}
-          </div>
+              <Input.Password size="large" placeholder="••••••••" />
+            </Form.Item>
 
-          {/* Số điện thoại */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Số điện thoại
-            </label>
-            <input
-              type="tel"
+            {/* Số điện thoại */}
+            <Form.Item
+              label="Số điện thoại"
               name="phone"
-              placeholder="0909xxxxxx"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
-              required
-            />
-          </div>
-
-          {/* Ngày sinh */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Ngày sinh
-            </label>
-            <input
-              type="date"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
-              required
-            />
-          </div>
-
-          {/* Giới tính */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Giới tính
-            </label>
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
-              required
+              rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
             >
-              <option value="">-- Chọn giới tính --</option>
-              <option value="male">Nam</option>
-              <option value="female">Nữ</option>
-              <option value="other">Khác</option>
-            </select>
-          </div>
+              <Input size="large" placeholder="Nhập số điện thoại" />
+            </Form.Item>
 
-          {/* Địa chỉ */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Địa chỉ
-            </label>
-            <input
-              type="text"
+            <div className="grid grid-cols-2 gap-4">
+              {/* Ngày sinh */}
+              <Form.Item
+                label="Ngày sinh"
+                name="dob"
+                rules={[{ required: true, message: "Chọn ngày sinh!" }]}
+              >
+                <DatePicker size="large" className="w-full" placeholder="Chọn ngày" />
+              </Form.Item>
+
+              {/* Giới tính */}
+              <Form.Item
+                label="Giới tính"
+                name="gender"
+                rules={[{ required: true, message: "Chọn giới tính!" }]}
+              >
+                <Select size="large" placeholder="Chọn giới tính">
+                  <Option value="male">Nam</Option>
+                  <Option value="female">Nữ</Option>
+                  <Option value="other">Khác</Option>
+                </Select>
+              </Form.Item>
+            </div>
+
+            {/* Địa chỉ */}
+            <Form.Item
+              label="Địa chỉ"
               name="address"
-              placeholder="123 Nguyễn Văn A, Quận 1, TP.HCM"
-              value={formData.address}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
-              required
-            />
+              rules={[{ required: true, message: "Vui lòng nhập địa chỉ!" }]}
+            >
+              <Input size="large" placeholder="Nhập địa chỉ" />
+            </Form.Item>
+
+            {/* Nút submit */}
+            <Form.Item className="mt-6">
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                block
+                loading={loading}
+                className="h-12 text-base font-semibold"
+              >
+                {loading ? "Đang đăng ký..." : "Đăng ký"}
+              </Button>
+            </Form.Item>
+          </Form>
+
+          <div className="text-center text-sm">
+            <Text type="secondary">Đã có tài khoản? </Text>
+            <Button 
+              type="link" 
+              className="p-0 h-auto font-medium" 
+              onClick={() => navigate("/login")}
+            >
+              Đăng nhập ngay
+            </Button>
           </div>
-
-          {/* Nút submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 rounded-lg font-semibold text-white transition duration-200 ${loading
-                ? "bg-indigo-300 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700 shadow-md"
-              }`}
-          >
-            {loading ? "Đang đăng ký..." : "Đăng ký"}
-          </button>
-        </form>
-
-        {/* Chuyển sang trang login */}
-        <div className="mt-6 text-center text-gray-600 text-sm">
-          Đã có tài khoản?{" "}
-          <button
-            onClick={() => navigate("/login")}
-            className="text-indigo-600 font-medium hover:underline transition"
-          >
-            Đăng nhập ngay
-          </button>
         </div>
       </div>
-    </div>
+    </ConfigProvider>
   );
 };
 

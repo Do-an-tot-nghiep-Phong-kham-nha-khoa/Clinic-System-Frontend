@@ -9,6 +9,7 @@ import ButtonPrimary from "../../utils/ButtonPrimary";
 import { AiFillEdit } from "react-icons/ai";
 import ModalCreateMedicine from "../../components/Admin/ModalCreateMedicine";
 import ModalEditMedicine from "../../components/Admin/ModalEditMedicine";
+import { CacheService } from "../../services/CacheService";
 
 const MedicineManagement = () => {
     const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -25,16 +26,36 @@ const MedicineManagement = () => {
     const [createOpen, setCreateOpen] = useState(false);
 
     const [editOpen, setEditOpen] = useState(false);
-    const [editingId, setEditingId] = useState<string | undefined>(undefined);
-
+    const [editingId, setEditingId] = useState<string | undefined>(undefined);    
     useEffect(() => {
         fetchMedicines();
-    }, [page, pageSize, sort, q]);
+    }, [page, pageSize, sort, q]);    // Helper function to generate cache key
+    const getCacheKey = (p: number, ps: number, s: string | undefined, query: string) => {
+        return `medicines_${p}_${ps}_${s || 'nosort'}_${query || 'noquery'}`;
+    };
 
     const fetchMedicines = async () => {
         try {
             setLoading(true);
+            
+            // Generate cache key based on current query params
+            const cacheKey = getCacheKey(page, pageSize, sort, q);
+            
+            // Try to get from cache first
+            const cached = CacheService.get<{ items: Medicine[]; meta: MedicineMeta | null }>(cacheKey);
+            if (cached) {
+                setMedicines(cached.items);
+                setMeta(cached.meta);
+                setLoading(false);
+                return cached.items;
+            }
+            
+            // If not in cache, fetch from API
             const { items, meta } = await getMedicines({ page, limit: pageSize, sort, q });
+            
+            // Store in cache
+            CacheService.set(cacheKey, { items, meta });
+            
             setMedicines(items);
             setMeta(meta);
             return items;
@@ -95,12 +116,16 @@ const MedicineManagement = () => {
             content: 'Bạn có chắc muốn xoá thuốc này? Hành động này không thể hoàn tác.',
             okText: 'Xoá',
             okType: 'danger',
-            cancelText: 'Huỷ',
+            cancelText: 'Huỷ',            
             onOk: async (): Promise<void> => {
                 try {
                     const id = String(_id);
                     await deleteMedicine(id);
                     message.success("Xoá thuốc thành công");
+                    
+                    // Clear cache after deleting
+                    CacheService.clear();
+                    
                     fetchMedicines();
                 } catch {
                     message.error("Xoá thuốc thất bại");
@@ -181,12 +206,12 @@ const MedicineManagement = () => {
                     pageSizeOptions: [5, 10, 20, 50],
                 }}
                 onChange={handleTableChange}
-            />
-
-            <ModalCreateMedicine
+            />            <ModalCreateMedicine
                 open={createOpen}
                 onClose={() => setCreateOpen(false)}
                 onCreated={() => {
+                    // Clear cache after creating new medicine
+                    CacheService.clear();
                     setPage(1);
                     fetchMedicines();
                 }}
@@ -196,7 +221,11 @@ const MedicineManagement = () => {
                 open={editOpen}
                 id={editingId}
                 onClose={() => { setEditOpen(false); setEditingId(undefined); }}
-                onUpdated={() => fetchMedicines()}
+                onUpdated={() => {
+                    // Clear cache after updating medicine
+                    CacheService.clear();
+                    fetchMedicines();
+                }}
             />
 
         </div>

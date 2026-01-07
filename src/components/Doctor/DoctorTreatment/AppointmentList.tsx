@@ -75,21 +75,29 @@ const AppointmentList = ({ onSelect, accountId, onDoctorIdChange }: Props) => {
     const columns = [
         {
             title: "Bệnh nhân",
-            dataIndex: ["healthProfile_id", "owner_detail"],
             key: "patient",
-            render: (owner: any) => {
-                const dob = owner?.dob ? dayjs().diff(dayjs(owner.dob), "year") : "N/A";
+            render: (record: any) => {
+                // Sử dụng snapshot data thay vì populated data
+                const patientData = record.patientSnapshot;
+                const name = patientData?.name || "N/A";
+                const gender = patientData?.gender || "";
+                const dob = patientData?.dob ? dayjs().diff(dayjs(patientData.dob), "year") : "N/A";
+                
                 return (
                     <div>
-                        <Text strong>{owner?.name || "N/A"}</Text>
+                        <Text strong>{name}</Text>
                         <br />
                         <Text type="secondary" style={{ fontSize: '0.85em' }}>
-                            {getGenderLabel(owner?.gender)} - {dob} tuổi
+                            {getGenderLabel(gender)} - {dob} tuổi
                         </Text>
                     </div>
                 );
             },
-            sorter: (a: any, b: any) => a.healthProfile_id.owner_detail.name.localeCompare(b.healthProfile_id.owner_detail.name),
+            sorter: (a: any, b: any) => {
+                const nameA = (a.patientSnapshot?.name || "");
+                const nameB = (b.patientSnapshot?.name || "");
+                return nameA.localeCompare(nameB);
+            },
         },
         {
             title: "Ngày & Giờ Hẹn",

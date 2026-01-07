@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getMedicines, type Medicine } from "../../../services/MedicineService";
 import { createPrescription } from "../../../services/PrescriptionService";
-import { Button, Input, Card, Space, Typography, List, Modal, InputNumber, Divider, message, Popconfirm } from "antd";
+import { Button, Input, Card, Space, Typography, List, Modal, InputNumber, Divider, message, Popconfirm, Pagination } from "antd";
 import { MedicineBoxOutlined, RollbackOutlined, SaveOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import ButtonPrimary from "../../../utils/ButtonPrimary";
@@ -39,16 +39,27 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
     const [form, setForm] = useState<DosageForm>(defaultForm);
     const [loading, setLoading] = useState(false);
     const [searchValue, setSearchValue] = useState<string>("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         loadMed();
-    }, []);
+    }, [currentPage, pageSize]);
 
+    /** Lấy danh sách thuốc từ API */
     const loadMed = async (query?: string) => {
         setLoading(true);
         try {
-            const res = await getMedicines({ page: 1, limit: 100, q: query || undefined });
+            const res = await getMedicines({ 
+                page: currentPage, 
+                limit: pageSize, 
+                q: query || undefined 
+            });
             setMedicines(res.items);
+            if (res.meta) {
+                setTotal(res.meta.total);
+            }
         } catch (error) {
             message.error("Lỗi khi tải danh sách thuốc.");
         } finally {
@@ -56,9 +67,16 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
         }
     };
 
-    // Hàm xử lý khi người dùng bấm nút tìm kiếm hoặc nhấn Enter
+    /** Xử lý khi người dùng bấm nút tìm kiếm hoặc nhấn Enter */
     const handleSearch = (value: string) => {
+        setCurrentPage(1);
         loadMed(value);
+    };
+
+    /** Xử lý khi thay đổi trang */
+    const handlePageChange = (page: number, size: number) => {
+        setCurrentPage(page);
+        setPageSize(size);
     };
 
     const selectMed = (med: Medicine) => {
@@ -184,9 +202,7 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
                             onSearch={handleSearch}
                             loading={loading}
                         />
-                    </div>
-
-                    <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
+                    </div>                    <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
                         {medicines.map(m => {
                             const isSelected = selectedMedicineIds.includes(m._id);
                             return (
@@ -207,7 +223,7 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
                                             type={isSelected ? "primary" : "default"}
                                             icon={isSelected ? <DeleteOutlined /> : <PlusOutlined />}
                                             size="small"
-                                            onClick={(e) => { e.stopPropagation(); selectMed(m); }} // Luôn mở modal để nhập liều lượng
+                                            onClick={(e) => { e.stopPropagation(); selectMed(m); }}
                                         >
                                             {isSelected ? "Chỉnh sửa" : "Chọn & Kê"}
                                         </Button>
@@ -215,6 +231,19 @@ const CreatePrescription = ({ healthProfileId, onCreated, onBack }: Props) => {
                                 </div>
                             );
                         })}
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="mt-4 flex justify-center">
+                        <Pagination
+                            current={currentPage}
+                            pageSize={pageSize}
+                            total={total}
+                            onChange={handlePageChange}
+                            showSizeChanger
+                            showTotal={(total) => `Tổng ${total} loại thuốc`}
+                            pageSizeOptions={['5', '10', '20', '50']}
+                        />
                     </div>
                 </Card>
 

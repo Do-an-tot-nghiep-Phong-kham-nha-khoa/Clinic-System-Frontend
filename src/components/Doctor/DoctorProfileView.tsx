@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar, Button, Input, message } from 'antd';
-import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, InfoCircleOutlined, EditOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
+import { Card, Spin, Skeleton, Alert, Tag, Descriptions, Empty, Avatar } from 'antd';
+import { UserOutlined, PhoneOutlined, IdcardOutlined, RocketOutlined, ExperimentOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
-import { getDoctorById, type Doctor, updateDoctorBio } from "../../services/DoctorService";
+import { getDoctorById, type Doctor} from "../../services/DoctorService";
 import { getAccountById } from '../../services/AccountService';
 import NavbarDark from '../General/NavbarDark';
 import Footer from '../General/Footer';
@@ -11,9 +11,6 @@ const DoctorProfileView: React.FC = () => {
     const [doctor, setDoctor] = useState<Doctor | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [editingBio, setEditingBio] = useState<boolean>(false);
-    const [bioValue, setBioValue] = useState<string>('');
-    const [updatingBio, setUpdatingBio] = useState<boolean>(false);
 
     // Lấy doctorId từ URL
     const { doctorId } = useParams<{ doctorId: string }>();
@@ -35,10 +32,6 @@ const DoctorProfileView: React.FC = () => {
             setDoctor(data);
             console.log(data)
             setError(null);
-            // Set bio value for editing
-            if (data) {
-                setBioValue(data.bio || '');
-            }
         } catch (err) {
             console.error("Lỗi khi tải dữ liệu bác sĩ:", err);
             setError("Không thể tải thông tin hồ sơ bác sĩ. Vui lòng thử lại.");
@@ -50,35 +43,6 @@ const DoctorProfileView: React.FC = () => {
     useEffect(() => {
         fetchDoctorData();
     }, [doctorId]);
-
-    const handleEditBio = () => {
-        setEditingBio(true);
-        setBioValue(doctor?.bio || '');
-    };
-
-    const handleCancelEditBio = () => {
-        setEditingBio(false);
-        setBioValue(doctor?.bio || '');
-    };
-
-    const handleSaveBio = async () => {
-        if (!doctor) return;
-
-        try {
-            setUpdatingBio(true);
-            const updatedDoctor = await updateDoctorBio(doctor._id, bioValue);
-            if (updatedDoctor) {
-                setDoctor({ ...doctor, bio: bioValue });
-                message.success('Cập nhật tiểu sử thành công!');
-            }
-            setEditingBio(false);
-        } catch (error) {
-            console.error('Lỗi khi cập nhật tiểu sử:', error);
-            message.error('Không thể cập nhật tiểu sử. Vui lòng thử lại.');
-        } finally {
-            setUpdatingBio(false);
-        }
-    };
 
     if (loading) {
         return (
@@ -135,7 +99,7 @@ const DoctorProfileView: React.FC = () => {
                         title={
                             <div className="flex items-center space-x-3 text-2xl font-bold text-gray-800">
                                 <ExperimentOutlined className="text-cyan-600" />
-                                <span>Hồ Sơ Bác Sĩ</span>
+                                <span>Hồ Sơ Bác Sĩ {doctor.name}</span>
                             </div>
                         }
                     >
@@ -191,18 +155,7 @@ const DoctorProfileView: React.FC = () => {
                             >
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
-                                        {editingBio ? (
-                                            <Input.TextArea
-                                                value={bioValue}
-                                                onChange={(e) => setBioValue(e.target.value)}
-                                                placeholder="Nhập tiểu sử bác sĩ..."
-                                                rows={4}
-                                                className="w-full"
-                                                disabled={updatingBio}
-                                            />
-                                        ) : (
-                                            <span className="text-gray-700">{bio}</span>
-                                        )}
+                                        <span className="text-gray-700">{bio}</span>
                                     </div>
                                 </div>
                             </Descriptions.Item>

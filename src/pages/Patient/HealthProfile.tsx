@@ -11,6 +11,7 @@ import * as FamilyMemberService from '../../services/FamilyMemberService';
 import type { HealthProfile } from '../../services/HealthProfileService';
 import { getPatientByAccountId } from "../../services/PatientService";
 import { CacheService } from '../../services/CacheService';
+import dayjs from 'dayjs';
 const { Option } = Select;
 
 // Define the Label component
@@ -181,6 +182,9 @@ const HealthProfilePage: React.FC = () => {
         form.setFieldsValue({
             familyMemberName: p.familyMemberName,
             relationship: p.relationship,
+            dob: p.familyMemberDob ? dayjs(p.familyMemberDob) : undefined,
+            gender: p.familyMemberGender,
+            familyMemberPhone: p.familyMemberPhone,
             height: p.height,
             weight: p.weight,
             bloodType: p.bloodType,
@@ -229,6 +233,7 @@ const HealthProfilePage: React.FC = () => {
                     name: values.familyMemberName,
                     relationship: values.relationship,
                     dob: values.dob?.toISOString(),
+                    gender: values.gender,
                     phone: values.familyMemberPhone
                 });
                 ownerId = fm._id || '';
@@ -257,6 +262,7 @@ const HealthProfilePage: React.FC = () => {
                         relationship: values.relationship,
                         name: values.familyMemberName,
                         dob: values.dob?.toISOString(),
+                        gender: values.gender,
                         phone: values.familyMemberPhone
                     });
                 }
@@ -305,7 +311,7 @@ const HealthProfilePage: React.FC = () => {
     const family = profiles.filter(p => p.type === "FamilyMember");
 
     return (
-        <div className="p-3 sm:p-4 md:p-6">
+        <div className="container p-3 sm:p-4 md:p-6">
             <Space direction="vertical" style={{ width: '100%' }} size={24}>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
                     <h2 className="text-xl sm:text-2xl font-bold">Hồ sơ sức khỏe</h2>
@@ -400,6 +406,14 @@ const HealthProfilePage: React.FC = () => {
 
                             <Form.Item name="dob" label="Ngày sinh">
                                 <DatePicker style={{ width: "100%" }} />
+                            </Form.Item>
+
+                            <Form.Item name="gender" label="Giới tính">
+                                <Select placeholder="Chọn giới tính">
+                                    <Option value="male">Nam</Option>
+                                    <Option value="female">Nữ</Option>
+                                    <Option value="other">Khác</Option>
+                                </Select>
                             </Form.Item>
 
                             <Form.Item name="familyMemberPhone" label="SĐT">
