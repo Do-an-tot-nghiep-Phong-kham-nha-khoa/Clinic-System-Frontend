@@ -26,9 +26,9 @@ const PatientProfile: React.FC = () => {
         const fetchPatientData = async () => {
             try {
                 setLoading(true);
-                
+
                 const cacheKey = `patient_${currentAccountId}`;
-                
+
                 // Check cache first
                 let data = CacheService.get<Patient>(cacheKey);
                 if (!data) {
@@ -151,7 +151,14 @@ const PatientProfile: React.FC = () => {
                     <h4 className="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 border-l-4 border-yellow-500 pl-2">Chi Tiết Cá Nhân</h4>
                     <Descriptions
                         bordered
-                        column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
+                        column={{
+                            xs: 2,
+                            sm: 2,
+                            md: 1,
+                            lg: 1,
+                            xl: 1,
+                            xxl: 1,
+                        }}
                         layout="horizontal"
                         className="
                         rounded-lg overflow-hidden
@@ -186,7 +193,7 @@ const PatientProfile: React.FC = () => {
                             <span className="font-semibold text-gray-700">{gender === "male" ? "Nam" : "Nữ"}</span>
                         </Descriptions.Item>
                         <Descriptions.Item
-                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><EnvironmentOutlined /> <span className="hidden xs:inline">Địa Chỉ</span><span className="inline xs:hidden">ĐC</span></span>}
+                            label={<span className="font-medium flex items-center gap-1 sm:gap-2"><EnvironmentOutlined /> <span className="hidden xs:inline">Địa Chỉ</span><span className="inline xs:hidden">Địa Chỉ</span></span>}
                             span={2}
                         >
                             <span className="break-words">{address}</span>
