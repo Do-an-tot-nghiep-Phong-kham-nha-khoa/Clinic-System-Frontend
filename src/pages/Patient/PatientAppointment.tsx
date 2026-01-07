@@ -105,14 +105,46 @@ const PatientAppointment = () => {
                 return startA.localeCompare(startB);
             });
 
+        if (daily.length === 0) return null;
+
         return (
-            <ul>
-                {daily.map((a) => (
-                    <li key={a._id}>
-                        <Badge status={statusToBadge(a.status)} text={`${a.timeSlot}`} />
-                    </li>
-                ))}
-            </ul>
+            <>
+                {/* Mobile view: just show colored dots */}
+                <div className="flex flex-wrap gap-1 sm:hidden">
+                    {daily.slice(0, 3).map((a) => (
+                        <span
+                            key={a._id}
+                            className={`w-2 h-2 rounded-full ${
+                                a.status === 'pending' ? 'bg-yellow-500' :
+                                a.status === 'waiting_assigned' ? 'bg-gray-400' :
+                                a.status === 'confirmed' ? 'bg-blue-500' :
+                                a.status === 'completed' ? 'bg-green-500' :
+                                a.status === 'cancelled' ? 'bg-red-500' :
+                                'bg-gray-400'
+                            }`}
+                        />
+                    ))}
+                    {daily.length > 3 && (
+                        <span className="text-[8px] text-gray-500">+{daily.length - 3}</span>
+                    )}
+                </div>
+
+                {/* Desktop view: show time slots */}
+                <ul className="hidden sm:block list-none p-0 m-0 space-y-0.5">
+                    {daily.map((a) => (
+                        <li key={a._id} className="truncate">
+                            <Badge 
+                                status={statusToBadge(a.status)} 
+                                text={
+                                    <span className="text-[11px] whitespace-nowrap overflow-hidden text-ellipsis">
+                                        {a.timeSlot}
+                                    </span>
+                                } 
+                            />
+                        </li>
+                    ))}
+                </ul>
+            </>
         );
     };
 
@@ -157,18 +189,20 @@ const PatientAppointment = () => {
 
     return (
         <div className="container mx-auto">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-3xl font-bold">Lịch hẹn của tôi</h1>
+            <div className="flex flex-col gap-4 mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold">Lịch hẹn của tôi</h1>
                 
                 {/* Month/Year Navigation */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3">
                     <Button
                         type="default"
                         icon={<MdChevronLeft />}
                         onClick={handlePreviousMonth}
                         disabled={loading}
+                        size="small"
+                        className="sm:!text-base"
                     />
-                    <div className="font-semibold text-lg min-w-[150px] text-center">
+                    <div className="font-semibold text-base sm:text-lg min-w-[120px] sm:min-w-[150px] text-center">
                         Tháng {currentMonth}/{currentYear}
                     </div>
                     <Button
@@ -176,11 +210,15 @@ const PatientAppointment = () => {
                         icon={<MdChevronRight />}
                         onClick={handleNextMonth}
                         disabled={loading}
+                        size="small"
+                        className="sm:!text-base"
                     />
                     <Button
                         type="primary"
                         onClick={handleToday}
                         disabled={loading}
+                        size="small"
+                        className="sm:!text-base"
                     >
                         Hôm nay
                     </Button>
@@ -189,7 +227,7 @@ const PatientAppointment = () => {
             
             <Calendar 
                 cellRender={cellRender} 
-                className="!p-2"
+                className="!p-2 sm:[&_.ant-picker-calendar-date-content]:!h-auto sm:[&_.ant-picker-calendar-date-content]:!min-h-[40px] [&_.ant-picker-cell-inner]:!text-[10px] sm:[&_.ant-picker-cell-inner]:!text-sm"
                 value={dayjs(`${currentYear}-${String(currentMonth).padStart(2, '0')}-01`)}
                 onPanelChange={(value) => {
                     setCurrentYear(value.year());

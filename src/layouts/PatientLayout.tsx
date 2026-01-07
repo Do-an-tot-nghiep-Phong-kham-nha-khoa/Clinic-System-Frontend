@@ -50,81 +50,43 @@ const PatientLayout = () => {
     () => [
       {
         key: "profile",
-        icon: (
-          <IconBox>
-            <CgProfile size={18} />
-          </IconBox>
-        ),
+        icon: <CgProfile size={20} />,
         label: collapsed ? null : "Thông tin cá nhân",
         onClick: () => navigate("/patient"),
       },
       {
         key: "health-profile",
-        icon: (
-          <IconBox>
-            <ImProfile size={18} />
-          </IconBox>
-        ),
+        icon: <ImProfile size={20} />,
         label: collapsed ? null : "Hồ sơ sức khỏe",
         onClick: () => navigate("/patient/health-profile"),
       },
       {
         key: "appointments",
-        icon: (
-          <IconBox>
-            <FaRegCalendarPlus size={16} />
-          </IconBox>
-        ),
+        icon: <FaRegCalendarPlus size={20} />,
         label: collapsed ? null : "Xem lịch hẹn",
         onClick: () => navigate("/patient/appointments"),
       },
       {
         key: "appointments-specialty",
-        icon: (
-          <IconBox>
-            <FaListCheck size={16} />
-          </IconBox>
-        ),
+        icon: <FaListCheck size={20} />,
         label: collapsed ? null : "Đặt lịch chuyên khoa",
         onClick: () => navigate("/patient/appointments-specialty"),
       },
       {
         key: "appointments-doctor",
-        icon: (
-          <IconBox>
-            <FaListCheck size={16} />
-          </IconBox>
-        ),
+        icon: <FaListCheck size={20} />,
         label: collapsed ? null : "Đặt lịch theo bác sĩ",
         onClick: () => navigate("/patient/appointments-doctor"),
       },
       {
         key: "medical-records",
-        icon: (
-          <IconBox>
-            <FaFileMedical size={16} />
-          </IconBox>
-        ),
+        icon: <FaFileMedical size={20} />,
         label: collapsed ? null : "Lịch sử khám",
         onClick: () => navigate("/patient/medical-records"),
       },
       {
-        key: "invoices",
-        icon: (
-          <IconBox>
-            <MdOutlineReceiptLong size={18} />
-          </IconBox>
-        ),
-        label: collapsed ? null : "Hóa đơn",
-        onClick: () => navigate("/patient/invoices"),
-      },
-      {
         key: "chatbot",
-        icon: (
-          <IconBox>
-            <FaRobot size={16} />
-          </IconBox>
-        ),
+        icon: <FaRobot size={20} />,
         label: collapsed ? null : "Chatbot tư vấn",
         onClick: () => navigate("/patient/chatbot"),
       },
@@ -152,9 +114,9 @@ const PatientLayout = () => {
         <div className="flex h-full flex-col">
           <div className="flex-1">
             <div className="h-[76px] flex items-center justify-center px-4 overflow-hidden">
-              {!collapsed && (
-                <Link to="/" className="filter brightness-0 invert">{collapsed ? <img src={logoOnly} alt="logo" /> : <img src={logo} alt="logo" />}</Link>
-              )}
+              <Link to="/" className="filter brightness-0 invert">
+                <img src={collapsed ? logoOnly : logo} alt="logo" />
+              </Link>
             </div>
 
             <Menu
@@ -162,7 +124,7 @@ const PatientLayout = () => {
               mode="inline"
               selectedKeys={[selectedKey]}
               items={menuItems}
-              className={`!bg-slate-800 ${collapsed
+              className={`!bg-slate-800 !text-base flex flex-col items-center justify-center gap-4 ${collapsed
                 ? "[&_.ant-menu-item]:!flex [&_.ant-menu-item]:!justify-center [&_.ant-menu-item]:!items-center [&_.ant-menu-item]:!px-0 [&_.ant-menu-item-icon]:!mr-0"
                 : ""
                 }`}
@@ -170,7 +132,7 @@ const PatientLayout = () => {
           </div>
 
           <div className="border-t border-slate-700 p-4">
-            <div className="flex items-center gap-3">
+            <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
               <Avatar
                 size={40}
                 className="!bg-blue-100 !text-blue-600 font-bold shrink-0 border border-blue-200"
@@ -179,10 +141,10 @@ const PatientLayout = () => {
               </Avatar>
               {!collapsed && (
                 <div className="flex flex-col overflow-hidden">
-                  <span className="font-semibold !text-white-700 truncate text-sm">
+                  <span className="font-semibold text-white truncate text-sm">
                     {user?.email?.split('@')[0]}
                   </span>
-                  <span className="text-[11px] !text-white-500 truncate">
+                  <span className="text-[11px] text-gray-300 truncate">
                     {user?.email}
                   </span>
                 </div>
@@ -226,7 +188,7 @@ const PatientLayout = () => {
           />
         </Header>
 
-        <Content className="bg-[#f5f5f5] overflow-y-auto p-4">
+        <Content className="p-4 bg-[#f5f5f5] flex-grow overflow-y-auto">
           <Outlet />
         </Content>
       </Layout>

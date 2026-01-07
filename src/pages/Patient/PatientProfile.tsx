@@ -151,7 +151,7 @@ const PatientProfile: React.FC = () => {
                     <h4 className="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 border-l-4 border-yellow-500 pl-2">Chi Tiết Cá Nhân</h4>
                     <Descriptions
                         bordered
-                        column={{ xs: 1, sm: 1, md: 2 }}
+                        column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
                         layout="horizontal"
                         className="
                         rounded-lg overflow-hidden

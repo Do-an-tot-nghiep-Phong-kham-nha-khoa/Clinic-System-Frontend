@@ -53,7 +53,9 @@ const AdminDashboard = () => {
     const [statusStats, setStatusStats] = useState<any[]>([]);
     const [revenueLast7Days, setRevenueLast7Days] = useState<number>(0);
     const [totalRevenue, setTotalRevenue] = useState<number>(0);
-    const [totalAppointments] = useState<number>(0);
+    const [totalAppointments, setTotalAppointments] = useState<number>(0);
+    const [topMedicines, setTopMedicines] = useState<any[]>([]);
+    const [topServices, setTopServices] = useState<any[]>([]);
 
     const [loading, setLoading] = useState(true);
 
@@ -66,6 +68,9 @@ const AdminDashboard = () => {
 
                 setLast7DaysAppointments(data.appointmentsLast7Days);
                 setStatusStats(data.appointmentStatusStats);
+                setTotalAppointments(data.totalAppointments);
+                setTopMedicines(data.topMedicines || []);
+                setTopServices(data.topServices || []);
 
                 const sum = data.revenueLast7Days.reduce(
                     (acc: number, cur: any) => acc + (cur.totalRevenue || 0),
@@ -207,6 +212,66 @@ const AdminDashboard = () => {
                             <Pie data={pieChartData} options={pieChartOptions} />
                         )}
                     </div>
+                </Card>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                <Card title="Top 10 Thuốc Bán Chạy" variant="outlined">
+                    {loading ? (
+                        <div className="flex justify-center items-center h-[200px]">
+                            <Spin size="large" tip="Đang tải dữ liệu..." />
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b">
+                                        <th className="text-left p-2">#</th>
+                                        <th className="text-left p-2">Tên thuốc</th>
+                                        <th className="text-right p-2">Số lượng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {topMedicines.map((med, idx) => (
+                                        <tr key={med._id} className="border-b">
+                                            <td className="p-2">{idx + 1}</td>
+                                            <td className="p-2">{med.name}</td>
+                                            <td className="text-right p-2">{med.totalQuantity}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </Card>
+
+                <Card title="Top 10 Dịch Vụ Phổ Biến" variant="outlined">
+                    {loading ? (
+                        <div className="flex justify-center items-center h-[200px]">
+                            <Spin size="large" tip="Đang tải dữ liệu..." />
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b">
+                                        <th className="text-left p-2">#</th>
+                                        <th className="text-left p-2">Tên dịch vụ</th>
+                                        <th className="text-right p-2">Số lượng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {topServices.map((svc, idx) => (
+                                        <tr key={svc._id} className="border-b">
+                                            <td className="p-2">{idx + 1}</td>
+                                            <td className="p-2">{svc.name}</td>
+                                            <td className="text-right p-2">{svc.totalQuantity}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </Card>
             </div>
         </div>
