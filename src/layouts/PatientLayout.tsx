@@ -114,9 +114,9 @@ const PatientLayout = () => {
         <div className="flex h-full flex-col">
           <div className="flex-1">
             <div className="h-[76px] flex items-center justify-center px-4 overflow-hidden">
-              {!collapsed && (
-                <Link to="/" className="filter brightness-0 invert">{collapsed ? <img src={logoOnly} alt="logo" /> : <img src={logo} alt="logo" />}</Link>
-              )}
+              <Link to="/" className="filter brightness-0 invert">
+                <img src={collapsed ? logoOnly : logo} alt="logo" />
+              </Link>
             </div>
 
             <Menu
@@ -132,7 +132,7 @@ const PatientLayout = () => {
           </div>
 
           <div className="border-t border-slate-700 p-4">
-            <div className="flex items-center gap-3">
+            <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
               <Avatar
                 size={40}
                 className="!bg-blue-100 !text-blue-600 font-bold shrink-0 border border-blue-200"
@@ -141,10 +141,10 @@ const PatientLayout = () => {
               </Avatar>
               {!collapsed && (
                 <div className="flex flex-col overflow-hidden">
-                  <span className="font-semibold !text-white-700 truncate text-sm">
+                  <span className="font-semibold text-white truncate text-sm">
                     {user?.email?.split('@')[0]}
                   </span>
-                  <span className="text-[11px] !text-white-500 truncate">
+                  <span className="text-[11px] text-gray-300 truncate">
                     {user?.email}
                   </span>
                 </div>
