@@ -193,7 +193,7 @@ const PatientAppointment = () => {
                 <h1 className="text-2xl sm:text-3xl font-bold">Lịch hẹn của tôi</h1>
                 
                 {/* Month/Year Navigation */}
-                <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3">
+                <div className="flex items-center justify-end gap-2 sm:gap-3">
                     <Button
                         type="default"
                         icon={<MdChevronLeft />}
@@ -227,7 +227,7 @@ const PatientAppointment = () => {
             
             <Calendar 
                 cellRender={cellRender} 
-                className="!p-2 sm:[&_.ant-picker-calendar-date-content]:!h-auto sm:[&_.ant-picker-calendar-date-content]:!min-h-[40px] [&_.ant-picker-cell-inner]:!text-[10px] sm:[&_.ant-picker-cell-inner]:!text-sm"
+                className="!p-2 sm:[&_.ant-picker-calendar-date-content]:!h-auto sm:[&_.ant-picker-calendar-date-content]:!min-h-[120px] [&_.ant-picker-cell-inner]:!text-[20px] sm:[&_.ant-picker-cell-inner]:!text-sm"
                 value={dayjs(`${currentYear}-${String(currentMonth).padStart(2, '0')}-01`)}
                 onPanelChange={(value) => {
                     setCurrentYear(value.year());
