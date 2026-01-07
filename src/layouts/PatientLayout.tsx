@@ -50,81 +50,43 @@ const PatientLayout = () => {
     () => [
       {
         key: "profile",
-        icon: (
-          <IconBox>
-            <CgProfile size={18} />
-          </IconBox>
-        ),
+        icon: <CgProfile size={20} />,
         label: collapsed ? null : "Thông tin cá nhân",
         onClick: () => navigate("/patient"),
       },
       {
         key: "health-profile",
-        icon: (
-          <IconBox>
-            <ImProfile size={18} />
-          </IconBox>
-        ),
+        icon: <ImProfile size={20} />,
         label: collapsed ? null : "Hồ sơ sức khỏe",
         onClick: () => navigate("/patient/health-profile"),
       },
       {
         key: "appointments",
-        icon: (
-          <IconBox>
-            <FaRegCalendarPlus size={16} />
-          </IconBox>
-        ),
+        icon: <FaRegCalendarPlus size={20} />,
         label: collapsed ? null : "Xem lịch hẹn",
         onClick: () => navigate("/patient/appointments"),
       },
       {
         key: "appointments-specialty",
-        icon: (
-          <IconBox>
-            <FaListCheck size={16} />
-          </IconBox>
-        ),
+        icon: <FaListCheck size={20} />,
         label: collapsed ? null : "Đặt lịch chuyên khoa",
         onClick: () => navigate("/patient/appointments-specialty"),
       },
       {
         key: "appointments-doctor",
-        icon: (
-          <IconBox>
-            <FaListCheck size={16} />
-          </IconBox>
-        ),
+        icon: <FaListCheck size={20} />,
         label: collapsed ? null : "Đặt lịch theo bác sĩ",
         onClick: () => navigate("/patient/appointments-doctor"),
       },
       {
         key: "medical-records",
-        icon: (
-          <IconBox>
-            <FaFileMedical size={16} />
-          </IconBox>
-        ),
+        icon: <FaFileMedical size={20} />,
         label: collapsed ? null : "Lịch sử khám",
         onClick: () => navigate("/patient/medical-records"),
       },
       {
-        key: "invoices",
-        icon: (
-          <IconBox>
-            <MdOutlineReceiptLong size={18} />
-          </IconBox>
-        ),
-        label: collapsed ? null : "Hóa đơn",
-        onClick: () => navigate("/patient/invoices"),
-      },
-      {
         key: "chatbot",
-        icon: (
-          <IconBox>
-            <FaRobot size={16} />
-          </IconBox>
-        ),
+        icon: <FaRobot size={20} />,
         label: collapsed ? null : "Chatbot tư vấn",
         onClick: () => navigate("/patient/chatbot"),
       },
@@ -162,7 +124,7 @@ const PatientLayout = () => {
               mode="inline"
               selectedKeys={[selectedKey]}
               items={menuItems}
-              className={`!bg-slate-800 ${collapsed
+              className={`!bg-slate-800 !text-base flex flex-col items-center justify-center gap-4 ${collapsed
                 ? "[&_.ant-menu-item]:!flex [&_.ant-menu-item]:!justify-center [&_.ant-menu-item]:!items-center [&_.ant-menu-item]:!px-0 [&_.ant-menu-item-icon]:!mr-0"
                 : ""
                 }`}
@@ -226,7 +188,7 @@ const PatientLayout = () => {
           />
         </Header>
 
-        <Content className="bg-[#f5f5f5] overflow-y-auto p-4">
+        <Content className="p-4 bg-[#f5f5f5] flex-grow overflow-y-auto">
           <Outlet />
         </Content>
       </Layout>
