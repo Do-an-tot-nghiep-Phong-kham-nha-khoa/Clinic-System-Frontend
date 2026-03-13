@@ -6,7 +6,7 @@ import {
 import { CgProfile } from "react-icons/cg";
 import { ImProfile } from "react-icons/im";
 import { FaHome } from 'react-icons/fa';
-import { Button, Layout, Menu, Avatar } from "antd";
+import { Button, Layout, Menu, Avatar, Drawer } from "antd";
 import {
     MdLogout,
 } from "react-icons/md";
@@ -19,57 +19,55 @@ import logoOnly from '../assets/logoOnly.svg';
 
 const { Header, Sider, Content } = Layout;
 
-
 const PatientLayout = () => {
     const [collapsed, setCollapsed] = useState(false);
+    const [openDrawer, setOpenDrawer] = useState(false); // Quản lý đóng mở menu trên mobile
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-
     const location = useLocation();
 
     const menuItems = [
-
         {
             key: "profile",
             icon: <CgProfile size={20} />,
             label: "Thông tin cá nhân",
-            onClick: () => navigate("/patient"),
+            onClick: () => { navigate("/patient"); setOpenDrawer(false); },
         },
         {
             key: "health-profile",
             icon: <ImProfile size={20} />,
             label: "Hồ sơ sức khỏe",
-            onClick: () => navigate("/patient/health-profile"),
+            onClick: () => { navigate("/patient/health-profile"); setOpenDrawer(false); },
         },
         {
             key: "appointments",
             icon: <FaRegCalendarPlus size={20} />,
             label: "Xem lịch hẹn",
-            onClick: () => navigate("/patient/appointments"),
+            onClick: () => { navigate("/patient/appointments"); setOpenDrawer(false); },
         },
         {
             key: "appointments-specialty",
             icon: <FaListCheck size={20} />,
             label: "Đặt lịch chuyên khoa",
-            onClick: () => navigate("/patient/appointments-specialty"),
+            onClick: () => { navigate("/patient/appointments-specialty"); setOpenDrawer(false); },
         },
         {
             key: "appointments-doctor",
             icon: <FaListCheck size={20} />,
-            label: "Đặt lịch hẹn theo bác sĩ",
-            onClick: () => navigate("/patient/appointments-doctor"),
+            label: "Đặt lịch theo bác sĩ",
+            onClick: () => { navigate("/patient/appointments-doctor"); setOpenDrawer(false); },
         },
         {
             key: "medical-records",
             icon: <FaFileMedical size={20} />,
             label: "Xem lịch sử khám",
-            onClick: () => navigate("/patient/medical-records"),
+            onClick: () => { navigate("/patient/medical-records"); setOpenDrawer(false); },
         },
         {
             key: "chatbot",
             icon: <FaRobot size={20} />,
             label: "Chatbot tư vấn",
-            onClick: () => navigate("/patient/chatbot"),
+            onClick: () => { navigate("/patient/chatbot"); setOpenDrawer(false); },
         },
     ];
 
@@ -81,93 +79,145 @@ const PatientLayout = () => {
     else if (pathname.startsWith("/patient/appointments-doctor")) selectedKey = "appointments-doctor";
     else if (pathname.startsWith("/patient/appointments-specialty")) selectedKey = "appointments-specialty";
     else if (pathname.startsWith("/patient/appointments")) selectedKey = "appointments";
-    else if (pathname === "/patient" || pathname === "/patient/") selectedKey = "profile";
 
     return (
-        <Layout className="h-screen">
+        <Layout className="h-screen overflow-hidden">
+            {/* --- DESKTOP SIDER (Ẩn trên Mobile < 768px) --- */}
             <Sider
                 trigger={null}
                 collapsible
                 collapsed={collapsed}
-                width={300}
-                className="!flex !flex-col !h-full"
+                width={280}
+                className="hidden md:flex flex-col h-full !bg-slate-800"
             >
-                <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-slate-800 text-white">
+                <div className="flex h-full flex-col justify-between text-white">
                     <div className="px-4 py-6">
-                        <div className="text-white text-xl font-bold text-center pb-4 align-middle justify-center flex items-center">
-                            <Link to="/" className="filter brightness-0 invert">{collapsed ? <img src={logoOnly} alt="logo" /> : <img src={logo} alt="logo" />}</Link>
+                        <div className="text-white text-xl font-bold text-center pb-6 flex items-center justify-center">
+                            <Link to="/" className="filter brightness-0 invert">
+                                <img src={collapsed ? logoOnly : logo} alt="logo" className="h-8 w-auto" />
+                            </Link>
                         </div>
-
-                        <div className="!flex-1 !overflow-auto">
-                            <Menu className="!bg-slate-800 !text-base flex flex-col items-center justify-center gap-4" theme="dark" mode="inline" items={menuItems} selectedKeys={[selectedKey]} />
-                        </div>
+                        <Menu
+                            className="!bg-transparent !border-none text-base"
+                            theme="dark"
+                            mode="inline"
+                            items={menuItems}
+                            selectedKeys={[selectedKey]}
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '16px',
+                                fontSize: '16px'
+                            }}
+                        />
                     </div>
 
-                    <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
-                    <div className="p-4 border-t border-gray-50">
-                        <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
-                            <Avatar 
-                                size={40} 
-                                className="!bg-blue-100 !text-blue-600 font-bold shrink-0 border border-blue-200"
-                            >
+                    <div className="p-4 border-t border-slate-700 bg-slate-900">
+                        <div className={`flex items-center gap-3 mb-4 ${collapsed ? 'justify-center' : ''}`}>
+                            <Avatar size={40} className="!bg-blue-100 !text-blue-600 font-bold shrink-0">
                                 {user?.email?.charAt(0).toUpperCase() || "A"}
                             </Avatar>
                             {!collapsed && (
                                 <div className="flex flex-col overflow-hidden">
-                                    <span className="font-semibold text-white-700 truncate text-sm">
-                                        {user?.email?.split('@')[0]}
-                                    </span>
-                                    <span className="text-[11px] text-white-500 truncate">
-                                        {user?.email}
-                                    </span>
+                                    <span className="font-semibold truncate text-sm">{user?.email?.split('@')[0]}</span>
+                                    <span className="text-[11px] text-gray-400 truncate">{user?.email}</span>
                                 </div>
                             )}
                         </div>
-
                         {!collapsed && (
                             <Button
-                                block
-                                icon={<MdLogout />}
-                                className="mt-4 flex items-center justify-center gap-2 rounded-lg border-gray-200 text-gray-600 hover:!text-red-500 hover:!border-red-200 transition-all"
-                                onClick={() => {
-                                    logout();
-                                    navigate("/");
-                                }}
+                                block danger type="primary" ghost icon={<MdLogout />}
+                                onClick={() => { logout(); navigate("/"); }}
                             >
                                 Đăng xuất
                             </Button>
                         )}
                     </div>
-                    </div>
                 </div>
             </Sider>
-            <Layout>
-                <Header
-                    className="px-4 flex items-center !bg-slate-800 text-white"
 
-                >
-                    <Button
-                        type="text"
-                        icon={
-                            collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
-                        }
-                        onClick={() => setCollapsed(!collapsed)}
-                        className="!w-[48px] !h-[48px] !text-base !text-white"
-                    />
-                    {/* Home button to return to patient home/dashboard */}
-                    <Button
-                        type="text"
-                        icon={<FaHome />}
-                        onClick={() => navigate('/')}
-                        className="!ml-2 !text-white"
-                    >
-                        {!collapsed && <span>Trang chủ</span>}
+            {/* --- MOBILE DRAWER (Chỉ hiện khi nhấn menu trên Mobile) --- */}
+            <Drawer
+                title={<img src={logo} alt="logo" className="h-8 brightness-0 invert" />}
+                placement="left"
+                onClose={() => setOpenDrawer(false)}
+                open={openDrawer}
+                width={280}
+                bodyStyle={{ padding: 0, backgroundColor: '#1e293b' }} // bg-slate-800
+                headerStyle={{ backgroundColor: '#1e293b', borderBottom: '1px solid #334155' }}
+            >
+                <Menu
+                    theme="dark"
+                    mode="inline"
+                    items={menuItems}
+                    selectedKeys={[selectedKey]}
+                    className="!bg-transparent !text-lg"
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '16px',
+                        fontSize: '16px'
+                    }}
+                />
+                <div className="absolute bottom-0 w-full p-4 border-t border-slate-700">
+                    <Button block danger icon={<MdLogout />} onClick={() => { logout(); navigate("/"); }}>
+                        Đăng xuất
                     </Button>
+                </div>
+            </Drawer>
+
+            <Layout className="flex flex-col">
+                {/* --- HEADER --- */}
+                <Header className="px-4 flex items-center justify-between !bg-slate-800 text-white sticky top-0 z-10 shadow-md">
+                    <div className="flex items-center">
+                        {/* Mobile Toggle */}
+                        <Button
+                            type="text"
+                            icon={openDrawer ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                            onClick={() => {
+                                if (window.innerWidth < 768) setOpenDrawer(true);
+                                else setCollapsed(!collapsed);
+                            }}
+                            className="!text-white !text-xl"
+                        />
+                        <Button
+                            type="text"
+                            icon={<FaHome />}
+                            onClick={() => navigate('/')}
+                            className="!ml-2 !text-white flex items-center gap-2"
+                        >
+                            <span className="hidden sm:inline">Trang chủ</span>
+                        </Button>
+                    </div>
+
+                    <div className="flex items-center gap-3 md:hidden">
+                        <span className="text-sm font-medium text-white">{user?.email?.split('@')[0]}</span>
+                        <Avatar size="small" className="!bg-blue-500">{user?.email?.charAt(0).toUpperCase()}</Avatar>
+                    </div>
                 </Header>
 
-                <Content className="p-4 bg-[#f5f5f5] flex-grow overflow-y-auto">
-                    <Outlet />
+                {/* --- CONTENT --- */}
+                <Content className="p-3 md:p-6 bg-[#f0f2f5] overflow-y-auto pb-20 md:pb-6">
+                    <div className="">
+                        <Outlet />
+                    </div>
                 </Content>
+
+                {/* --- MOBILE BOTTOM NAVIGATION (UI chuyên nghiệp cho bệnh nhân) --- */}
+                <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+                    <div className="flex flex-col items-center text-blue-600" onClick={() => navigate("/patient")}>
+                        <CgProfile size={22} />
+                        <span className="text-[10px] mt-1">Cá nhân</span>
+                    </div>
+                    <div className="flex flex-col items-center text-gray-500" onClick={() => navigate("/patient/appointments")}>
+                        <FaRegCalendarPlus size={22} />
+                        <span className="text-[10px] mt-1">Lịch hẹn</span>
+                    </div>
+                    <div className="flex flex-col items-center text-gray-500" onClick={() => navigate("/patient/chatbot")}>
+                        <FaRobot size={22} />
+                        <span className="text-[10px] mt-1">AI Tư vấn</span>
+                    </div>
+                </div>
             </Layout>
         </Layout>
     );

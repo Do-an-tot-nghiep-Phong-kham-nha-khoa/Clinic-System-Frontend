@@ -1,121 +1,103 @@
-import picAbout1 from '../../assets/pic-about-1.png'
-import picAbout2 from '../../assets/pic-about-2.png';
 import { Card, Carousel } from 'antd';
-import { FaArrowRight, } from 'react-icons/fa';
+import { FaArrowRight, FaClinicMedical, FaGlobe, } from 'react-icons/fa';
 import Link from 'antd/es/typography/Link';
 import Footer from '../../components/General/Footer';
 import NavbarDark from '../../components/General/NavbarDark';
 
 
-const AboutContent = () => {
+const AboutSection = () => {
     return (
-        <section id='about-content' className='bg-white pt-10'>
-            <div className='container mx-auto px-4'>
-                <div className='flex flex-col md:flex-row items-center'>
-                    <div className='w-full md:w-1/2 p-5 md:p-10'>
-                        <div className='image object-center text-center flex items-center 
-                            justify-center'>
-                            <img src={picAbout1} alt="ContactBg" className='h-[400px] md:h-[480px] 
-                                object-cover rounded-lg' />
-                        </div>
-                    </div>
-                    <div className="w-full md:w-1/2 p-5">
-                        <div className="text">
-                            <span className="text-gray-500 border-b-2 border-[var(--color-primary)] 
-                            uppercase">Về chúng tôi
-                            </span>
-                            <h2 className="my-4 font-bold text-3xl sm:text-4xl ">
-                                Về <span className="text-[var(--color-primary)]">
-                                    Phòng Khám ProHealth
-                                </span>
-                            </h2>
-                            <p className="text-gray-700 text-lg mb-4">
-                                Phòng Khám ProHealth là một nhà cung cấp dịch vụ chăm sóc sức khỏe hàng đầu tại Hà Nội, Việt Nam,
-                                tận tâm mang đến các dịch vụ y tế toàn diện bằng
-                                sự tận tâm và chuyên môn cao.
-                            </p>
-                            <p className="text-gray-600 text-base mb-4">
-                                Được thành lập vào năm 2010, phòng khám của chúng tôi đã phát triển thành một cái tên đáng tin cậy
-                                trong cộng đồng, cung cấp cơ sở vật chất hiện đại và đội ngũ
-                                chuyên gia có tay nghề cao. Chúng tôi chuyên sâu trong nhiều chuyên khoa
-                                bao gồm Cấp Cứu, Nhi Khoa, Sản Phụ khoa, Tim Mạch, Thần Kinh,
-                                và Tâm Thần.
-                            </p>
-                            <p className="text-gray-600 text-base mb-4">
-                                Sứ mệnh của chúng tôi là cung cấp dịch vụ chăm sóc sức khỏe toàn diện, giải quyết
-                                sự khỏe mạnh về thể chất, cảm xúc và tinh thần của bệnh nhân.
-                                Chúng tôi tin vào chăm sóc phòng ngừa, giáo dục bệnh nhân và kế hoạch
-                                điều trị cá nhân hóa để đảm bảo kết quả tốt nhất.
-                            </p>
-                            <div className='flex items-center gap-2 mt-5'>
-                                <Link className='!text-base !text-[var(--color-primary)] 
-                                hover:!text-[var(--color-secondary)]' href='/contact'>
-                                    Liên hệ với chúng tôi để biết thêm thông tin
-                                </Link>
-                                <FaArrowRight className='text-xs text-[var(--color-primary)]' />
+        <section id='about-prohealth' className='bg-gray-100 py-16 md:py-24'>
+            <div className='container mx-auto px-4 lg:px-8'>
+                <div className='grid grid-cols-1 lg:grid-cols-2 gap-0 border border-gray-100 shadow-2xl rounded-3xl overflow-hidden'>
+
+                    {/* Phần 1: Về chúng tôi */}
+                    <div className='p-8 md:p-12 lg:p-16 flex flex-col justify-center bg-white border-b lg:border-b-0 lg:border-r border-gray-100'>
+                        <div className='flex items-center gap-3 mb-6'>
+                            <div className='p-3 bg-blue-50 rounded-lg'>
+                                <FaClinicMedical className='text-[var(--color-primary)] text-2xl' />
                             </div>
+                            <span className="text-sm font-bold tracking-widest text-[var(--color-primary)] uppercase">
+                                Về chúng tôi
+                            </span>
                         </div>
+
+                        <h2 className="mb-6 font-bold text-3xl md:text-4xl leading-tight text-gray-900">
+                            Phòng Khám <span className="text-[var(--color-primary)]">ProHealth</span>
+                        </h2>
+
+                        <div className='space-y-4 text-gray-600 text-base md:text-lg leading-relaxed'>
+                            <p className="font-medium text-gray-800">
+                                Nhà cung cấp dịch vụ chăm sóc sức khỏe hàng đầu tại Hà Nội từ năm 2010.
+                            </p>
+                            <p>
+                                Chúng tôi chuyên sâu trong nhiều chuyên khoa bao gồm
+                                <span className='text-gray-900 font-semibold'> Cấp Cứu, Nhi Khoa, Tim Mạch và Thần Kinh</span>.
+                                Hệ thống trang thiết bị hiện đại đảm bảo kết quả chính xác nhất.
+                            </p>
+                            <p>
+                                Sứ mệnh của ProHealth là mang lại sự an tâm và sức khỏe toàn diện cho bệnh nhân thông qua giáo dục và điều trị cá nhân hóa.
+                            </p>
+                        </div>
+
+                        <Link
+                            href='/contact'
+                            className='group mt-10 flex items-center gap-2 text-base font-bold text-[var(--color-primary)] hover:underline'
+                        >
+                            Liên hệ tư vấn chi tiết
+                            <FaArrowRight className='group-hover:translate-x-2 transition-transform' />
+                        </Link>
                     </div>
+
+                    {/* Phần 2: Phạm vi toàn cầu */}
+                    <div className='p-8 md:p-12 lg:p-16 flex flex-col justify-center bg-slate-50/50'>
+                        <div className='flex items-center gap-3 mb-6'>
+                            <div className='p-3 bg-blue-50 rounded-lg'>
+                                <FaGlobe className='text-[var(--color-primary)] text-2xl' />
+                            </div>
+                            <span className="text-sm font-bold tracking-widest text-[var(--color-primary)] uppercase">
+                                Phạm vi Toàn cầu
+                            </span>
+                        </div>
+
+                        <h2 className="mb-6 font-bold text-3xl md:text-4xl leading-tight text-gray-900">
+                            Sự Hiện Diện <span className="text-[var(--color-primary)]">Quốc Tế</span>
+                        </h2>
+
+                        <div className='space-y-4 text-gray-600 text-base md:text-lg leading-relaxed'>
+                            <p>
+                                Hợp tác chiến lược với các bệnh viện hàng đầu tại <strong>Mỹ, Châu Âu và Châu Á</strong> để cập nhật công nghệ y tế tiên tiến nhất toàn cầu.
+                            </p>
+
+                            <div className='flex flex-wrap gap-2 py-3'>
+                                <span className='px-3 py-1 bg-white border border-blue-100 text-[var(--color-primary)] rounded-md text-sm font-medium shadow-sm italic'>
+                                    #Chứng nhận JCI
+                                </span>
+                                <span className='px-3 py-1 bg-white border border-blue-100 text-[var(--color-primary)] rounded-md text-sm font-medium shadow-sm italic'>
+                                    #Y học từ xa
+                                </span>
+                            </div>
+
+                            <p>
+                                Chúng tôi kết nối bạn với mạng lưới chuyên gia quốc tế thông qua dịch vụ Telemedicine, đảm bảo tiếp cận chuyên môn đa dạng mọi lúc.
+                            </p>
+                        </div>
+
+                        <Link
+                            href='/global-partners'
+                            className='group mt-10 flex items-center gap-2 text-base font-bold text-[var(--color-primary)] hover:underline'
+                        >
+                            Xem mạng lưới đối tác quốc tế
+                            <FaArrowRight className='group-hover:translate-x-2 transition-transform' />
+                        </Link>
+                    </div>
+
                 </div>
             </div>
         </section>
     );
 };
 
-const GlobalReach = () => {
-    return (
-        <section id='global-reach' className='bg-white py-20'>
-            <div className='container mx-auto px-4'>
-                <div className='flex flex-col md:flex-row items-center'>
-                    <div className='w-full md:w-1/2 p-5 md:p-10 order-2 md:order-1'>
-                        <div className="text">
-                            <span className="text-gray-500 border-b-2 border-[var(--color-primary)]
-                             uppercase">
-                                Phạm vi Toàn cầu
-                            </span>
-                            <h2 className="my-4 font-bold text-3xl sm:text-4xl ">
-                                Sự Hiện Diện <span className="text-[var(--color-primary)]">
-                                    Quốc Tế Của Chúng Tôi
-                                </span>
-                            </h2>
-                            <p className="text-gray-700 text-lg mb-4">
-                                Phòng Khám ProHealth mở rộng chuyên môn vượt ra ngoài biên giới,
-                                hợp tác với các tổ chức chăm sóc sức khỏe quốc tế để mang lại
-                                các phương pháp y tế đẳng cấp thế giới đến Việt Nam.
-                            </p>
-                            <p className="text-gray-600 text-base mb-4">
-                                Chúng tôi hợp tác với các bệnh viện hàng đầu ở Mỹ, Châu Âu và Châu Á
-                                để trao đổi kiến thức, áp dụng công nghệ tiên tiến và tham gia
-                                vào các sáng kiến sức khỏe toàn cầu. Các bác sĩ của chúng tôi thường xuyên tham dự
-                                các hội nghị và chương trình đào tạo quốc tế để luôn đi đầu
-                                trong những tiến bộ y học.
-                            </p>
-                            <p className="text-gray-600 text-base mb-4">
-                                Thông qua dịch vụ y học từ xa, chúng tôi kết nối bệnh nhân với các chuyên gia
-                                trên toàn thế giới, đảm bảo tiếp cận chuyên môn đa dạng. ProHealth
-                                cam kết tuân thủ các tiêu chuẩn chăm sóc toàn cầu, giữ các chứng nhận từ
-                                các tổ chức quốc tế như JCI.
-                            </p>
-                            <div className='flex items-center gap-2 mt-5'>
-                                <Link className='!text-base !text-[var(--color-primary)] 
-                                hover:!text-[var(--color-secondary)]'>
-                                    Tìm hiểu thêm về quan hệ đối tác toàn cầu của chúng tôi</Link>
-                                <FaArrowRight className='text-xs text-[var(--color-primary)]' />
-                            </div>
-                        </div>
-                    </div>
-                    <div className='w-full md:w-1/2 p-5 md:p-10 order-1 md:order-2'>
-                        <div className='image object-center text-center flex items-center 
-                            justify-center'>
-                            <img src={picAbout2} alt="Global Reach" className='h-[400px] md:h-[480px] 
-                                object-cover rounded-lg' />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
-};
 
 const MissionVision = () => {
     return (
@@ -234,8 +216,7 @@ const About = () => {
     return (
         <div>
             <NavbarDark />
-            <AboutContent />
-            <GlobalReach />
+            <AboutSection />
             <MissionVision />
             <PatientFeedback />
             <Footer />
