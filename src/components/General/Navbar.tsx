@@ -91,7 +91,7 @@ const Navbar = () => {
                                 <span className="flex items-center gap-2 text-sm font-medium">
                                     <FaUserLarge /> {user.email?.split('@')[0]}
                                 </span>
-                                <Button onClick={handleLogout} type="primary" danger ghost size="middle">
+                                <Button onClick={handleLogout} type="primary" danger size="middle">
                                     Đăng xuất
                                 </Button>
                             </div>
