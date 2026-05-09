@@ -1,5 +1,6 @@
 import axios from 'axios';
 import api from './Api';
+import type { Specialty } from './SpecialtyService';
 export type AppointmentPayload = {
     _id?: string;
 
@@ -75,6 +76,16 @@ export interface AppointmentModel {
     reason: string;
     status: string;
     createdAt: string;
+    patientSnapshot: PatientSnapshot;
+    specialty: Specialty;
+}
+
+export interface PatientSnapshot {
+    name: string;
+    dob: string;
+    phone: string;
+    gender: string;
+    ownerModel: string;
 }
 
 export interface ListAppointmentByDoctorResponse {
@@ -108,6 +119,15 @@ export interface BookerAppointmentModel {
     reason: string;
     status: string;
     createdAt: string;
+    doctorSnapshot: DoctorSnapshot;
+    specialty: Specialty;
+}
+
+export interface DoctorSnapshot {
+    name: string;
+    experience: number;
+    phone: string;
+    avatar: string;
 }
 
 export interface ListAppointmentByBookerResponse {
@@ -264,20 +284,20 @@ export async function getMonthAppointmentByBooker(
     status?: string
 ): Promise<MonthAppointmentResponse> {
     const url = `/appointments/booker/${bookerId}/month`;
-    
+
     try {
         const params: any = {};
-        
+
         // Nếu có year và month, tạo date string
         if (year && month) {
             const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
             params.date = dateStr;
         }
-        
+
         if (status) {
             params.status = status;
         }
-        
+
         const res = await api.get(url, { params });
         return res.data;
     } catch (error: any) {
@@ -295,20 +315,20 @@ export async function getMonthAppointmentByDoctor(
     status?: string
 ): Promise<MonthAppointmentByDoctorResponse> {
     const url = `/appointments/doctor/${doctorId}/month`;
-    
+
     try {
         const params: any = {};
-        
+
         // Nếu có year và month, tạo date string
         if (year && month) {
             const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
             params.date = dateStr;
         }
-        
+
         if (status) {
             params.status = status;
         }
-        
+
         const res = await api.get(url, { params });
         return res.data;
     } catch (error: any) {

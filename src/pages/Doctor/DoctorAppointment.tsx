@@ -29,7 +29,7 @@ const DoctorAppointment = () => {
 
     const loadAppointments = async () => {
         if (!user?.id) return;
-        
+
         try {
             setLoading(true);
             const res = await getMonthAppointmentByDoctor(
@@ -75,7 +75,7 @@ const DoctorAppointment = () => {
             // Parse appointmentDate as UTC - chỉ lấy date string (không có time)
             const appointmentDateStr = a.appointmentDate.split('T')[0]; // "2025-12-25"
             const calendarDateStr = date.format('YYYY-MM-DD'); // "2025-12-25"
-            
+
             // So sánh trực tiếp string để tránh mọi vấn đề timezone
             return appointmentDateStr === calendarDateStr;
         });
@@ -169,38 +169,38 @@ const DoctorAppointment = () => {
     return (
         <div className="">
             <div className="container mx-auto ">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-3xl font-bold">Lịch hẹn của tôi</h1>
-                
-                {/* Month/Year Navigation */}
-                <div className="flex items-center gap-3">
-                    <Button
-                        type="default"
-                        icon={<MdChevronLeft />}
-                        onClick={handlePreviousMonth}
-                        disabled={loading}
-                    />
-                    <div className="font-semibold text-lg min-w-[150px] text-center">
-                        Tháng {currentMonth}/{currentYear}
-                    </div>
-                    <Button
-                        type="default"
-                        icon={<MdChevronRight />}
-                        onClick={handleNextMonth}
-                        disabled={loading}
-                    />
-                    <Button
-                        type="primary"
-                        onClick={handleToday}
-                        disabled={loading}
-                    >
-                        Hôm nay
-                    </Button>
-                </div>
-            </div>
+                <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-3xl font-bold">Lịch hẹn của tôi</h1>
 
-                <Calendar 
-                    cellRender={cellRender} 
+                    {/* Month/Year Navigation */}
+                    <div className="flex items-center gap-3">
+                        <Button
+                            type="default"
+                            icon={<MdChevronLeft />}
+                            onClick={handlePreviousMonth}
+                            disabled={loading}
+                        />
+                        <div className="font-semibold text-lg min-w-[150px] text-center">
+                            Tháng {currentMonth}/{currentYear}
+                        </div>
+                        <Button
+                            type="default"
+                            icon={<MdChevronRight />}
+                            onClick={handleNextMonth}
+                            disabled={loading}
+                        />
+                        <Button
+                            type="primary"
+                            onClick={handleToday}
+                            disabled={loading}
+                        >
+                            Hôm nay
+                        </Button>
+                    </div>
+                </div>
+
+                <Calendar
+                    cellRender={cellRender}
                     className="!p-2"
                     value={dayjs().year(currentYear).month(currentMonth - 1)}
                 />
@@ -227,7 +227,10 @@ const DoctorAppointment = () => {
                                             <div className="text-sm">Lý do: {a.reason}</div>
                                             <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
                                             <div className="text-sm">
-                                                Bệnh nhân: {a.healthProfile_id.owner_detail.name}
+                                                Bệnh nhân: {a.patientSnapshot?.name ?? a.healthProfile_id?.owner_detail?.name ?? "N/A"}
+                                            </div>
+                                            <div className="text-sm">
+                                                Số điện thoại: {a.patientSnapshot?.phone ?? a.healthProfile_id?.owner_detail?.phone ?? "N/A"}
                                             </div>
                                         </div>
                                         {(a.status === "pending" || a.status === "waiting_assigned") && (

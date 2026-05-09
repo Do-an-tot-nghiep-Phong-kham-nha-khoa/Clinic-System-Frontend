@@ -16,7 +16,7 @@ const PatientAppointment = () => {
     const [appointments, setAppointments] = useState<BookerAppointmentModel[]>([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-    
+
     // State for month/year navigation
     const [currentYear, setCurrentYear] = useState(dayjs().year());
     const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1); // 1-12
@@ -28,7 +28,7 @@ const PatientAppointment = () => {
 
     const loadAppointments = async () => {
         if (!user?.id) return;
-        
+
         try {
             setLoading(true);
             const res = await getMonthAppointmentByBooker(
@@ -67,12 +67,12 @@ const PatientAppointment = () => {
         const now = dayjs();
         setCurrentYear(now.year());
         setCurrentMonth(now.month() + 1);
-    };    const getAppointmentsForDate = (date: Dayjs) => {
+    }; const getAppointmentsForDate = (date: Dayjs) => {
         return appointments.filter((a) => {
             // Parse appointmentDate as UTC - chỉ lấy date string (không có time)
-            const appointmentDateStr = a.appointmentDate.split('T')[0]; 
-            const calendarDateStr = date.format('YYYY-MM-DD'); 
-            
+            const appointmentDateStr = a.appointmentDate.split('T')[0];
+            const calendarDateStr = date.format('YYYY-MM-DD');
+
             // So sánh trực tiếp string để tránh mọi vấn đề timezone
             return appointmentDateStr === calendarDateStr;
         });
@@ -87,7 +87,7 @@ const PatientAppointment = () => {
             case "cancelled": return "error";
             default: return "default";
         }
-    };    const statusToVietnamese = (status: string) => {
+    }; const statusToVietnamese = (status: string) => {
         switch (status) {
             case "waiting_assigned": return "Chờ được phân công";
             case "pending": return "Chờ xác nhận";
@@ -96,8 +96,8 @@ const PatientAppointment = () => {
             case "completed": return "Đã hoàn thành";
             default: return status;
         }
-    };    const dateCellRender = (value: Dayjs) => {
-        
+    }; const dateCellRender = (value: Dayjs) => {
+
         const daily = getAppointmentsForDate(value)
             .sort((a, b) => {
                 const startA = a.timeSlot.split("-")[0];
@@ -153,13 +153,13 @@ const PatientAppointment = () => {
             );
         }
         return info.originNode;
-    };    if (!user?.id) return <div className="p-4">Loading user info...</div>;
+    }; if (!user?.id) return <div className="p-4">Loading user info...</div>;
 
     return (
         <div className="container mx-auto">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-3xl font-bold">Lịch hẹn của tôi</h1>
-                
+
                 {/* Month/Year Navigation */}
                 <div className="flex items-center gap-3">
                     <Button
@@ -186,16 +186,16 @@ const PatientAppointment = () => {
                     </Button>
                 </div>
             </div>
-            
-            <Calendar 
-                cellRender={cellRender} 
+
+            <Calendar
+                cellRender={cellRender}
                 className="!p-2"
                 value={dayjs(`${currentYear}-${String(currentMonth).padStart(2, '0')}-01`)}
                 onPanelChange={(value) => {
                     setCurrentYear(value.year());
                     setCurrentMonth(value.month() + 1);
                 }}
-            />            
+            />
             <Modal
                 title={`Lịch hẹn vào ngày ${selectedDate ? selectedDate.format("DD/MM/YYYY") : ""}`}
                 open={isModalVisible}
@@ -218,10 +218,10 @@ const PatientAppointment = () => {
                                             <div className="text-sm">Lý do: {a.reason}</div>
                                             <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
                                             <div className="text-sm">
-                                                Bác sĩ: {a.doctor_id?.name || "Chưa phân công"}
+                                                Bác sĩ: {a.doctorSnapshot?.name ?? a.doctor_id?.name ?? "Chưa phân công"}
                                             </div>
                                             <div className="text-sm">
-                                                Chuyên khoa: {a.specialty_id?.name || "Không rõ"}
+                                                Chuyên khoa: {a.specialty?.name || a.specialty_id?.name || "Không rõ"}
                                             </div>
                                         </div>
                                         {(a.status === "pending" || a.status === "waiting_assigned" || a.status === "confirmed") && (
