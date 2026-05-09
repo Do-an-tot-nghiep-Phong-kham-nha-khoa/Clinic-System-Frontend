@@ -218,7 +218,7 @@ const PatientAppointment = () => {
                                             <div className="text-sm">Lý do: {a.reason}</div>
                                             <div className="text-sm">Trạng thái: {statusToVietnamese(a.status)}</div>
                                             <div className="text-sm">
-                                                Bác sĩ: {a.doctorSnapshot.name || "Chưa phân công"}
+                                                Bác sĩ: {a.doctorSnapshot?.name ?? a.doctor_id?.name ?? "Chưa phân công"}
                                             </div>
                                             <div className="text-sm">
                                                 Chuyên khoa: {a.specialty.name || "Không rõ"}
